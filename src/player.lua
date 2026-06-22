@@ -68,6 +68,8 @@ function player_update()
 	if p.dash_cooldown_timer > 0 then
 		p.dash_cooldown_timer -= 1
 	end
+	-- reset invulnerability after dash
+	p.is_invulnerable = false
 
 	if not p.is_dashing and not p.is_invulnerable then
 		local offset = 1
@@ -87,6 +89,7 @@ function player_update()
 		if hit_left or hit_right or hit_top or hit_bot then
 			p.is_stunned     = true
 			p.is_invulnerable = true
+			p.hp = p.hp - 1
 		end
 	end
 end

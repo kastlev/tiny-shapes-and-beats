@@ -12,13 +12,8 @@ EK_SQUARE = "square"
 EK_LINE = "line"
 EK_WARN = "warn" -- anillo rosa oscuro de aviso
 EK_BULLET = "bullet" -- proyectil que se mueve
---  dash parameters
-DASH_EXPLOSION_RADIUS = 6
-DASH_REMAP_FROM = C_DARK_BLUE -- color 1, se remapea durante el dash diagonal
-DASH_REMAP_TO = C_BLUE -- color 12
 
 -- pico-8 default palette, named
-
 C_BLACK = 0
 C_DARK_BLUE = 1
 C_DARK_PINK = 2
@@ -35,3 +30,8 @@ C_BLUE = 12
 C_LAVENDER = 13
 C_PINK = 14
 C_PEACH = 15
+
+--  dash parameters
+DASH_EXPLOSION_RADIUS = 6
+DASH_REMAP_FROM = C_DARK_BLUE -- color 1, se remapea durante el dash diagonal
+DASH_REMAP_TO = C_BLUE -- color 12

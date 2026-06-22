@@ -53,25 +53,59 @@ function repeat_pattern(n, fn)
 end
 
 -- spawn el anillo de aviso, espera que expire, luego spawnea el circulo real
-function spawn_warned_circle(x, y, warn_frames, params)
-    warn_frames = warn_frames or 40
-    local warn = spawn_enemy(EK_WARN, x, y, {
-        max_tam        = params.max_tam or 12,
-        duration_frames = warn_frames,
-        growth_rate    = (params.max_tam or 12) / warn_frames,
+function spawn_warned_circle(x,y,warn_frames,params)
+
+    params = params or {}
+
+    local max_tam = params.max_tam or 10
+    local grow = params.grow
+    if grow == nil then grow = true end
+
+    local growth_rate = 0
+    if grow then
+        growth_rate = max_tam / warn_frames
+    end
+
+    local warn = spawn_enemy(EK_WARN,x,y,{
+        start_size = grow and 0 or max_tam,
+        end_size = max_tam,
+        grow = grow,
+        growth_rate = growth_rate,
+        duration_frames = warn_frames
     })
+
     wait_for_enemy(warn)
-    return spawn_enemy(EK_CIRCLE, x, y, params)
+
+    return spawn_enemy(EK_CIRCLE,x,y,{
+        size = max_tam,
+        duration_frames = params.duration_frames or 40
+    })
 end
 
--- spawn el anillo de aviso y luego explota en proyectiles
 function spawn_warned_burst(x, y, count, warn_frames, params)
+
+    params = params or {}
     warn_frames = warn_frames or 35
+
+    local max_tam = params.warn_size or 8
+    local grow = params.grow
+    if grow == nil then grow = true end
+
+    local growth_rate = 0
+    if grow then
+        growth_rate = max_tam / warn_frames
+    end
+
     local warn = spawn_enemy(EK_WARN, x, y, {
-        max_tam        = 8,
+        start_size = grow and 0 or max_tam,
+        end_size = max_tam,
+        grow = grow,
+        growth_rate = growth_rate,
         duration_frames = warn_frames,
-        growth_rate    = 8 / warn_frames,
+        color = params.warn_color or C_DARK_PINK
     })
+
     wait_for_enemy(warn)
+
     spawn_burst(x, y, count, params)
 end

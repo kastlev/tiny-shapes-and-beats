@@ -19,20 +19,30 @@ enemies = {}
 
 function spawn_enemy(kind, x, y, params)
     params = params or {}
+
     local e = {
         kind = kind,
+
         x = x,
         y = y,
-        tam = params.tam or 2,
-        max_tam = params.max_tam or 12,
-        growth_rate = params.growth_rate or 0.2, -- per frame
+
+        tam = params.start_size or params.size or 2,
+        max_tam = params.end_size or params.size or 12,
+
+        grow = params.grow or false,
+
+        growth_rate = params.growth_rate or 0.2,
+
         duration_frames = params.duration_frames or 30,
+
         color = params.color or C_PINK,
-        len = params.len or 20,
+
         age = 0,
         alive = true
     }
+
     add(enemies, e)
+
     return e
 end
 
@@ -45,8 +55,12 @@ function update_enemies()
         if e.vy then e.y += e.vy end
 
         -- crecimiento
-        if e.age < e.duration_frames then
-            e.tam = min(e.max_tam, e.tam + e.growth_rate)
+        if e.grow then
+            e.tam = min(
+                e.max_tam,
+                e.tam + e.growth_rate
+            )
+
         end
         -- muerte por tiempo o por salir de pantalla
         local out = e.x < -8 or e.x > 136 or e.y < -8 or e.y > 136
