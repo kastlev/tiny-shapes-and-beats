@@ -8,6 +8,7 @@ function _init()
 
 	-- init
 	player_init()
+	particle_init()
 
 	-- timers
 	hitstop_timer = 0
@@ -34,6 +35,9 @@ function game_update()
 	end
 
 	player_update()
+	for p in all(ps) do
+		update_particle(p)
+	end
 	update_enemies()
 	update_patterns()
 end
@@ -55,8 +59,17 @@ function game_draw()
 		camera(0, 0)
 	end
 
+	-- reset base
+	pal()
+
+	-- fondo: negro normal en memoria
+	bg_color = BG_COLOR_DEFAULT
+
+	-- screen palette base: negro -> negro secundario
+	pal(BG_COLOR_DEFAULT, BG_COLOR_DEFAULT + 128, 1)
+
+	-- flash daño: solo remapea colores extra
 	if p.flash_damage_timer > 0 then
-		pal(C_BLACK, C_BLACK + 128, 1)
 		pal(C_DARK_BLUE, C_DARK_BLUE + 128, 1)
 		pal(C_DARK_PINK, C_DARK_PINK + 128, 1)
 		pal(C_DARK_GREEN, C_DARK_GREEN + 128, 1)
@@ -70,41 +83,23 @@ function game_draw()
 		pal(C_GREEN, C_GREEN + 128, 1)
 		pal(C_BLUE, C_BLUE + 128, 1)
 		pal(C_LAVENDER, C_LAVENDER + 128, 1)
-		pal(C_PINK, C_RED + 128, 1)
+		pal(C_PINK, C_PINK + 128, 1)
 		pal(C_PEACH, C_PEACH + 128, 1)
-		-- pal({[0]=128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143}, 1)
-	else
-		pal()
-	end
 
-	-- flash damage background color
-	if p.flash_damage_timer > 0 then
+		-- si quieres que el fondo también cambie durante daño, cambia bg_color aquí:
 		if p.flash_damage_timer_max - p.flash_damage_timer >= 0 then
 			bg_color = C_DARK_PINK
 		end
 		if p.flash_damage_timer_max - p.flash_damage_timer >= 4 then
 			bg_color = C_LAVENDER
 		end
-	else
-		bg_color = BG_COLOR_DEFAULT
 	end
 
 	cls(bg_color)
 
-	rectfill(0,0,0,127,C_DARK_GRAY)
-	rectfill(127,0,127,127,C_DARK_GRAY)
 	draw_enemies()
 	player_draw()
-
-	-- debug: check for pink collision
-	local offset = 1
-	local px, py = flr(p.x), flr(p.y)
-	local hit_left = pget(px - offset, py + p.h / 2) == C_PINK
-	local hit_right = pget(px + p.w + offset, py + p.h / 2) == C_PINK
-	local hit_top = pget(px + p.w / 2, py - offset) == C_PINK
-	local hit_bot = pget(px + p.w / 2, py + p.h + offset) == C_PINK
-
-	if hit_left or hit_right or hit_top or hit_bot then
-		print("pink collision! l:" .. (hit_left and 1 or 0) .. " r:" .. (hit_right and 1 or 0) .. " t:" .. (hit_top and 1 or 0) .. " b:" .. (hit_bot and 1 or 0), 0, 0, C_WHITE)
+	for p in all(ps) do
+		draw_particle(p)
 	end
 end

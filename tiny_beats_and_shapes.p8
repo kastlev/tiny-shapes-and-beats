@@ -4,6 +4,7 @@ __lua__
 #include src/enums.lua
 #include src/main.lua
 #include src/player.lua
+#include src/particles.lua
 #include src/enemies.lua
 #include src/patterns.lua
 #include src/levels.lua

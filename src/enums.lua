@@ -26,7 +26,8 @@ C_PEACH = 15
 
 --  dash parameters
 DASH_EXPLOSION_RADIUS = 6
-DASH_TRAIL_COLOR = 5
+DASH_EXPLOSION_COLOR = C_BLUE
+DASH_TRAIL_COLOR = C_DARK_GRAY
 DASH_TRAIL_OFFSET = 1
 
 -- hp damage mask params
@@ -45,4 +46,5 @@ function trigger_hit_juice()
 	shake_timer = SHAKE_DURATION
 	p.flash_damage_timer = p.flash_damage_timer_max
 	sfx(1)
+	spawn_damage_particles(p.x + p.w/2, p.y + p.h/2)
 end

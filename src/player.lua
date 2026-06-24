@@ -219,9 +219,9 @@ function player_draw()
 			local ey = p.dash_explosion_y - 1
 
 			if p.dash_timer > 1 then
-				circfill(ex, ey, r, C_BLUE)
+				circfill(ex, ey, r, DASH_EXPLOSION_COLOR)
 			else
-				circ(ex, ey, r, C_BLUE)
+				circ(ex, ey, r, DASH_EXPLOSION_COLOR)
 			end
 		end
 		-- dash trail: yellow echo of the sprite, offset behind the dash direction
@@ -269,10 +269,10 @@ function player_draw()
 	-- half of the 8x8 cell
 
 	local quadrants = {
-		{ rx, ry + half }, -- bottom-left
+		{ rx + half, ry }, -- top-right
 		{ rx + half, ry + half }, -- bottom-right
-		{ rx, ry }, -- top-left
-		{ rx + half, ry } -- top-right
+		{ rx, ry + half }, -- bottom-left
+		{ rx, ry } -- top-left
 	}
 
 	local damage_count = p.hp_max - p.hp
@@ -295,22 +295,5 @@ function player_draw()
 	-- draws with HP_DAMAGE_FX_SLOT, the effect reads as local to the quadrants.
 	if damage_count > 0 then
 		pal(HP_DAMAGE_FX_SLOT, HP_DAMAGE_FX_SLOT + 128, 1)
-	else
-		pal(1) -- reset ONLY the screen palette, leave draw palette untouched
 	end
-
-	-- local damage_count = p.hp_max - p.hp
-
-	-- for i = 1, damage_count do
-	-- 	local q = quadrants[i]
-	-- 	if q then
-	-- 		clip(q[1], q[2], half, half)
-	-- 		for c = 0, 15 do
-	-- 			pal(c, HP_DAMAGE_COLOR, 0)
-	-- 		end
-	-- 		spr(p.sp, rx, ry, 1, 1, p.flip_x, p.flip_y)
-	-- 		pal(0)
-	-- 		clip()
-	-- 	end
-	-- end
 end
