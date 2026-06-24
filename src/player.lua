@@ -266,6 +266,7 @@ function player_draw()
 	-- instead of assuming they're all centered the same way.
 	local rx, ry = p.x - 1, p.y - 1
 	local half = 4
+	
 	-- half of the 8x8 cell
 
 	local quadrants = {
