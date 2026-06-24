@@ -66,12 +66,13 @@ function spawn_warned_circle(x,y,warn_frames,params)
         growth_rate = max_tam / warn_frames
     end
 
-    local warn = spawn_enemy(EK_WARN,x,y,{
+      local warn = spawn_enemy(EK_WARN,x,y,{
         start_size = grow and 0 or max_tam,
         end_size = max_tam,
         grow = grow,
         growth_rate = growth_rate,
-        duration_frames = warn_frames
+        duration_frames = warn_frames,
+        color = params.warn_color or C_DARK_PINK
     })
 
     wait_for_enemy(warn)
@@ -108,4 +109,27 @@ function spawn_warned_burst(x, y, count, warn_frames, params)
     wait_for_enemy(warn)
 
     spawn_burst(x, y, count, params)
+end
+
+function spawn_warned_laser(x, y, warn_frames, params)
+    params = params or {}
+
+    local warn = spawn_enemy(EK_WARN, x, y, {
+        end_size = 8,
+        grow = true,
+        growth_rate = 8 / warn_frames,
+        duration_frames = warn_frames,
+        color = params.warn_color or C_DARK_PINK
+    })
+
+    wait_for_enemy(warn)
+
+    return spawn_enemy(EK_LINE, x, y, {
+        size = params.tam or 1,
+        len = params.len or 100,
+        ang = params.ang or 0,
+        ang_vel = params.ang_vel or 0,
+        duration_frames = params.duration_frames or 60,
+        color = params.color or C_PINK
+    })
 end

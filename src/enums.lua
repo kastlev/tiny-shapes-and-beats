@@ -1,10 +1,3 @@
--- ============================
--- enums / named constants
--- pico-8 no tiene un tipo enum real,
--- usamos tablas de constantes con nombre
--- en vez de strings/numeros magicos
--- ============================
-
 -- enemy shape kinds (keys into enemy_types)
 EK_CIRCLE = "circle"
 EK_RING = "ring"
@@ -33,5 +26,17 @@ C_PEACH = 15
 
 --  dash parameters
 DASH_EXPLOSION_RADIUS = 6
-DASH_REMAP_FROM = C_DARK_BLUE -- color 1, se remapea durante el dash diagonal
-DASH_REMAP_TO = C_BLUE -- color 12
+DASH_TRAIL_COLOR = 5
+DASH_TRAIL_OFFSET = 1
+
+-- combat / feedback params
+HITSTOP_FRAMES = 2
+SHAKE_DURATION = 8
+SHAKE_MAGNITUDE = 2
+
+function trigger_hit_juice()
+	hitstop_timer = HITSTOP_FRAMES
+	shake_timer = SHAKE_DURATION
+	p.flash_damage_timer = p.flash_damage_timer_max
+	sfx(1)
+end

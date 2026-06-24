@@ -19,7 +19,6 @@ function wave_ring(i)
   wait_frames(30)
 end
 function level_1()
-
   -- =========================
   -- INTRO: lectura del jugador
   -- =========================
@@ -82,5 +81,5 @@ function level_1()
   spawn_warned_circle(64, 64, 35, { max_tam = 16, grow = false })
 
   wait_for_clear()
-
+  spawn_warned_laser(64, 64, 30, { ang = 0.25, ang_vel = 0.01, duration_frames = 90, len = 90 })
 end

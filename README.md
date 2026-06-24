@@ -1,4 +1,4 @@
-# Just Shapes & Beats Demake - PICO-8
+# Tiny beats and shapes - PICO-8
 
 A small PICO-8 demake inspired by Just Shapes & Beats.
 
