@@ -14,7 +14,7 @@ function _init()
 	shake_timer = 0
 
 	-- level
-	bg_color = C_DARK_BLUE
+	bg_color = BG_COLOR_DEFAULT
 	start_pattern(level_1)
 end
 -- ============================
@@ -56,22 +56,22 @@ function game_draw()
 	end
 
 	if p.flash_damage_timer > 0 then
-		pal(C_BLACK, C_BLACK + 128,1)
-		pal(C_DARK_BLUE, C_DARK_BLUE + 128,1)
-		pal(C_DARK_PINK, C_DARK_PINK + 128,1)
-		pal(C_DARK_GREEN, C_DARK_GREEN + 128,1)
-		pal(C_BROWN, C_BROWN + 128,1)
-		pal(C_DARK_GRAY, C_DARK_GRAY + 128,1)
-		pal(C_LIGHT_GRAY, C_LIGHT_GRAY + 128,1)
-		pal(C_WHITE, C_WHITE + 128,1)
-		pal(C_RED, C_RED + 128,1)
-		pal(C_ORANGE, C_ORANGE + 128,1)
-		pal(C_YELLOW, C_YELLOW + 128,1)
-		pal(C_GREEN, C_GREEN + 128,1)
-		pal(C_BLUE, C_BLUE + 128,1)
-		pal(C_LAVENDER, C_LAVENDER + 128,1)
-		pal(C_PINK, C_RED + 128,1)
-		pal(C_PEACH, C_PEACH + 128,1)
+		pal(C_BLACK, C_BLACK + 128, 1)
+		pal(C_DARK_BLUE, C_DARK_BLUE + 128, 1)
+		pal(C_DARK_PINK, C_DARK_PINK + 128, 1)
+		pal(C_DARK_GREEN, C_DARK_GREEN + 128, 1)
+		pal(C_BROWN, C_BROWN + 128, 1)
+		pal(C_DARK_GRAY, C_DARK_GRAY + 128, 1)
+		pal(C_LIGHT_GRAY, C_LIGHT_GRAY + 128, 1)
+		pal(C_WHITE, C_WHITE + 128, 1)
+		pal(C_RED, C_RED + 128, 1)
+		pal(C_ORANGE, C_ORANGE + 128, 1)
+		pal(C_YELLOW, C_YELLOW + 128, 1)
+		pal(C_GREEN, C_GREEN + 128, 1)
+		pal(C_BLUE, C_BLUE + 128, 1)
+		pal(C_LAVENDER, C_LAVENDER + 128, 1)
+		pal(C_PINK, C_RED + 128, 1)
+		pal(C_PEACH, C_PEACH + 128, 1)
 		-- pal({[0]=128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143}, 1)
 	else
 		pal()
@@ -79,17 +79,20 @@ function game_draw()
 
 	-- flash damage background color
 	if p.flash_damage_timer > 0 then
-		if p.flash_damage_timer_max - p.flash_damage_timer >= 0 then 
+		if p.flash_damage_timer_max - p.flash_damage_timer >= 0 then
 			bg_color = C_DARK_PINK
 		end
 		if p.flash_damage_timer_max - p.flash_damage_timer >= 4 then
 			bg_color = C_LAVENDER
 		end
 	else
-		bg_color = C_DARK_BLUE
+		bg_color = BG_COLOR_DEFAULT
 	end
 
 	cls(bg_color)
+
+	rectfill(0,0,0,127,C_DARK_GRAY)
+	rectfill(127,0,127,127,C_DARK_GRAY)
 	draw_enemies()
 	player_draw()
 

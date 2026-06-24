@@ -29,10 +29,16 @@ DASH_EXPLOSION_RADIUS = 6
 DASH_TRAIL_COLOR = 5
 DASH_TRAIL_OFFSET = 1
 
+-- hp damage mask params
+-- HP_DAMAGE_COLOR = 5  -- shade used to "drain" the sprite as hp drops
+HP_DAMAGE_FX_SLOT = C_DARK_BLUE
+
 -- combat / feedback params
 HITSTOP_FRAMES = 2
 SHAKE_DURATION = 8
 SHAKE_MAGNITUDE = 2
+
+BG_COLOR_DEFAULT = C_BLACK
 
 function trigger_hit_juice()
 	hitstop_timer = HITSTOP_FRAMES

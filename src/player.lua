@@ -1,6 +1,7 @@
 function player_init()
 	p = {
 		hp = 4,
+		hp_max = 4,
 		-- position and movement
 		x = 63,
 		y = 63,
@@ -258,4 +259,58 @@ function player_draw()
 	if flicker then
 		pal(0)
 	end
+
+	-- hp damage mask: split the full 8x8 sprite cell into 4 quadrants,
+	-- not just the centered hitbox area — this way it covers whatever
+	-- shape each sprite variant (normal, dash, diagonal) actually draws,
+	-- instead of assuming they're all centered the same way.
+	local rx, ry = p.x - 1, p.y - 1
+	local half = 4
+	-- half of the 8x8 cell
+
+	local quadrants = {
+		{ rx, ry + half }, -- bottom-left
+		{ rx + half, ry + half }, -- bottom-right
+		{ rx, ry }, -- top-left
+		{ rx + half, ry } -- top-right
+	}
+
+	local damage_count = p.hp_max - p.hp
+
+	for i = 1, damage_count do
+		local q = quadrants[i]
+		if q then
+			clip(q[1], q[2], half, half)
+			for c = 0, 15 do
+				pal(c, HP_DAMAGE_FX_SLOT, 0) -- redirect to the reserved slot, not the final color
+			end
+			spr(p.sp, rx, ry, 1, 1, p.flip_x, p.flip_y)
+			pal(0) -- reset draw palette before the next quadrant
+			clip()
+		end
+	end
+
+	-- tint ONLY the reserved slot to its hidden/secondary variant this frame.
+	-- screen palette is technically whole-screen, but since nothing else
+	-- draws with HP_DAMAGE_FX_SLOT, the effect reads as local to the quadrants.
+	if damage_count > 0 then
+		pal(HP_DAMAGE_FX_SLOT, HP_DAMAGE_FX_SLOT + 128, 1)
+	else
+		pal(1) -- reset ONLY the screen palette, leave draw palette untouched
+	end
+
+	-- local damage_count = p.hp_max - p.hp
+
+	-- for i = 1, damage_count do
+	-- 	local q = quadrants[i]
+	-- 	if q then
+	-- 		clip(q[1], q[2], half, half)
+	-- 		for c = 0, 15 do
+	-- 			pal(c, HP_DAMAGE_COLOR, 0)
+	-- 		end
+	-- 		spr(p.sp, rx, ry, 1, 1, p.flip_x, p.flip_y)
+	-- 		pal(0)
+	-- 		clip()
+	-- 	end
+	-- end
 end
