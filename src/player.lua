@@ -47,12 +47,10 @@ function player_init()
 		--  timers
 		hit_iframes_timer = 0,
 		hit_iframes_timer_max = 40,
-		flash_damage_timer = 0,
-		flash_damage_timer_max = 8
 	}
 end
 
-function player_update()
+function update_player()
 	-- normalized input
 	local dx = (btn(➡️) and 1 or 0) - (btn(⬅️) and 1 or 0)
 	local dy = (btn(⬇️) and 1 or 0) - (btn(⬆️) and 1 or 0)
@@ -167,7 +165,7 @@ function player_update()
 				p.is_dead = true
 			end
 
-			trigger_hit_juice()
+			trigger_hit_effect()
 		end
 	end
 
@@ -177,10 +175,6 @@ function player_update()
 
 	if p.hit_iframes_timer > 0 then
 		p.hit_iframes_timer -= 1
-	end
-
-	if p.flash_damage_timer > 0 then
-		p.flash_damage_timer -= 1
 	end
 
 	if p.dash_buffer_timer > 0 then
@@ -195,7 +189,7 @@ function player_update()
 	end
 end
 
-function player_draw()
+function draw_player()
 	p.flip_x = p.dx < 0
 	p.flip_y = p.dy < 0
 

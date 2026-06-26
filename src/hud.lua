@@ -60,7 +60,7 @@ function hud_set_complete()
     hud_level_complete = true
 end
 
-function hud_update()
+function update_hud()
     if card_done() then
         if level_progress_frame < level_total_frames - 1 then level_progress_frame += 1 end
     end
@@ -120,7 +120,7 @@ function hud_update()
     end
 end
 
-function hud_draw()
+function draw_hud()
     -- bar
     line(HUD_X, HUD_Y, HUD_X + HUD_W, HUD_Y, C_DARK_GRAY)
 
