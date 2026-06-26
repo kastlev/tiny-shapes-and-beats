@@ -6,7 +6,9 @@ __lua__
 #include src/player.lua
 #include src/particles.lua
 #include src/enemies.lua
+#include src/helpers.lua
 #include src/patterns.lua
+#include src/hud.lua
 #include src/levels.lua
 
 

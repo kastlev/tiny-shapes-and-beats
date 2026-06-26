@@ -1,10 +1,12 @@
--- enemy shape kinds (keys into enemy_types)
-EK_CIRCLE = "circle"
-EK_RING = "ring"
-EK_SQUARE = "square"
-EK_LINE = "line"
-EK_WARN = "warn" -- anillo rosa oscuro de aviso
-EK_BULLET = "bullet" -- proyectil que se mueve
+-- enemy shape types (keys into enemy_types)
+E_CIRCLE  = "circle"   -- fill o outline segun param
+E_SQUARE  = "square"   -- fill o outline segun param
+E_LINE    = "line"     -- rayo desde origen, una direccion
+E_LINE_BI = "line_bi"  -- rayo en ambas direcciones desde centro
+E_CROSS   = "cross"    -- cruz (dos E_LINE_BI perpendiculares)
+E_BULLET  = "bullet"   -- pixel que se mueve
+
+DEFAULT_WARNING_TIME = 20
 
 -- pico-8 default palette, named
 C_BLACK = 0

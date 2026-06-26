@@ -1,118 +1,143 @@
--- ============================
--- enemy types
--- each type only defines how it's drawn;
--- growth/lifetime is shared logic in update_enemies()
--- ============================
 enemy_types = {
-    [EK_CIRCLE] = { draw = function(e) circfill(e.x, e.y, e.tam, e.color) end },
-    [EK_RING] = { draw = function(e) circ(e.x, e.y, e.tam, e.color) end },
-    [EK_SQUARE] = { draw = function(e) rectfill(e.x - e.tam, e.y - e.tam, e.x + e.tam, e.y + e.tam, e.color) end },
-    [EK_LINE] = {
-        draw = function(e)
-            local dx = cos(e.ang) * e.len
-            local dy = sin(e.ang) * e.len
-            local x2, y2 = e.x + dx, e.y + dy
-
-            local px, py = -sin(e.ang), cos(e.ang)
-            for t = -e.tam, e.tam do
-                line(e.x + px * t, e.y + py * t, x2 + px * t, y2 + py * t, e.color)
-            end
+  [E_CIRCLE] = {
+    draw = function(e)
+      if e.fill then
+        circfill(e.x, e.y, e.size, e.color)
+      else
+        circ(e.x, e.y, e.size, e.color)
+      end
+    end
+  },
+  [E_SQUARE] = {
+    draw = function(e)
+      local s = e.size
+      if e.fill then
+        rectfill(e.x - s, e.y - s, e.x + s, e.y + s, e.color)
+      else
+        rect(e.x - s, e.y - s, e.x + s, e.y + s, e.color)
+      end
+    end
+  },
+  [E_LINE] = {
+    draw = function(e)
+      local dx, dy = cos(e.ang) * e.len, sin(e.ang) * e.len
+      local x2, y2 = e.x + dx, e.y + dy
+      local px, py = -sin(e.ang), cos(e.ang)
+      for t = -e.size, e.size do
+        line(e.x + px * t, e.y + py * t, x2 + px * t, y2 + py * t, e.color)
+      end
+    end
+  },
+  [E_LINE_BI] = {
+    draw = function(e)
+      local dx, dy = cos(e.ang), sin(e.ang)
+      local px, py = -sin(e.ang), cos(e.ang)
+      for t = -e.size, e.size do
+        line(
+          e.x - dx * e.len + px * t, e.y - dy * e.len + py * t,
+          e.x + dx * e.len + px * t, e.y + dy * e.len + py * t, e.color
+        )
+      end
+    end
+  },
+  [E_CROSS] = {
+    draw = function(e)
+      local function arm(a)
+        local dx, dy = cos(a), sin(a)
+        local px, py = -dy, dx
+        for t = -e.size, e.size do
+          line(
+            e.x - dx * e.len + px * t, e.y - dy * e.len + py * t,
+            e.x + dx * e.len + px * t, e.y + dy * e.len + py * t, e.color
+          )
         end
-    }, [EK_WARN] = { draw = function(e) circ(e.x, e.y, e.tam, e.color) end },
-    [EK_BULLET] = { draw = function(e) pset(e.x, e.y, e.color) end }
+      end
+      arm(e.ang)
+      arm(e.ang + 0.25)
+    end
+  },
+  [E_BULLET] = {
+    draw = function(e)
+      local remaining = e.duration_frames - e.age
+      local col = remaining <= 8 and C_DARK_PINK or e.color
+      if e.size <= 1 then
+        pset(flr(e.x), flr(e.y), col)
+      else
+        circfill(flr(e.x), flr(e.y), e.size, col)
+      end
+    end
+  }
 }
 
--- ============================
--- enemy spawner
--- ============================
 enemies = {}
 
-function spawn_enemy(kind, x, y, params)
-    params = params or {}
+function spawn_enemy(enemy_type, x, y, settings)
+  settings = settings or {}
+  local configured_size = settings.size or settings.max_size
+  local e = {
+    type = enemy_type,
+    x = x, y = y,
+    vx = settings.vx,
+    vy = settings.vy,
+    delay = settings.delay or 0,
+    fill = settings.fill ~= false, -- default true
+    size = settings.start_size or configured_size or 2,
+    max_size = settings.end_size or configured_size or 12,
+    grow = settings.grow or false,
+    growth_rate = settings.growth_rate or 0.2,
+    duration_frames = settings.duration_frames or 30,
+    color = settings.color or C_PINK,
+    len = settings.len or 80,
+    ang = settings.ang or 0,
+    ang_vel = settings.ang_vel or 0,
+    age = 0,
+    alive = true
+  }
 
-    -- 'max_tam' se acepta como alias de tamaño estático cuando no hay grow
-    local size_alias = params.size or params.max_tam
-
-    local e = {
-        kind = kind,
-
-        x = x,
-        y = y,
-
-        tam = params.start_size or size_alias or 2,
-        max_tam = params.end_size or size_alias or 12,
-
-        grow = params.grow or false,
-        growth_rate = params.growth_rate or 0.2,
-        duration_frames = params.duration_frames or 30,
-        color = params.color or C_PINK,
-
-        -- linea / laser
-        len = params.len or 8,
-        ang = params.ang or 0,
-        ang_vel = params.ang_vel or 0,
-
-        age = 0,
-        alive = true
-    }
-
-    add(enemies, e)
+  if checkpoint_fast_forward_frames > 0 then
+    e.alive = false
     return e
+  end
+
+  add(enemies, e)
+  return e
 end
 
 function update_enemies()
-    for e in all(enemies) do
-        e.age += 1
+  for e in all(enemies) do
+    e.age += 1
 
-        -- movimiento (solo proyectiles)
-        if e.vx then e.x += e.vx end
-        if e.vy then e.y += e.vy end
-
-        -- rotacion (laser / barra giratoria)
-        if e.ang_vel and e.ang_vel != 0 then
-            e.ang += e.ang_vel
-        end
-
-        -- crecimiento
-        if e.grow then
-            e.tam = min(
-                e.max_tam,
-                e.tam + e.growth_rate
-            )
-        end
-        -- muerte por tiempo o por salir de pantalla
-        local out = e.x < -8 or e.x > 136 or e.y < -8 or e.y > 136
-        if e.age > e.duration_frames or out then
-            e.alive = false
-            del(enemies, e)
-        end
+    if e.delay > 0 then
+      e.delay -= 1
+    else
+      if e.vx then e.x += e.vx end
+      if e.vy then e.y += e.vy end
     end
+
+    if e.ang_vel != 0 then e.ang += e.ang_vel end
+
+    if e.grow then
+      e.size = min(e.max_size, e.size + e.growth_rate)
+    end
+
+    local out = e.x < -8 or e.x > 136 or e.y < -8 or e.y > 136
+    if e.age > e.duration_frames or out then
+      e.alive = false
+      del(enemies, e)
+    end
+  end
 end
 
 function draw_enemies()
-    for e in all(enemies) do
-        local t = enemy_types[e.kind]
-        if t then t.draw(e) end
-    end
+  for e in all(enemies) do
+    local t = enemy_types[e.type]
+    if t then t.draw(e) end
+  end
 end
 
--- spawn un burst de count proyectiles desde (x,y) en todas direcciones
--- pico-8: cos/sin reciben 0..1 en vez de radianes
-function spawn_burst(x, y, count, params)
-    params = params or {}
-    local speed = params.speed or 1.5
-    for i = 0, count - 1 do
-        local angle = i / count
-        spawn_enemy(
-            EK_BULLET, x, y, {
-                vx = cos(angle) * speed,
-                vy = sin(angle) * speed,
-                tam = 1,
-                max_tam = 1,
-                growth_rate = 0,
-                duration_frames = params.duration_frames or 70,
-                color = params.color or C_PINK
-            }
-        )
-    end
+function draw_enemies()
+  for e in all(enemies) do
+    local t = enemy_types[e.type]
+    if t then t.draw(e) end
+  end
 end

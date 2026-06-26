@@ -6,7 +6,7 @@ function particle_init()
         6,
         12,
         12,
-        13,
+        13
     }
 
     min_particles = 8
@@ -76,6 +76,6 @@ function draw_particle(p)
 end
 
 function rndb(low, high)
-	local range = high - low + 1
-	return flr(rnd(range) + low)
+    local range = high - low + 1
+    return flr(rnd(range) + low)
 end
