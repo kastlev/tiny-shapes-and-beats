@@ -1,4 +1,3 @@
--- grilla 3x3 simetrica con offsets aleatorios, cubre toda la pantalla
 function ring_expand(n, col)
     local pos = {
         { 21, 21 }, { 64, 21 }, { 107, 21 },
@@ -40,7 +39,6 @@ function burst_triangle(speed, count)
     )
 end
 
--- fix: -12 y 140 caian fuera del check out-of-bounds (-8/136) y se borraban al frame 1
 function sweep_h(dir, col)
     local sx = dir == 1 and -7 or 133
     for i = 0, 3 do

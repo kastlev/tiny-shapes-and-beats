@@ -73,19 +73,45 @@ enemies = {}
 
 function spawn_enemy(enemy_type, x, y, settings)
   settings = settings or {}
-  local configured_size = settings.size or settings.max_size
+
+  local s0 = settings.size or 2
+  local s1 = settings.size_max or s0
+
+  local grow_mode = "px"
+  if settings.grow_lerp ~= nil then
+    grow_mode = "lerp"
+  elseif settings.ease_grow ~= nil then
+    grow_mode = "curve"
+  end
+
   local e = {
     type = enemy_type,
     x = x, y = y,
+
     vx = settings.vx,
     vy = settings.vy,
-    delay = settings.delay or 0,
-    fill = settings.fill ~= false, -- default true
-    size = settings.start_size or configured_size or 2,
-    max_size = settings.end_size or configured_size or 12,
-    grow = settings.grow or false,
-    growth_rate = settings.growth_rate or 0.2,
+    delay_move = settings.delay_move or 0,
+    delay_move_total = settings.delay_move or 0,
+
+    origin_x = x,
+    origin_y = y,
+    target_x = settings.target_x,
+    target_y = settings.target_y,
+    ease_move = settings.ease_move or "linear",
+    lerp_factor = settings.lerp_factor or 0.1,
+
+    fill = settings.fill ~= false,
+    size = s0,
+    size_start = s0,
+    max_size = s1,
+    grow = s1 > s0,
+    grow_mode = grow_mode,
+    grow_px = settings.grow_px or DEFAULT_GROWTH_RATE,
+    grow_lerp = settings.grow_lerp or 0.1,
+    ease_grow = settings.ease_grow or "linear",
+
     duration_frames = settings.duration_frames or 30,
+    hold_frames = settings.hold_frames or 0,
     color = settings.color or C_PINK,
     len = settings.len or 80,
     ang = settings.ang or 0,
@@ -107,8 +133,19 @@ function update_enemies()
   for e in all(enemies) do
     e.age += 1
 
-    if e.delay > 0 then
-      e.delay -= 1
+    if e.delay_move > 0 then
+      e.delay_move -= 1
+    elseif e.target_x ~= nil or e.target_y ~= nil then
+      if e.ease_move == "lerp" then
+        if e.target_x ~= nil then e.x += (e.target_x - e.x) * e.lerp_factor end
+        if e.target_y ~= nil then e.y += (e.target_y - e.y) * e.lerp_factor end
+      else
+        local move_frames = e.duration_frames - e.delay_move_total
+        local t = min(1, (e.age - e.delay_move_total) / move_frames)
+        local et = _ease(t, e.ease_move)
+        if e.target_x ~= nil then e.x = e.origin_x + (e.target_x - e.origin_x) * et end
+        if e.target_y ~= nil then e.y = e.origin_y + (e.target_y - e.origin_y) * et end
+      end
     else
       if e.vx then e.x += e.vx end
       if e.vy then e.y += e.vy end
@@ -117,11 +154,18 @@ function update_enemies()
     if e.ang_vel != 0 then e.ang += e.ang_vel end
 
     if e.grow then
-      e.size = min(e.max_size, e.size + e.growth_rate)
+      if e.grow_mode == "lerp" then
+        e.size += (e.max_size - e.size) * e.grow_lerp
+      elseif e.grow_mode == "curve" then
+        local t = min(1, e.age / e.duration_frames)
+        e.size = e.size_start + (e.max_size - e.size_start) * _ease(t, e.ease_grow)
+      else
+        e.size = min(e.max_size, e.size + e.grow_px)
+      end
     end
 
     local out = e.x < -8 or e.x > 136 or e.y < -8 or e.y > 136
-    if e.age > e.duration_frames or out then
+    if e.age > e.duration_frames + e.hold_frames or out then
       e.alive = false
       del(enemies, e)
     end

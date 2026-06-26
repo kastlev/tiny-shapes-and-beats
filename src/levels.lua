@@ -68,8 +68,6 @@ function level_1()
   wait_for_orb()
 end
 
---- lv2
-
 function level_2()
   level_setup {
     name = "level 2", song = "flux",

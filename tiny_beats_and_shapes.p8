@@ -2,6 +2,7 @@ pico-8 cartridge // http://www.pico-8.com
 version 42
 __lua__
 #include src/enums.lua
+#include src/easing.lua
 #include src/main.lua
 #include src/player.lua
 #include src/particles.lua
@@ -10,6 +11,7 @@ __lua__
 #include src/patterns.lua
 #include src/hud.lua
 #include src/levels.lua
+
 
 
 

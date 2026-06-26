@@ -16,7 +16,7 @@ end
 
 function menu_update()
 	if btnp(5) then
-		run_level(level_1)
+		run_level(level_2)
 		_update = game_update
 		_draw = game_draw
 	end
