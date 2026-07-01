@@ -47,6 +47,7 @@ function player_init()
 		--  timers
 		hit_iframes_timer = 0,
 		hit_iframes_timer_max = 40,
+		trail_active = false
 	}
 end
 
@@ -100,7 +101,7 @@ function update_player()
 
 		--  if we have a direction, start the dash
 		if ix != 0 or iy != 0 then
-			sfx(0)
+			sfx(0) -- dash sound
 			local len = sqrt(ix * ix + iy * iy)
 
 			p.dash_dir_x = ix / len
@@ -192,6 +193,23 @@ end
 function draw_player()
 	p.flip_x = p.dx < 0
 	p.flip_y = p.dy < 0
+	local spd = sqrt(p.dx * p.dx + p.dy * p.dy)
+	if spd > 0.6 then
+		local nx = p.dx / spd
+		local ny = p.dy / spd
+		local cx = p.x + p.w / 2
+		local cy = p.y + p.h / 2
+
+		spawn_trail_particle(
+			cx - nx * 3,
+			cy - ny * 3
+		)
+		p.trail_active = true
+	end
+	if p.trail_active and p.input_x == 0 and p.input_y == 0 then
+			expire_particles("trail", 8)
+			p.trail_active = false
+	end
 
 	local is_diagonal = p.input_x != 0 and p.input_y != 0
 
@@ -260,7 +278,7 @@ function draw_player()
 	-- instead of assuming they're all centered the same way.
 	local rx, ry = p.x - 1, p.y - 1
 	local half = 4
-	
+
 	-- half of the 8x8 cell
 
 	local quadrants = {

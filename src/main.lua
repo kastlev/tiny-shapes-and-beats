@@ -10,6 +10,7 @@ TITLE_H = 32
 title_scale = 1
 
 function _init()
+	bg_color_base = BG_COLOR_DEFAULT  -- checkpoints pueden cambiar esto
 	_update = menu_update
 	_draw = menu_draw
 	hitstop_init()
@@ -17,8 +18,6 @@ function _init()
 	screen_flash_init()
 	particle_init()
 	player_init()
-
-	bg_color = BG_COLOR_DEFAULT
 end
 
 function menu_update()
@@ -91,12 +90,12 @@ function game_draw()
 	
 	cls(bg_color)
 
-	draw_enemies()
-	draw_player()
-
 	for part in all(ps) do
 		draw_particle(part)
 	end
+
+	draw_enemies()
+	draw_player()
 
 	camera_clear_offset()
 	draw_hud()

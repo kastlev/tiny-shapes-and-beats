@@ -1,7 +1,8 @@
 
 
-CAM_TRAUMA_DECAY   = 0.06 -- frames
-CAM_MAX_OFFSET     = 4 -- pixels
+CAM_TRAUMA_DECAY, CAM_MAX_OFFSET =
+0.06, -- frames
+4 -- pixels
 
 function camera_init()
   cam_trauma, cam_x, cam_y = 0, 0, 0

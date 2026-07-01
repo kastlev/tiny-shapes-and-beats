@@ -1,9 +1,6 @@
 BTN_LEFT,BTN_RIGHT,BTN_UP,BTN_DOWN,BTN_O,BTN_X=
 0,1,2,3,4,5
 
-SFX_DASH,SFX_HIT,SFX_CHECKPOINT,SFX_ORB=
-0,1,2,3
-
 E_CIRCLE,E_SQUARE,E_LINE,E_LINE_BI,E_CROSS,E_BULLET=
 "circle","square","line","line_bi","cross","bullet"
 
@@ -61,6 +58,6 @@ C_DARK_PINK -- warning color
 DEFAULT_EMITTER_SIZE,
 DEFAULT_EMITTER_DURATION,
 DEFAULT_EMITTER_HOLD=
-6, -- size
+4, -- size
 30, -- duration
 20 -- hold

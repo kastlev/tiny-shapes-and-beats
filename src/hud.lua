@@ -2,10 +2,10 @@
 HUD_X = 1
 HUD_Y = 1
 HUD_W = 125
-
+progress_bar_drawing = false
 level_total_frames = 0
 level_progress_frame = 0
-last_respawn_frame = 0 -- { frac, hit }
+last_respawn_frame = 0
 hud_level_complete = false
 
 level_runtime_frames = 0
@@ -13,20 +13,27 @@ level_final_frames = 0
 
 -- ---- checkpoint lines
 checkpoints = {}
-active_checkpoint_markers = {} -- { x, frac }
+active_checkpoint_markers = {}
 checkpoint_marker_speed = 1.5
 
 -- ---- intro card
 CARD_W = 72
 CARD_H = 14
-CARD_DISPLAY_TIME = 20
+CARD_DISPLAY_TIME = 30
+CARD_REVEAL_FRAC = 1 -- que fraccion del hold debe pasar antes de "in_game"
 CART_SPEED_IN = 0.2
-CART_SPEED_OUT = 0.09
-card_song = "no title" -- ??
+CART_SPEED_OUT = 0.07
+card_song = "no title"
 level_name = "level 1"
 level_card_state = "idle"
 card_timer = 0
-level_card_position_x = 200 -- ??
+level_card_position_x = 200
+
+-- ---- estado in_game ----
+-- true desde la mitad del hold de la carta en adelante:
+-- progress bar y enemigos ya arrancan, aunque la carta siga
+-- visible deslizandose hacia afuera
+level_started = false
 
 -- ---- goal orb ----
 ORB_R = 5
@@ -43,9 +50,15 @@ function hud_start(total_f, checkpoint_list, song, lvl)
     checkpoints = {}
     last_respawn_frame = 0
     active_checkpoint_markers = {}
+    bg_color_base = BG_COLOR_DEFAULT
+    level_started = false
 
     for _, f in pairs(checkpoint_list or {}) do
-        add(checkpoints, { frac = f, hit = false })
+        if type(f) == "table" then
+            add(checkpoints, { frac = f[1], color = f[2], hit = false })
+        else
+            add(checkpoints, { frac = f, color = nil, hit = false })
+        end
     end
 
     card_song = song or "no title"
@@ -60,17 +73,20 @@ function hud_set_complete()
     hud_level_complete = true
 end
 
+function level_is_started()
+    return level_started
+end
+
 function update_hud()
-    if card_done() then
+    if level_started then
         if level_progress_frame < level_total_frames - 1 then level_progress_frame += 1 end
     end
 
-    -- spawn lines checkpoints
     local frac = level_progress_frame / level_total_frames
     for ck in all(checkpoints) do
         if not ck.hit and frac >= ck.frac then
             ck.hit = true
-            add(active_checkpoint_markers, { x = 130, frac = ck.frac })
+            add(active_checkpoint_markers, { x = 130, frac = ck.frac, color = ck.color })
         end
     end
 
@@ -79,8 +95,10 @@ function update_hud()
 
         if c.x >= p.x - 1 and c.x <= p.x + p.w + 1 then
             last_respawn_frame = level_progress_frame
-            sfx(2) -- ??
-            -- ??
+            if c.color then
+                bg_color_base = c.color
+            end
+            sfx(2)
             del(active_checkpoint_markers, c)
         elseif c.x < -2 then
             del(active_checkpoint_markers, c)
@@ -89,7 +107,6 @@ function update_hud()
 
     _card_update()
 
-    -- orb
     if orb and not orb.collected then
         orb.pulse += 0.06
         orb.x += orb.vx
@@ -110,7 +127,7 @@ function update_hud()
         if dx * dx + dy * dy < ORB_HR * ORB_HR then
             orb.collected = true
             _spawn_wave(orb.x, orb.y)
-            sfx(3) -- ??
+            sfx(3)
         end
     end
 
@@ -121,24 +138,33 @@ function update_hud()
 end
 
 function draw_hud()
-    -- bar
-    line(HUD_X, HUD_Y, HUD_X + HUD_W, HUD_Y, C_DARK_GRAY)
+    if level_started then
+        if progress_bar_drawing != true then
+            local frac = level_progress_frame / 25
+            local fill_x = HUD_X + flr(frac * HUD_W)
+            line(HUD_X, HUD_Y, fill_x, HUD_Y, C_DARK_GRAY)
+            if fill_x == HUD_X + HUD_W then
+                progress_bar_drawing = true
+            end
+        else
+            line(HUD_X, HUD_Y, HUD_X + HUD_W, HUD_Y, C_DARK_GRAY)
+        end
+        
 
-    -- progress bar
-    local frac = min(1, level_progress_frame / level_total_frames)
-    local fill_x = HUD_X + flr(frac * HUD_W)
-    if fill_x > HUD_X then
-        line(HUD_X, HUD_Y, fill_x, HUD_Y, C_BLUE)
+        local frac = min(1, level_progress_frame / level_total_frames)
+        local fill_x = HUD_X + flr(frac * HUD_W)
+        if fill_x > HUD_X and level_started then
+            line(HUD_X, HUD_Y, fill_x, HUD_Y, C_BLUE)
+        end
+        if progress_bar_drawing then
+        for ck in all(checkpoints) do
+            local tx = HUD_X + flr(ck.frac * HUD_W)
+            local tc = ck.hit and C_WHITE or C_LIGHT_GRAY
+            line(tx, HUD_Y - 1, tx, HUD_Y + 1, tc)
+        end
+    end
     end
 
-    -- checkpoints
-    for ck in all(checkpoints) do
-        local tx = HUD_X + flr(ck.frac * HUD_W)
-        local tc = ck.hit and C_WHITE or C_LIGHT_GRAY
-        line(tx, HUD_Y - 1, tx, HUD_Y + 1, tc)
-    end
-
-    -- line checkpoint
     for c in all(active_checkpoint_markers) do
         local lx = flr(c.x)
         if lx >= 0 and lx <= 127 then
@@ -161,7 +187,6 @@ function draw_hud()
     if orb and not orb.collected then
         local r = ORB_R + sin(orb.pulse) * 1.5
         local r2 = max(1, r - 2)
-        -- todo
         circfill(flr(orb.x), flr(orb.y), flr(r2), C_YELLOW)
         circ(flr(orb.x), flr(orb.y), flr(r), C_WHITE)
         for i = 0, 3 do
@@ -206,7 +231,7 @@ function _card_update()
         return
     end
 
-    local target_x = 128 - CARD_W - 0 -- ??
+    local target_x = 128 - CARD_W - 0
 
     if level_card_state == "in" then
         level_card_position_x += (target_x - level_card_position_x) * CART_SPEED_IN
@@ -219,10 +244,15 @@ function _card_update()
                 card_timer = CARD_DISPLAY_TIME
             else
                 level_card_state = "out"
+                level_started = true -- sin hold, arranca de una
             end
         end
     elseif level_card_state == "hold" then
         card_timer -= 1
+
+        if not level_started and card_timer <= CARD_DISPLAY_TIME * (1 - CARD_REVEAL_FRAC) then
+            level_started = true
+        end
 
         if card_timer <= 0 then
             level_card_state = "out"
@@ -237,7 +267,7 @@ function _card_update()
     end
 end
 
-function _spawn_wave(cx, cy) -- ??
+function _spawn_wave(cx, cy)
     waves = {}
     for i = 1, 6 do
         add(

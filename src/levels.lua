@@ -5,7 +5,7 @@ end
 function level_1()
   level_setup {
     name = "level 1", song = "waves",
-    total_frames = 1142, checkpoints = { 0.4, 0.72 }
+    total_frames = 1142, checkpoints = { {0.4, C_DARK_PINK}, {0.72, C_LAVENDER} }
   }
   wait_for_card()
 
@@ -82,7 +82,7 @@ end
 function level_2()
   level_setup {
     name = "level 2", song = "flux",
-    total_frames = 2100, checkpoints = { 0.25, 0.52, 0.78 }
+    total_frames = 2100, checkpoints = {0.25, 0.52, 0.78 }
   }
   wait_for_card()
 

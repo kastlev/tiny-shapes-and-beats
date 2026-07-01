@@ -102,7 +102,7 @@ end
 function wait_for_card()
   if _try_skip(0) then return end
 
-  while not card_done() do
+  while not level_started do
     yield()
   end
 end

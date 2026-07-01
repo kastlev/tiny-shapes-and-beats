@@ -6,11 +6,6 @@ function screen_flash_init()
 	screen_flash_cfg = nil
 end
 
--- cfg = {
---   frames   = duracion del flash,
---   colors   = colores a redirigir (default: todos 0..15),
---   bg_steps = { {elapsed, color}, ... } ascendente (opcional)
--- }
 function trigger_screen_flash(cfg)
 	screen_flash_timer = cfg.frames
 	screen_flash_timer_max = cfg.frames

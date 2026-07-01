@@ -21,24 +21,29 @@ local _hit_cfg = {
 }
 
 local _trail_cfg = {
-    cols = { C_BLUE, C_LAVENDER, C_DARK_GRAY },
-    min_vel = 0.2,
-    max_vel = 0.8,
-    min_life = 5,
-    max_life = 10,
-    gravity = 0.0
+    cols = { C_DARK_BLUE },
+    min_vel = 0.1,
+    max_vel = 0.3,
+    min_life = 6,
+    max_life = 100,
+    min_size = 1,
+    max_size = 3,
+    square = true,
+    rate = 2,
+    shrink = true,
+    tag = "trail"
 }
 
 function trigger_hit_effect()
-	trigger_hitstop()
-	add_trauma(1)
-	trigger_screen_flash(_hit_flash_cfg)
-	sfx(1)
-	spawn_hit_particles(p.x + p.w / 2, p.y + p.h / 2)
+    trigger_hitstop()
+    add_trauma(1)
+    trigger_screen_flash(_hit_flash_cfg)
+    sfx(1)
+    spawn_hit_particles(p.x + p.w / 2, p.y + p.h / 2)
 end
 
 function draw_screen_fx()
-	bg_color = apply_screen_flash(BG_COLOR_DEFAULT, { BG_COLOR_DEFAULT })
+    bg_color = apply_screen_flash(bg_color_base, { bg_color_base})
 end
 
 function spawn_hit_particles(x, y, n)
@@ -48,6 +53,6 @@ function spawn_hit_particles(x, y, n)
     end
 end
 
-function spawn_trail_particle(x, y)
-    spawn_particle(x, y, _trail_cfg)
+function spawn_trail_particle(x, y, gx, gy)
+    spawn_particle(x, y, _trail_cfg, gx, gy)
 end
