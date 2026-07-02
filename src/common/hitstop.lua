@@ -1,6 +1,6 @@
 HITSTOP_FRAMES = 2
 
-function hitstop_init()
+function init_hitstop()
     hitstop_timer = 0
 end
 

@@ -1,4 +1,4 @@
-function particle_init()
+function init_particle()
     ps = {}
 end
 

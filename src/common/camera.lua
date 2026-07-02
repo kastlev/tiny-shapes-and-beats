@@ -1,35 +1,50 @@
+CAM_SHAKE_POWER, CAM_SHAKE_DECAY, CAM_SHAKE_JITTER = 12, 0.45, 0.2
 
-
-CAM_TRAUMA_DECAY, CAM_MAX_OFFSET =
-0.06, -- frames
-4 -- pixels
-
-function camera_init()
-  cam_trauma, cam_x, cam_y = 0, 0, 0
+function init_camera()
+  cam_x, cam_y, cam_vx, cam_vy, shk_x, shk_y, kick_x, kick_y, kick_decay = 0, 0, 0, 0, 0, 0, 0, 0, 0.08
 end
 
 function draw_camera()
-  if cam_trauma > 0 then
-    cam_trauma = max(0, cam_trauma - CAM_TRAUMA_DECAY)
-    local s = cam_trauma * cam_trauma
-    cam_y = (rnd(2) - 1) * CAM_MAX_OFFSET * s
+  if abs(shk_x) + abs(shk_y) < 0.7 then
+    shk_x, shk_y = 0, 0
   else
-    cam_x = 0
-    cam_y = 0
+    local f = -(CAM_SHAKE_DECAY + rnd(CAM_SHAKE_JITTER))
+    shk_x, shk_y = f * shk_x, f * shk_y
   end
-  camera(cam_x, cam_y)
+
+  kick_x = lerp_to(kick_x, 0, kick_decay, 0.3)
+  kick_y = lerp_to(kick_y, 0, kick_decay, 0.3)
+
+  cam_x, cam_y = cam_x + cam_vx, cam_y + cam_vy
+
+  if abs(cam_x) + abs(cam_y) > 0.5 then
+    local a, d = atan2(cam_x, cam_y), sqrt(cam_x * cam_x + cam_y * cam_y)
+    cam_vx -= cos(a) * (0.25 + max(d - 2, 0) * 0.1)
+    cam_vy -= sin(a) * (0.25 + max(d - 2, 0) * 0.1)
+    cam_vx, cam_vy = lerp_to(cam_vx, 0, 0.1, 0.4), lerp_to(cam_vy, 0, 0.1, 0.4)
+    cam_x, cam_y = lerp_to(cam_x, 0, 0.1, 0.2), lerp_to(cam_y, 0, 0.1, 0.2)
+  else
+    cam_x, cam_y = 0, 0
+  end
+
+  camera(cam_x + shk_x + kick_x, cam_y + shk_y + kick_y)
 end
 
-function camera_clear_offset()
-  camera()
-end
-
--- called in level load / respawn
 function camera_reset()
-  cam_trauma = 0
+  init_camera()
   camera()
 end
 
-function add_trauma(amount) -- 0 -> 1
-  cam_trauma = min(1, cam_trauma + (amount or 0.4))
+function add_trauma(amount)
+  local a, p = rnd(1), (amount or 0.4) * CAM_SHAKE_POWER
+  shk_x, shk_y = shk_x + p * cos(a), shk_y + p * sin(a)
+end
+
+function add_kick(power, dir_ang, decay)
+  kick_x, kick_y = kick_x + cos(dir_ang) * power, kick_y + sin(dir_ang) * power
+  kick_decay = decay or 0.08
+end
+
+function wall_bump_shake(dir_ang)
+  add_kick(7, dir_ang, 0.6)
 end

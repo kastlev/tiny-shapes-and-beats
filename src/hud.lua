@@ -105,7 +105,7 @@ function update_hud()
         end
     end
 
-    _card_update()
+    _update_card()
 
     if orb and not orb.collected then
         orb.pulse += 0.06
@@ -226,7 +226,7 @@ function orb_collected()
     return orb == nil or orb.collected
 end
 
-function _card_update()
+function _update_card()
     if level_card_state == "idle" or level_card_state == "done" then
         return
     end

@@ -1,4 +1,4 @@
-function player_init()
+function init_player()
 	p = {
 		hp = 4,
 		hp_max = 4,
@@ -34,6 +34,7 @@ function player_init()
 		dash_explosion_y = 0,
 		dash_buffer_timer = 0,
 		dash_buffer_max = 7,
+		dash_wall_hit = false,
 		last_input_x = 0,
 		last_input_y = 0,
 		last_input_timer = 0,
@@ -48,6 +49,7 @@ function player_init()
 		hit_iframes_timer = 0,
 		hit_iframes_timer_max = 40,
 		trail_active = false
+	
 	}
 end
 
@@ -115,6 +117,7 @@ function update_player()
 			p.dash_explosion_y = p.y + p.h / 2
 
 			p.dash_buffer_timer = 0
+			p.dash_wall_hit = false
 		end
 	end
 
@@ -132,8 +135,15 @@ function update_player()
 	p.y += p.dy
 
 	-- clamp player position to play area (after moving)
+	local before_x, before_y = p.x, p.y
 	p.x = mid(0, p.x, 127 - p.w)
 	p.y = mid(0, p.y, 127 - p.h)
+
+	if p.is_dashing and not p.dash_wall_hit and (p.x != before_x or p.y != before_y) then
+		p.dash_wall_hit = true
+		local bump_ang = atan2(-p.dash_dir_x, -p.dash_dir_y)
+		wall_bump_shake(bump_ang)
+	end
 
 	-- clamp speed
 	p.dx = mid(-p.max_dx, p.dx, p.max_dx)
@@ -207,8 +217,8 @@ function draw_player()
 		p.trail_active = true
 	end
 	if p.trail_active and p.input_x == 0 and p.input_y == 0 then
-			expire_particles("trail", 8)
-			p.trail_active = false
+		expire_particles("trail", 8)
+		p.trail_active = false
 	end
 
 	local is_diagonal = p.input_x != 0 and p.input_y != 0
@@ -307,6 +317,6 @@ function draw_player()
 	-- screen palette is technically whole-screen, but since nothing else
 	-- draws with HP_DAMAGE_FX_SLOT, the effect reads as local to the quadrants.
 	if damage_count > 0 then
-		pal(HP_DAMAGE_FX_SLOT, HP_DAMAGE_FX_SLOT + 128, 1)
+		-- pal(HP_DAMAGE_FX_SLOT, HP_DAMAGE_FX_SLOT + 128, 1)
 	end
 end

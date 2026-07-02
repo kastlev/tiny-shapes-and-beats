@@ -21,11 +21,11 @@ local _hit_cfg = {
 }
 
 local _trail_cfg = {
-    cols = { C_DARK_BLUE },
+    cols = {C_DARK_BLUE }, -- C_DARK_BLUE, 
     min_vel = 0.1,
     max_vel = 0.3,
     min_life = 6,
-    max_life = 100,
+    max_life = 20,
     min_size = 1,
     max_size = 3,
     square = true,
@@ -36,9 +36,18 @@ local _trail_cfg = {
 
 function trigger_hit_effect()
     trigger_hitstop()
-    add_trauma(1)
+    add_trauma(0.4)              -- equilibrado, como ahora (sin cambios en llamadas existentes)
+    -- add_trauma(0.6, 0)           -- fuerte hacia la derecha (0° = derecha en pico8)
+    -- add_trauma(0.6, 0.5)         -- fuerte hacia la izquierda (0.5 = 180°)
+    -- add_trauma(0.6, 0.25)        -- hacia abajo (0.25 = 90°, y+ es abajo en pico8)
+    -- add_trauma(0.6, 0, 0.05) 
+    -- wall_bump_shake(0.25)
     trigger_screen_flash(_hit_flash_cfg)
-    sfx(1)
+    if p.hp > 0 then
+        sfx(2)
+    else
+        sfx(1)
+    end
     spawn_hit_particles(p.x + p.w / 2, p.y + p.h / 2)
 end
 

@@ -1,6 +1,6 @@
 SCREEN_FLASH_ALL_COLORS = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }
 
-function screen_flash_init()
+function init_screen_flash()
 	screen_flash_timer = 0
 	screen_flash_timer_max = 0
 	screen_flash_cfg = nil
@@ -27,6 +27,7 @@ end
 -- base_colors: colores siempre redirigidos a +128 (flash o no),
 --              util para mantener reservado el slot del bg
 function apply_screen_flash(default_bg, base_colors)
+	if fading then return default_bg end
 	pal()
 
 	if base_colors then
