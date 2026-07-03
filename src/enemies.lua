@@ -22,43 +22,19 @@ enemy_types = {
   },
   [E_LINE] = {
     draw = function(e)
-      local col = enemy_color(e)
-      local dx, dy = cos(e.ang) * e.len, sin(e.ang) * e.len
-      local x2, y2 = e.x + dx, e.y + dy
-      local px, py = -sin(e.ang), cos(e.ang)
-      for t = -e.size, e.size do
-        line(e.x + px * t, e.y + py * t, x2 + px * t, y2 + py * t, col)
-      end
+      line_c(e.x, e.y, e.len, e.size * 2, e.ang, enemy_color(e))
     end
   },
   [E_LINE_BI] = {
     draw = function(e)
-      local col = enemy_color(e)
-      local dx, dy = cos(e.ang), sin(e.ang)
-      local px, py = -sin(e.ang), cos(e.ang)
-      for t = -e.size, e.size do
-        line(
-          e.x - dx * e.len + px * t, e.y - dy * e.len + py * t,
-          e.x + dx * e.len + px * t, e.y + dy * e.len + py * t, col
-        )
-      end
+      line_c(e.x, e.y, e.len, e.size * 2, e.ang, enemy_color(e), true)
     end
   },
   [E_CROSS] = {
     draw = function(e)
       local col = enemy_color(e)
-      local function arm(a)
-        local dx, dy = cos(a), sin(a)
-        local px, py = -dy, dx
-        for t = -e.size, e.size do
-          line(
-            e.x - dx * e.len + px * t, e.y - dy * e.len + py * t,
-            e.x + dx * e.len + px * t, e.y + dy * e.len + py * t, col
-          )
-        end
-      end
-      arm(e.ang)
-      arm(e.ang + 0.25)
+      line_c(e.x, e.y, e.len, e.size * 2, e.ang, col, true)
+      line_c(e.x, e.y, e.len, e.size * 2, e.ang + 0.25, col, true)
     end
   },
   [E_BULLET] = {
@@ -83,8 +59,8 @@ enemies = {}
 -- base color y flicker comparten el mismo punto de verdad.
 function enemy_color(e)
   if e.flicker then
-    local colors = e.flicker_colors or DEFAULT_FLICKER_COLORS
-    local rate = e.flicker_rate or DEFAULT_FLICKER_RATE
+    local colors = e.flicker_colors or { C_PINK, C_WHITE }
+    local rate = e.flicker_rate or 4
     local i = (e.age \ rate % #colors) + 1
     return colors[i]
   end
@@ -99,8 +75,8 @@ end
 -- velocidad, desde que angulo, si no se especifica nada. usado tanto
 -- por el burst inmediato de spawn() como por el burst-al-morir.
 function fire_bullet_ring(x, y, count, speed, angle_offset, bullet_settings)
-  count = count or DEFAULT_BURST_COUNT
-  speed = speed or DEFAULT_BULLET_SPEED
+  count = count or 8
+  speed = speed or 1.5
   angle_offset = angle_offset or 0
   bullet_settings = bullet_settings or {}
 
@@ -133,7 +109,7 @@ end
 function spawn_enemy(enemy_type, x, y, settings)
   settings = settings or {}
 
-  local default_size = enemy_type == E_BULLET and DEFAULT_BULLET_SIZE or DEFAULT_ENEMY_SIZE
+  local default_size = enemy_type == E_BULLET and 1 or 2
   local s0 = settings.size or default_size
   local s1 = settings.size_max or s0
 
@@ -158,7 +134,7 @@ function spawn_enemy(enemy_type, x, y, settings)
     target_x = settings.target_x,
     target_y = settings.target_y,
     ease_move = settings.ease_move, -- nil ok: _ease() ya defaultea a linear
-    lerp_factor = settings.lerp_factor or DEFAULT_MOVE_LERP,
+    lerp_factor = settings.lerp_factor or 0.1,
 
     fill = settings.fill ~= false,
     shape = settings.shape, -- nil ok: el draw trata todo lo que no sea "square" como circulo
@@ -167,14 +143,14 @@ function spawn_enemy(enemy_type, x, y, settings)
     max_size = s1,
     grow = s1 > s0,
     grow_mode = grow_mode,
-    grow_px = settings.grow_px or DEFAULT_GROWTH_RATE,
-    grow_lerp = settings.grow_lerp or DEFAULT_GROW_LERP,
+    grow_px = settings.grow_px or 0.5,
+    grow_lerp = settings.grow_lerp or 0.1,
     ease_grow = settings.ease_grow, -- nil ok: _ease() ya defaultea a linear
 
-    duration_frames = settings.duration_frames or DEFAULT_DURATION_FRAMES,
+    duration_frames = settings.duration_frames or 30,
     hold_frames = settings.hold_frames or 0,
     color = settings.color, -- nil ok: enemy_color() resuelve a C_PINK
-    len = settings.len or DEFAULT_LINE_LEN,
+    len = settings.len or 80,
     ang = settings.ang or 0,
     ang_vel = settings.ang_vel or 0,
     age = 0,
@@ -203,7 +179,6 @@ function spawn_enemy(enemy_type, x, y, settings)
   add(enemies, e)
   return e
 end
-
 
 function update_enemies()
   for e in all(enemies) do
@@ -301,14 +276,14 @@ function spawn(etype, x, y, params)
   end
 
   if do_warn then
-    local warn_size = params.size or DEFAULT_WARNING_SIZE
+    local warn_size = params.size or 10
     local we = spawn_enemy(
       etype, x, y, {
         size = warn_size,
         size_max = warn_size,
         fill = params.fill,
-        color = params.warning_color or DEFAULT_WARNING_COLOR,
-        duration_frames = params.warning_time or DEFAULT_WARNING_TIME,
+        color = params.warning_color or C_DARK_PINK,
+        duration_frames = params.warning_time or 20,
         hold_frames = params.hold_frames or 0,
         len = params.len, -- spawn_enemy ya defaultea, no repetir aqui
         ang = params.ang, -- idem
@@ -330,7 +305,7 @@ function spawn(etype, x, y, params)
     return
   end
 
-  local base = params.size or DEFAULT_SHAPE_SIZE
+  local base = params.size or 10
   local has_max = params.size_max ~= nil
 
   return spawn_enemy(
@@ -341,7 +316,7 @@ function spawn(etype, x, y, params)
       ease_grow = params.ease_grow,
       grow_lerp = params.grow_lerp,
       fill = params.fill,
-      duration_frames = params.duration_frames or DEFAULT_SHAPE_DURATION,
+      duration_frames = params.duration_frames or 40,
       hold_frames = params.hold_frames or 0,
       color = params.color,
       vx = params.vx,
@@ -350,7 +325,7 @@ function spawn(etype, x, y, params)
       target_x = params.target_x,
       target_y = params.target_y,
       ease_move = params.ease_move,
-      lerp_factor = params.lerp_factor or DEFAULT_MOVE_LERP,
+      lerp_factor = params.lerp_factor,
       len = params.len,
       ang = params.ang,
       ang_vel = params.ang_vel,
@@ -372,7 +347,6 @@ function spawn(etype, x, y, params)
   )
 end
 
-
 -- bulletspawner(x, y, target_x, target_y, params)
 -- entra desde fuera de pantalla parpadeando pink/white, desacelera
 -- hasta target_x/y, se queda quieto hold_frames, y al morir dispara
@@ -386,7 +360,7 @@ function bullet_emitter(x, y, target_x, target_y, params)
   params = params or {}
   return spawn(
     E_CIRCLE, x, y, {
-      size = params.size or DEFAULT_EMITTER_SIZE,
+      size = params.size or 4,
       color = params.color,
       shape = params.shape,
       warning = false,
@@ -394,8 +368,8 @@ function bullet_emitter(x, y, target_x, target_y, params)
       target_x = target_x,
       target_y = target_y,
       ease_move = params.ease_move or "out_quad",
-      duration_frames = params.duration_frames or DEFAULT_EMITTER_DURATION,
-      hold_frames = params.hold_frames or DEFAULT_EMITTER_HOLD,
+      duration_frames = params.duration_frames or 30,
+      hold_frames = params.hold_frames or 20,
 
       flicker = true,
       flicker_colors = params.flicker_colors,

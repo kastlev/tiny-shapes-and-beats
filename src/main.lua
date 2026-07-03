@@ -15,6 +15,7 @@ end
 
 function _update()
 	update_fade()
+	update_reveal()
 	update_delays()
 	screen_update()
 end
@@ -22,6 +23,7 @@ end
 function _draw()
 	draw_fade()
 	screen_draw()
+	draw_reveal()
 end
 
 function set_screen(u, d)

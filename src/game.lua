@@ -1,7 +1,8 @@
 function init_game()
-    current_level = level_1
-    run_level(current_level)
-    set_screen(update_game, draw_game)
+	current_level = level_1
+	respawn_pending = false
+	run_level(current_level)
+	set_screen(update_game, draw_game)
 end
 
 function update_game()
@@ -11,28 +12,39 @@ function update_game()
 	end
 
 	update_player()
-	
-	if p.is_dead then
-		_do_respawn()
-		return
-	end
-	
+
 	for part in all(ps) do
 		update_particle(part)
 	end
-	
+
 	update_screen_flash()
 	update_enemies()
 	update_active_patterns()
 	update_hud()
-	
+
 	level_runtime_frames += 1
+
+	if p.is_dead then
+		if not death_sequence_started then
+			death_sequence_started = true
+			delay(
+				45, function()
+					start_fadeout(
+						30, function()
+							_do_respawn()
+							death_sequence_started = false
+						end
+					)
+				end
+			)
+		end
+	end
 end
 
 function draw_game()
 	draw_screen_fx()
 	draw_camera()
-	
+
 	cls(bg_color)
 
 	for part in all(ps) do
@@ -47,6 +59,9 @@ function draw_game()
 end
 
 function _do_respawn()
+	bg_color_base = BG_COLOR_DEFAULT
+	camera()
+	death_sequence_started = false
 	enemies = {}
 	active_patterns = {}
 	ps = {}
@@ -55,6 +70,10 @@ function _do_respawn()
 	orb = nil
 
 	init_player()
+	init_hitstop()
+	init_camera()
+	init_screen_flash()
+	init_particle()
 	level_progress_frame = last_respawn_frame
 	hud_level_complete = false
 
@@ -80,4 +99,5 @@ function _do_respawn()
 	end
 
 	checkpoint_fast_forward_frames = 0
+	start_reveal(64, 64, 10)
 end

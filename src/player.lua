@@ -3,8 +3,8 @@ function init_player()
 		hp = 4,
 		hp_max = 4,
 		-- position and movement
-		x = 63,
-		y = 63,
+		x = 61,
+		y = 61,
 		input_x = 0,
 		input_y = 0,
 		acc = 0.9,
@@ -49,11 +49,15 @@ function init_player()
 		hit_iframes_timer = 0,
 		hit_iframes_timer_max = 40,
 		trail_active = false
-	
 	}
 end
 
 function update_player()
+	if p.is_dead then
+		update_death_bullets()
+		return
+	end
+
 	-- normalized input
 	local dx = (btn(➡️) and 1 or 0) - (btn(⬅️) and 1 or 0)
 	local dy = (btn(⬇️) and 1 or 0) - (btn(⬆️) and 1 or 0)
@@ -143,6 +147,7 @@ function update_player()
 		p.dash_wall_hit = true
 		local bump_ang = atan2(-p.dash_dir_x, -p.dash_dir_y)
 		wall_bump_shake(bump_ang)
+		sfx(5)
 	end
 
 	-- clamp speed
@@ -174,6 +179,7 @@ function update_player()
 
 			if p.hp <= 0 then
 				p.is_dead = true
+				spawn_death_bullets(p.x + p.w / 2, p.y + p.h / 2, 6)
 			end
 
 			trigger_hit_effect()
@@ -201,6 +207,12 @@ function update_player()
 end
 
 function draw_player()
+
+	if p.is_dead then
+		draw_death_bullets()
+		return
+	end
+
 	p.flip_x = p.dx < 0
 	p.flip_y = p.dy < 0
 	local spd = sqrt(p.dx * p.dx + p.dy * p.dy)
@@ -233,25 +245,24 @@ function draw_player()
 			p.sp = 0 -- sprite estirado diagonal
 		end
 
-		-- dash explosion effect
-		local r = DASH_EXPLOSION_RADIUS - p.dash_timer - 1
+		local r = 6 - p.dash_timer - 1
 
 		if r > 0 then
 			local ex = p.dash_explosion_x - 1
 			local ey = p.dash_explosion_y - 1
 
 			if p.dash_timer > 1 then
-				circfill(ex, ey, r, DASH_EXPLOSION_COLOR)
+				circfill(ex, ey, r, C_BLUE)
 			else
-				circ(ex, ey, r, DASH_EXPLOSION_COLOR)
+				circ(ex, ey, r, C_BLUE)
 			end
 		end
 		-- dash trail: yellow echo of the sprite, offset behind the dash direction
-		local trail_x = p.x - p.dash_dir_x * DASH_TRAIL_OFFSET
-		local trail_y = p.y - p.dash_dir_y * DASH_TRAIL_OFFSET
+		local trail_x = p.x - p.dash_dir_x * 1
+		local trail_y = p.y - p.dash_dir_y * 1
 
 		for i = 0, 15 do
-			pal(i, DASH_TRAIL_COLOR, 0)
+			pal(i, C_DARK_GRAY, 0)
 		end
 		spr(p.sp, trail_x - 1, trail_y - 1, 1, 1, p.flip_x, p.flip_y)
 		pal(0)
@@ -282,14 +293,8 @@ function draw_player()
 		pal(0)
 	end
 
-	-- hp damage mask: split the full 8x8 sprite cell into 4 quadrants,
-	-- not just the centered hitbox area — this way it covers whatever
-	-- shape each sprite variant (normal, dash, diagonal) actually draws,
-	-- instead of assuming they're all centered the same way.
 	local rx, ry = p.x - 1, p.y - 1
 	local half = 4
-
-	-- half of the 8x8 cell
 
 	local quadrants = {
 		{ rx + half, ry }, -- top-right
@@ -305,18 +310,12 @@ function draw_player()
 		if q then
 			clip(q[1], q[2], half, half)
 			for c = 0, 15 do
-				pal(c, HP_DAMAGE_FX_SLOT, 0) -- redirect to the reserved slot, not the final color
+				pal(c, C_DARK_BLUE, 0)
 			end
 			spr(p.sp, rx, ry, 1, 1, p.flip_x, p.flip_y)
-			pal(0) -- reset draw palette before the next quadrant
+			pal(0)
 			clip()
 		end
 	end
-
-	-- tint ONLY the reserved slot to its hidden/secondary variant this frame.
-	-- screen palette is technically whole-screen, but since nothing else
-	-- draws with HP_DAMAGE_FX_SLOT, the effect reads as local to the quadrants.
-	if damage_count > 0 then
-		-- pal(HP_DAMAGE_FX_SLOT, HP_DAMAGE_FX_SLOT + 128, 1)
-	end
 end
+

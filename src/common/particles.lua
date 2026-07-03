@@ -55,7 +55,6 @@ function update_particle(pt)
     local t = pt.age / pt.life
 
     if pt.shrink then
-        -- (1-t): 1 cuando nace (grande), 0 cuando muere (pequeño)
         pt.size = pt.size_min + (pt.size_max - pt.size_min) * (1 - t)
     end
 

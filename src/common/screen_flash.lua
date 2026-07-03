@@ -1,5 +1,3 @@
-SCREEN_FLASH_ALL_COLORS = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }
-
 function init_screen_flash()
 	screen_flash_timer = 0
 	screen_flash_timer_max = 0
@@ -40,7 +38,7 @@ function apply_screen_flash(default_bg, base_colors)
 
 	if screen_flash_timer > 0 then
 		local cfg = screen_flash_cfg
-		local cols = cfg.colors or SCREEN_FLASH_ALL_COLORS
+		local cols = cfg.colors or split"0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15"
 
 		for c in all(cols) do
 			pal(c, c + 128, 1)

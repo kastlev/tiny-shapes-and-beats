@@ -29,13 +29,8 @@ level_card_state = "idle"
 card_timer = 0
 level_card_position_x = 200
 
--- ---- estado in_game ----
--- true desde la mitad del hold de la carta en adelante:
--- progress bar y enemigos ya arrancan, aunque la carta siga
--- visible deslizandose hacia afuera
 level_started = false
 
--- ---- goal orb ----
 ORB_R = 5
 ORB_HR = 8
 
@@ -82,6 +77,10 @@ function update_hud()
         if level_progress_frame < level_total_frames - 1 then level_progress_frame += 1 end
     end
 
+    if orb and #enemies == 0 and bg_color_base != BG_COLOR_DEFAULT then
+        bg_color_base = BG_COLOR_DEFAULT
+    end
+
     local frac = level_progress_frame / level_total_frames
     for ck in all(checkpoints) do
         if not ck.hit and frac >= ck.frac then
@@ -98,7 +97,8 @@ function update_hud()
             if c.color then
                 bg_color_base = c.color
             end
-            sfx(2)
+            sfx(4)
+            trigger_screen_flash(_hit_flash_cfg)
             del(active_checkpoint_markers, c)
         elseif c.x < -2 then
             del(active_checkpoint_markers, c)
@@ -149,7 +149,6 @@ function draw_hud()
         else
             line(HUD_X, HUD_Y, HUD_X + HUD_W, HUD_Y, C_DARK_GRAY)
         end
-        
 
         local frac = min(1, level_progress_frame / level_total_frames)
         local fill_x = HUD_X + flr(frac * HUD_W)
@@ -157,12 +156,12 @@ function draw_hud()
             line(HUD_X, HUD_Y, fill_x, HUD_Y, C_BLUE)
         end
         if progress_bar_drawing then
-        for ck in all(checkpoints) do
-            local tx = HUD_X + flr(ck.frac * HUD_W)
-            local tc = ck.hit and C_WHITE or C_LIGHT_GRAY
-            line(tx, HUD_Y - 1, tx, HUD_Y + 1, tc)
+            for ck in all(checkpoints) do
+                local tx = HUD_X + flr(ck.frac * HUD_W)
+                local tc = ck.hit and C_WHITE or C_LIGHT_GRAY
+                line(tx, HUD_Y - 1, tx, HUD_Y + 1, tc)
+            end
         end
-    end
     end
 
     for c in all(active_checkpoint_markers) do
@@ -185,16 +184,9 @@ function draw_hud()
     end
 
     if orb and not orb.collected then
-        local r = ORB_R + sin(orb.pulse) * 1.5
-        local r2 = max(1, r - 2)
-        circfill(flr(orb.x), flr(orb.y), flr(r2), C_YELLOW)
-        circ(flr(orb.x), flr(orb.y), flr(r), C_WHITE)
-        for i = 0, 3 do
-            local a = orb.pulse + i * 0.25
-            local sx = orb.x + cos(a) * (r + 3)
-            local sy = orb.y + sin(a) * (r + 3)
-            pset(flr(sx), flr(sy), C_WHITE)
-        end
+        local ox, oy = flr(orb.x) - 4, flr(orb.y) - 4 -- centrar el sprite 8x8 en orb.x/orb.y
+        draw_anim(ox, oy, level_runtime_frames * 2, 5, 16, 8)
+        draw_anim(ox + 8 / 2 - 16 / 2, oy + 8 / 2 - 16 / 2, level_runtime_frames, 21, 5, 6, 2, 2)
     end
 
     for w in all(waves) do

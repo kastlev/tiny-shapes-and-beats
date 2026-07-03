@@ -11,7 +11,7 @@ function ring_expand(n, col)
         spawn(
             E_CIRCLE, b[1] + ox, b[2] + oy, {
                 size = 2, max_size = 44,
-                fill = false, grow = true, growth_rate = 1.6,
+                fill = false, grow = true, grow_px = 1.6,
                 duration_frames = 50,
                 color = col or C_PINK,
                 warning = false
