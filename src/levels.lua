@@ -38,16 +38,18 @@ function level_1()
   spawn(E_BULLET, 64, 64, { count = 8, speed = 1.5 })
   wait_frames(20)
 
+  local basic = {size=10, duration_frames=40, warning=false}
+
   meanwhile(function()
-    spawn(E_CIRCLE, 30, 60, { size = 10, duration_frames = 40, warning = false })
+    spawn(E_CIRCLE, 30, 60, basic)
     wait_frames(20)
-    spawn(E_CIRCLE, 30, 80, { size = 10, duration_frames = 40, warning = false })
+    spawn(E_CIRCLE, 30, 80, basic)
   end)
 
   wait_frames(10)
-  spawn(E_CIRCLE, 90, 60, { size = 10, duration_frames = 40, warning = false })
+  spawn(E_CIRCLE, 90, 60, basic)
   wait_frames(20)
-  spawn(E_CIRCLE, 90, 80, { size = 10, duration_frames = 40, warning = false })
+  spawn(E_CIRCLE, 90, 80, basic)
   wait_frames(20)
 
   for i = 1, 3 do
@@ -74,9 +76,7 @@ function level_1()
   spawn(E_LINE_BI, 64, 64, { ang = 0.25, ang_vel = 0.01, duration_frames = 90, len = 90, size = 2 })
 
   wait_for_clear()
-  level_final_frames = level_runtime_frames
-  spawn_orb(64, 52)
-  wait_for_orb()
+  finish_level(64, 52)
 end
 
 function level_2()
@@ -182,7 +182,11 @@ function level_2()
   )
 
   wait_for_clear()
+  finish_level(64, 52)
+end
+
+function finish_level(x, y)
   level_final_frames = level_runtime_frames
-  spawn_orb(64, 52)
+  spawn_orb(x, y)
   wait_for_orb()
 end

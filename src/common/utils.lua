@@ -40,3 +40,13 @@ function line_c(x, y, len, width, ang, col, centered)
     circfill(x + dirx * i, y + diry * i, hw, col)
   end
 end
+
+function callfromstring(l)
+	for s in all(split(l,"/")) do
+		s=split(s)
+		for i,si in inext,s do
+			s[i]=_ENV[si] or si
+		end
+		deli(s,1)(unpack(s))
+	end
+end

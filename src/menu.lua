@@ -109,7 +109,6 @@ function _draw_title()
     local x = 64 - TITLE_W / 2
     local y = 35
     sspr(TITLE_X, TITLE_Y, TITLE_W, TITLE_H, x, y, TITLE_W, TITLE_H)
-    sspr(TITLE_X, TITLE_Y, TITLE_W, TITLE_H, x, y, TITLE_W, TITLE_H)
 end
 
 function draw_menu()
