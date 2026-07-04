@@ -90,11 +90,8 @@ function _do_respawn()
 	active_checkpoint_markers = {}
 	orb = nil
 
-	init_player()
-	-- init_hitstop()
-	-- init_camera()
-	-- init_screen_flash()
-	init_particle()
+	callfromstring"init_player/init_hitstop/init_camera/init_screen_flash/init_particle"
+
 	level_progress_frame = last_respawn_frame
 	hud_level_complete = false
 
@@ -120,5 +117,6 @@ function _do_respawn()
 	end
 
 	checkpoint_fast_forward_frames = 0
-	start_reveal(64, 64, 10)
+	callfromstring"start_reveal,64,64,10"
+
 end

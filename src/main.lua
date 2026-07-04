@@ -5,12 +5,7 @@ function _init()
 	start_fadein(25)
 
 	bg_color_base = BG_COLOR_DEFAULT
-	init_hitstop()
-	init_camera()
-	init_screen_flash()
-	init_particle()
-	init_player()
-	init_menu()
+	callfromstring"init_hitstop/init_camera/init_screen_flash/init_particle/init_player/init_menu"
 end
 
 function _update()

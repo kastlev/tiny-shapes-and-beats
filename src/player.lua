@@ -1,57 +1,62 @@
+-- 	p = {
+-- 		-- health
+-- 		hp = 4,
+-- 		hp_max = 4,
+-- 		-- position and movement
+-- 		x = 61,
+-- 		y = 61,
+-- 		input_x = 0,
+-- 		input_y = 0,
+-- 		acc = 0.9,
+-- 		friction = 0.8,
+-- 		dx = 0,
+-- 		dy = 0,
+-- 		max_dx = 2.5,
+-- 		max_dy = 2.5,
+-- 		-- drawing
+-- 		sp = 0,
+-- 		flip_x = false,
+-- 		flip_y = false,
+-- 		scl_x = 1,
+-- 		scl_y = 1,
+-- 		w = 4,
+-- 		h = 4,
+-- 		-- dash
+-- 		dash_dir_x = 0,
+-- 		dash_dir_y = 0,
+-- 		dash_timer_max = 8,
+-- 		dash_timer = 0,
+-- 		dash_force_max = 4,
+-- 		dash_force = 0,
+-- 		dash_cooldown_max = 16,
+-- 		dash_cooldown_timer = 0,
+-- 		dash_explosion_x = 0,
+-- 		dash_explosion_y = 0,
+-- 		dash_buffer_timer = 0,
+-- 		dash_buffer_max = 7,
+-- 		dash_wall_hit = false,
+-- 		last_input_x = 0,
+-- 		last_input_y = 0,
+-- 		last_input_timer = 0,
+-- 		last_input_max = 5,
+-- 		-- state
+-- 		is_diagonal = false,
+-- 		is_dashing = false,
+-- 		is_invulnerable = false,
+-- 		is_stunned = false,
+-- 		is_dead = false,
+-- 		--  timers
+-- 		hit_iframes_timer = 0,
+-- 		hit_iframes_timer_max = 40,
+-- 		trail_active = false,
+-- 		in_danger = false
+-- 	}
+
 function init_player()
-	p = {
-		-- health
-		hp = 4,
-		hp_max = 4,
-		-- position and movement
-		x = 61,
-		y = 61,
-		input_x = 0,
-		input_y = 0,
-		acc = 0.9,
-		friction = 0.8,
-		dx = 0,
-		dy = 0,
-		max_dx = 2.5,
-		max_dy = 2.5,
-		-- drawing
-		sp = 0,
-		flip_x = false,
-		flip_y = false,
-		scl_x = 1,
-		scl_y = 1,
-		w = 4,
-		h = 4,
-		-- dash
-		dash_dir_x = 0,
-		dash_dir_y = 0,
-		dash_timer_max = 8,
-		dash_timer = 0,
-		dash_force_max = 4,
-		dash_force = 0,
-		dash_cooldown_max = 16,
-		dash_cooldown_timer = 0,
-		dash_explosion_x = 0,
-		dash_explosion_y = 0,
-		dash_buffer_timer = 0,
-		dash_buffer_max = 7,
-		dash_wall_hit = false,
-		last_input_x = 0,
-		last_input_y = 0,
-		last_input_timer = 0,
-		last_input_max = 5,
-		-- state
-		is_diagonal = false,
-		is_dashing = false,
-		is_invulnerable = false,
-		is_stunned = false,
-		is_dead = false,
-		--  timers
-		hit_iframes_timer = 0,
-		hit_iframes_timer_max = 40,
-		trail_active = false,
-		in_danger = false
-	}
+	p = ptbl(
+		split "hp,hp_max,x,y,input_x,input_y,acc,friction,dx,dy,max_dx,max_dy,sp,flip_x,flip_y,scl_x,scl_y,w,h,dash_dir_x,dash_dir_y,dash_timer_max,dash_timer,dash_force_max,dash_force,dash_cooldown_max,dash_cooldown_timer,dash_explosion_x,dash_explosion_y,dash_buffer_timer,dash_buffer_max,dash_wall_hit,last_input_x,last_input_y,last_input_timer,last_input_max,is_diagonal,is_dashing,is_invulnerable,is_stunned,is_dead,hit_iframes_timer,hit_iframes_timer_max,trail_active,in_danger",
+		{ 4, 4, 61, 61, 0, 0, .9, .8, 0, 0, 2.5, 2.5, 0, false, false, 1, 1, 4, 4, 0, 0, 8, 0, 4, 0, 16, 0, 0, 0, 0, 7, false, 0, 0, 0, 5, false, false, false, false, false, 0, 40, false, false }
+	)
 end
 
 function update_player()
@@ -67,6 +72,7 @@ function update_player()
 	p.input_x = dx
 	p.input_y = dy
 
+	-- last input
 	if dx != 0 or dy != 0 then
 		p.last_input_x = dx
 		p.last_input_y = dy
@@ -145,6 +151,7 @@ function update_player()
 	p.x = mid(0, p.x, 127 - p.w)
 	p.y = mid(0, p.y, 127 - p.h)
 
+	-- wall bump
 	if p.is_dashing and not p.dash_wall_hit and (p.x != before_x or p.y != before_y) then
 		p.dash_wall_hit = true
 		local bump_ang = atan2(-p.dash_dir_x, -p.dash_dir_y)
@@ -156,6 +163,7 @@ function update_player()
 	p.dx = mid(-p.max_dx, p.dx, p.max_dx)
 	p.dy = mid(-p.max_dy, p.dy, p.max_dy)
 
+	-- hit iframes
 	p.is_invulnerable = p.is_dashing or p.hit_iframes_timer > 0
 
 	-- stun
@@ -195,10 +203,12 @@ function update_player()
 		"last_input_timer"
 	}
 
+	-- decrement timers
 	for t in all(timers) do
 		p[t] = max(0, p[t] - 1)
 	end
-	
+
+	-- reset last input
 	if p.last_input_timer <= 0 then
 		p.last_input_x = 0
 		p.last_input_y = 0
@@ -216,7 +226,10 @@ function draw_player()
 
 	p.flip_x = p.dx < 0
 	p.flip_y = p.dy < 0
+
+	-- trail particles
 	local spd = sqrt(p.dx * p.dx + p.dy * p.dy)
+
 	if spd > 0.6 then
 		local nx = p.dx / spd
 		local ny = p.dy / spd
@@ -229,6 +242,8 @@ function draw_player()
 		)
 		p.trail_active = true
 	end
+
+	-- trail particles (when not moving)
 	if p.trail_active and p.input_x == 0 and p.input_y == 0 then
 		expire_particles("trail", 8)
 		p.trail_active = false
@@ -258,14 +273,18 @@ function draw_player()
 				circ(ex, ey, r, C_BLUE)
 			end
 		end
-		-- dash trail
+
+		-- dash trail sprite
 		local trail_x = p.x - p.dash_dir_x * 1
 		local trail_y = p.y - p.dash_dir_y * 1
 
+		-- trail sprite shadow
 		for i = 0, 15 do
 			pal(i, C_DARK_GRAY, 0)
 		end
+
 		spr(p.sp, trail_x - 1, trail_y - 1, 1, 1, p.flip_x, p.flip_y)
+
 		pal(0)
 	else
 		p.sp = 1 -- sprite normal
@@ -274,7 +293,10 @@ function draw_player()
 			p.sp = 4
 		end
 	end
+
+	-- hit iframes flicker
 	local flicker = false
+	
 	if p.hit_iframes_timer > 0 then
 		local t = p.hit_iframes_timer / p.hit_iframes_timer_max
 		local max_interval = 4
@@ -291,7 +313,8 @@ function draw_player()
 	if flicker then
 		pal(0)
 	end
-
+	
+	-- sprite quadrants when taking HP
 	local rx, ry = p.x - 1, p.y - 1
 	local half = 4
 

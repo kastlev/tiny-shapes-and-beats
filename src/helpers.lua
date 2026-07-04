@@ -9,13 +9,11 @@ function ring_expand(n, col)
         local ox = rnd(14) - 7
         local oy = rnd(14) - 7
         spawn(
-            E_CIRCLE, b[1] + ox, b[2] + oy, {
-                size = 2, max_size = 44,
-                fill = false, grow = true, grow_px = 1.6,
-                duration_frames = 50,
-                color = col or C_PINK,
-                warning = false
-            }
+            E_CIRCLE, b[1] + ox, b[2] + oy,
+            ptbl(
+                split "size,max_size,fill,grow,grow_px,duration_frames,color,warning",
+                { 2, 44, false, true, 1.6, 50, col or C_PINK, false }
+            )
         )
         wait_frames(18)
     end
@@ -43,12 +41,8 @@ function sweep_h(dir, col)
     local sx = dir == 1 and -7 or 133
     for i = 0, 3 do
         spawn(
-            E_SQUARE, sx, 18 + i * 28, {
-                vx = dir * 1.9, size = 10,
-                duration_frames = 85,
-                color = col or C_PINK,
-                warning = false
-            }
+            E_SQUARE, sx, 18 + i * 28,
+            ptbl(split "vx,size,duration_frames,color,warning", { dir * 1.9, 10, 85, col or C_PINK, false })
         )
         wait_frames(14)
     end
@@ -58,12 +52,8 @@ function sweep_v(dir, col)
     local sy = dir == 1 and -7 or 133
     for i = 0, 3 do
         spawn(
-            E_SQUARE, 18 + i * 28, sy, {
-                vy = dir * 1.9, size = 10,
-                duration_frames = 85,
-                color = col or C_PINK,
-                warning = false
-            }
+            E_SQUARE, 18 + i * 28, sy,
+            ptbl(split "vy,size,duration_frames,color,warning", { dir * 1.9, 10, 85, col or C_PINK, false })
         )
         wait_frames(14)
     end

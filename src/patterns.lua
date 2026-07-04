@@ -9,9 +9,7 @@ end
 
 function run_level(fn)
   active_patterns = {}
-  local co = cocreate(fn)
-  add(active_patterns, co)
-  return co
+  return meanwhile(fn)
 end
 
 function meanwhile(fn)

@@ -1,23 +1,11 @@
-HUD_X, HUD_Y, HUD_W, progress_bar_drawing = 1, 1, 125, false
-level_total_frames, level_progress_frame, last_respawn_frame, level_runtime_frames, level_final_frames = 0, 0, 0, 0, 0
-
-checkpoints, active_checkpoint_markers, checkpoint_marker_speed = {}, {}, 1.5
-
-CARD_W, CARD_H, CARD_DISPLAY_TIME, CARD_REVEAL_FRAC, CART_SPEED_IN, CART_SPEED_OUT = 72, 14, 30, 1, 0.2, 0.07
-
-card_song, level_name, level_card_state, card_timer, level_card_position_x, level_started = "no title", "level 1", "idle", 0, 200, false
-
-ORB_R, ORB_HR, orb, waves = 5, 8, nil, {}
-
+HUD_X, HUD_Y, HUD_W, level_final_frames, checkpoint_marker_speed, card_timer = unpack(split"1,1,125,0,1.5,0")
+CARD_W, CARD_H, CARD_DISPLAY_TIME, CARD_REVEAL_FRAC, CART_SPEED_IN, CART_SPEED_OUT, ORB_R, ORB_HR  = unpack(split"72,14,30,1,0.2,0.07,5,8")
 
 function hud_start(total_f, checkpoint_list, song, lvl)
     level_total_frames = total_f
-    level_progress_frame, level_runtime_frames = 0, 0
-    checkpoints = {}
-    last_respawn_frame = 0
-    active_checkpoint_markers = {}
+    level_progress_frame, level_runtime_frames, last_respawn_frame, level_started = 0, 0, 0, false
+    checkpoints, active_checkpoint_markers = {}, {}
     bg_color_base = BG_COLOR_DEFAULT
-    level_started = false
 
     for _, f in pairs(checkpoint_list or {}) do
         if type(f) == "table" then
@@ -136,14 +124,22 @@ function draw_hud()
         end
     end
 
+    -- if level_card_state != "idle" and level_card_state != "done" then
+    --     local cx = flr(level_card_position_x)
+    --     local cy = 128 - CARD_H - 4
+    --     rectfill(cx + 1, cy + 1, cx + CARD_W + 1, cy + CARD_H + 1, C_BLACK)
+    --     rectfill(cx, cy, cx + CARD_W, cy + CARD_H, C_DARK_BLUE)
+    --     rectfill(cx, cy, cx + 2, cy + CARD_H, C_LAVENDER)
+    --     print(level_name, cx + 5, cy + 3, C_LIGHT_GRAY)
+    --     print(card_song, cx + 5, cy + 9, C_WHITE)
+    -- end
+
     if level_card_state != "idle" and level_card_state != "done" then
         local cx = flr(level_card_position_x)
         local cy = 128 - CARD_H - 4
-        rectfill(cx + 1, cy + 1, cx + CARD_W + 1, cy + CARD_H + 1, C_BLACK)
-        rectfill(cx, cy, cx + CARD_W, cy + CARD_H, C_DARK_BLUE)
-        rectfill(cx, cy, cx + 2, cy + CARD_H, C_LAVENDER)
-        print(level_name, cx + 5, cy + 3, C_LIGHT_GRAY)
-        print(card_song, cx + 5, cy + 9, C_WHITE)
+        camera(-cx, -cy)
+        callfromstring "rectfill,1,1,73,15,C_BLACK/rectfill,0,0,72,14,C_DARK_BLUE/rectfill,0,0,2,14,C_LAVENDER/print,level_name,5,3,C_LIGHT_GRAY/print,card_song,5,9,C_WHITE"
+        camera()
     end
 
     if orb and not orb.collected then

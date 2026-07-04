@@ -2,6 +2,12 @@ function level_setup(cfg)
   hud_start(cfg.total_frames, cfg.checkpoints, cfg.song, cfg.name)
 end
 
+function finish_level(x, y)
+  level_final_frames = level_runtime_frames
+  spawn_orb(x, y)
+  wait_for_orb()
+end
+
 function level_1()
   level_setup {
     name = "level 1", song = "waves",
@@ -185,8 +191,3 @@ function level_2()
   finish_level(64, 52)
 end
 
-function finish_level(x, y)
-  level_final_frames = level_runtime_frames
-  spawn_orb(x, y)
-  wait_for_orb()
-end

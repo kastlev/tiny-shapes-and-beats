@@ -42,6 +42,7 @@ TRAIL_COLOR_BY_BG = {
     [C_DARK_PINK] = { C_LAVENDER },
     [C_LAVENDER]  = { C_DARK_PINK },
 }
+
 TRAIL_COLOR_DEFAULT = { C_DARK_BLUE }
 
 function trigger_hit_effect()
