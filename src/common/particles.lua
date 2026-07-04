@@ -78,6 +78,18 @@ function draw_particle(pt)
     end
 end
 
+function update_particles()
+    for pt in all(ps) do
+        update_particle(pt)
+    end
+end
+
+function draw_particles()
+    for pt in all(ps) do
+        draw_particle(pt)
+    end
+end
+
 -- acorta la vida restante de particulas con ese tag.
 -- llamar cuando el emisor para: las existentes desaparecen
 -- en max `remaining` frames en vez de su vida original.

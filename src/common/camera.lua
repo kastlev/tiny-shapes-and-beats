@@ -1,7 +1,7 @@
 CAM_SHAKE_POWER, CAM_SHAKE_DECAY, CAM_SHAKE_JITTER = 12, 0.45, 0.2
 
 function init_camera()
-  cam_x, cam_y, cam_vx, cam_vy, shk_x, shk_y, kick_x, kick_y, kick_decay = 0, 0, 0, 0, 0, 0, 0, 0, 0.08
+  cam_x, cam_y, cam_vx, cam_vy, shk_x, shk_y, kick_x, kick_y, kick_decay = unpack(split("0,0,0,0,0,0,0,0,0.08"))
 end
 
 function draw_camera()
@@ -28,11 +28,6 @@ function draw_camera()
   end
 
   camera(cam_x + shk_x + kick_x, cam_y + shk_y + kick_y)
-end
-
-function camera_reset()
-  init_camera()
-  camera()
 end
 
 function add_trauma(amount)

@@ -1,7 +1,5 @@
 function init_screen_flash()
-	screen_flash_timer = 0
-	screen_flash_timer_max = 0
-	screen_flash_cfg = nil
+	screen_flash_timer, screen_flash_timer_max, screen_flash_cfg = 0, 0, nil
 end
 
 function trigger_screen_flash(cfg)
@@ -20,10 +18,6 @@ function is_screen_flash()
 	return screen_flash_timer > 0
 end
 
--- aplica el pal() del flash y devuelve el bg_color de este frame.
--- default_bg:  color de fondo cuando no hay flash activo
--- base_colors: colores siempre redirigidos a +128 (flash o no),
---              util para mantener reservado el slot del bg
 function apply_screen_flash(default_bg, base_colors)
 	if fading then return default_bg end
 	pal()

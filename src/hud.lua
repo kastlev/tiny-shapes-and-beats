@@ -1,47 +1,18 @@
--- ---- progress bar
-HUD_X = 1
-HUD_Y = 1
-HUD_W = 125
-progress_bar_drawing = false
-level_total_frames = 0
-level_progress_frame = 0
-last_respawn_frame = 0
-hud_level_complete = false
+HUD_X, HUD_Y, HUD_W, progress_bar_drawing = 1, 1, 125, false
+level_total_frames, level_progress_frame, last_respawn_frame, level_runtime_frames, level_final_frames = 0, 0, 0, 0, 0
 
-level_runtime_frames = 0
-level_final_frames = 0
+checkpoints, active_checkpoint_markers, checkpoint_marker_speed = {}, {}, 1.5
 
--- ---- checkpoint lines
-checkpoints = {}
-active_checkpoint_markers = {}
-checkpoint_marker_speed = 1.5
+CARD_W, CARD_H, CARD_DISPLAY_TIME, CARD_REVEAL_FRAC, CART_SPEED_IN, CART_SPEED_OUT = 72, 14, 30, 1, 0.2, 0.07
 
--- ---- intro card
-CARD_W = 72
-CARD_H = 14
-CARD_DISPLAY_TIME = 30
-CARD_REVEAL_FRAC = 1 -- que fraccion del hold debe pasar antes de "in_game"
-CART_SPEED_IN = 0.2
-CART_SPEED_OUT = 0.07
-card_song = "no title"
-level_name = "level 1"
-level_card_state = "idle"
-card_timer = 0
-level_card_position_x = 200
+card_song, level_name, level_card_state, card_timer, level_card_position_x, level_started = "no title", "level 1", "idle", 0, 200, false
 
-level_started = false
+ORB_R, ORB_HR, orb, waves = 5, 8, nil, {}
 
-ORB_R = 5
-ORB_HR = 8
-
-orb = nil
-waves = {}
 
 function hud_start(total_f, checkpoint_list, song, lvl)
     level_total_frames = total_f
-    level_progress_frame = 0
-    level_runtime_frames = 0
-    hud_level_complete = false
+    level_progress_frame, level_runtime_frames = 0, 0
     checkpoints = {}
     last_respawn_frame = 0
     active_checkpoint_markers = {}
@@ -62,14 +33,6 @@ function hud_start(total_f, checkpoint_list, song, lvl)
     level_card_position_x = 128 + CARD_W
     orb = nil
     waves = {}
-end
-
-function hud_set_complete()
-    hud_level_complete = true
-end
-
-function level_is_started()
-    return level_started
 end
 
 function update_hud()
@@ -184,7 +147,7 @@ function draw_hud()
     end
 
     if orb and not orb.collected then
-        local ox, oy = flr(orb.x) - 4, flr(orb.y) - 4 -- centrar el sprite 8x8 en orb.x/orb.y
+        local ox, oy = flr(orb.x) - 4, flr(orb.y) - 4
         draw_anim(ox, oy, level_runtime_frames * 2, 5, 16, 8)
         draw_anim(ox + 8 / 2 - 16 / 2, oy + 8 / 2 - 16 / 2, level_runtime_frames, 21, 5, 6, 2, 2)
     end
@@ -210,10 +173,6 @@ function spawn_orb(x, y)
     waves = {}
 end
 
-function card_done()
-    return level_card_state == "done" or level_card_state == "idle"
-end
-
 function orb_collected()
     return orb == nil or orb.collected
 end
@@ -236,7 +195,7 @@ function _update_card()
                 card_timer = CARD_DISPLAY_TIME
             else
                 level_card_state = "out"
-                level_started = true -- sin hold, arranca de una
+                level_started = true
             end
         end
     elseif level_card_state == "hold" then

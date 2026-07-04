@@ -90,15 +90,6 @@ function wait_until_pattern_finished(co)
   end
 end
 
--- function wait_for_input(btn_id)
---   if _try_skip(0) then return end
-
---   btn_id = btn_id or 5
---   while not btnp(btn_id) do
---     yield()
---   end
--- end
-
 function wait_for_card()
   if _try_skip(0) then return end
 
@@ -116,11 +107,11 @@ function wait_for_orb()
 end
 
 function sync(...)
-  local cos = {}
+  local coros = {}
   for _, fn in ipairs({ ... }) do
-    add(cos, meanwhile(fn))
+    add(coros, meanwhile(fn))
   end
-  for co in all(cos) do
+  for co in all(coros) do
     wait_until_pattern_finished(co)
   end
 end

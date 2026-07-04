@@ -20,11 +20,6 @@ enemy_types = {
       end
     end
   },
-  [E_LINE] = {
-    draw = function(e)
-      line_c(e.x, e.y, e.len, e.size * 2, e.ang, enemy_color(e))
-    end
-  },
   [E_LINE_BI] = {
     draw = function(e)
       line_c(e.x, e.y, e.len, e.size * 2, e.ang, enemy_color(e), true)
@@ -55,8 +50,6 @@ enemy_types = {
 
 enemies = {}
 
--- unico lugar que resuelve color/flicker cuando no se especifico nada.
--- base color y flicker comparten el mismo punto de verdad.
 function enemy_color(e)
   if e.flicker then
     local colors = e.flicker_colors or { C_PINK, C_WHITE }
@@ -71,9 +64,6 @@ function enemy_remaining_frames(e)
   return max(0, (e.duration_frames or 0) + (e.hold_frames or 0) - (e.age or 0))
 end
 
--- unico lugar que sabe armar un anillo de E_BULLET: cuantas, a que
--- velocidad, desde que angulo, si no se especifica nada. usado tanto
--- por el burst inmediato de spawn() como por el burst-al-morir.
 function fire_bullet_ring(x, y, count, speed, angle_offset, bullet_settings)
   count = count or 8
   speed = speed or 1.5
@@ -87,7 +77,7 @@ function fire_bullet_ring(x, y, count, speed, angle_offset, bullet_settings)
         vx = cos(a) * speed,
         vy = sin(a) * speed,
         size = bullet_settings.size,
-        duration_frames = bullet_settings.duration_frames,
+        duration_frames = bullet_settings.duration_frames or 80,
         color = bullet_settings.color,
         shape = bullet_settings.shape
       }
@@ -109,8 +99,7 @@ end
 function spawn_enemy(enemy_type, x, y, settings)
   settings = settings or {}
 
-  local default_size = enemy_type == E_BULLET and 1 or 2
-  local s0 = settings.size or default_size
+  local s0 = settings.size or (enemy_type == E_BULLET and 1 or 2)
   local s1 = settings.size_max or s0
 
   local grow_mode = "px"
@@ -133,11 +122,11 @@ function spawn_enemy(enemy_type, x, y, settings)
     origin_y = y,
     target_x = settings.target_x,
     target_y = settings.target_y,
-    ease_move = settings.ease_move, -- nil ok: _ease() ya defaultea a linear
+    ease_move = settings.ease_move,
     lerp_factor = settings.lerp_factor or 0.1,
 
     fill = settings.fill ~= false,
-    shape = settings.shape, -- nil ok: el draw trata todo lo que no sea "square" como circulo
+    shape = settings.shape,
     size = s0,
     size_start = s0,
     max_size = s1,
@@ -145,11 +134,11 @@ function spawn_enemy(enemy_type, x, y, settings)
     grow_mode = grow_mode,
     grow_px = settings.grow_px or 0.5,
     grow_lerp = settings.grow_lerp or 0.1,
-    ease_grow = settings.ease_grow, -- nil ok: _ease() ya defaultea a linear
+    ease_grow = settings.ease_grow,
 
     duration_frames = settings.duration_frames or 30,
     hold_frames = settings.hold_frames or 0,
-    color = settings.color, -- nil ok: enemy_color() resuelve a C_PINK
+    color = settings.color,
     len = settings.len or 80,
     ang = settings.ang or 0,
     ang_vel = settings.ang_vel or 0,
@@ -157,18 +146,17 @@ function spawn_enemy(enemy_type, x, y, settings)
     alive = true,
 
     flicker = settings.flicker or false,
-    flicker_colors = settings.flicker_colors, -- nil ok: enemy_color() resuelve
-    flicker_rate = settings.flicker_rate, -- nil ok: enemy_color() resuelve
+    flicker_colors = settings.flicker_colors,
+    flicker_rate = settings.flicker_rate,
 
-    -- burst: campo explicito, no implicito por burst_count (igual que flicker)
     burst = settings.burst or false,
-    burst_count = settings.burst_count, -- nil ok: fire_bullet_ring() resuelve
-    burst_speed = settings.burst_speed, -- nil ok: fire_bullet_ring() resuelve
-    burst_angle_offset = settings.burst_angle_offset, -- nil ok: fire_bullet_ring() resuelve
-    burst_size = settings.burst_size, -- nil ok: spawn_enemy() del hijo resuelve
-    burst_color = settings.burst_color, -- nil ok: enemy_color() del hijo resuelve
-    burst_duration_frames = settings.burst_duration_frames, -- nil ok: spawn_enemy() del hijo resuelve
-    burst_shape = settings.burst_shape -- nil ok: draw del hijo resuelve
+    burst_count = settings.burst_count,
+    burst_speed = settings.burst_speed,
+    burst_angle_offset = settings.burst_angle_offset,
+    burst_size = settings.burst_size,
+    burst_color = settings.burst_color,
+    burst_duration_frames = settings.burst_duration_frames,
+    burst_shape = settings.burst_shape
   }
 
   if checkpoint_fast_forward_frames > 0 then
@@ -233,17 +221,14 @@ function draw_enemies()
   end
 end
 
-------------------------------------------------------
--- spawn(tipo, x, y, params)
---
--- size            radio inicial (default 10)
--- size_max        radio final — implica grow automaticamente
--- fill            true=relleno false=contorno (default true)
--- color           (default C_PINK)
--- duration_frames (default 40)
--- hold_frames      frames extra quieto en estado final antes de morir (default 0)
 
---
+-- size
+-- size_max
+-- fill
+-- color
+-- duration_frames
+-- hold_frames      frames extra quieto en estado final antes de morir
+
 -- crecimiento — elegir uno:
 --   grow_px    crece N pixeles por frame hasta size_max
 --              (default DEFAULT_GROWTH_RATE si hay size_max)
@@ -253,9 +238,9 @@ end
 --              ej: 0.1 = acercamiento suave, 0.3 = llega rapido
 --
 -- movimiento — elegir uno:
---   vx, vy       velocidad constante por frame
---   target_x/y   destino — llega al final de duration_frames
---   delay_move   frames quieto antes de empezar a moverse
+--   vx, vy       velocidad constante
+--   target_x/y
+--   delay_move
 --
 -- ease_move    curva para target_x/y — nombre en ease_fns o "lerp"
 -- lerp_factor  factor para ease_move="lerp" (default 0.1)
@@ -285,8 +270,8 @@ function spawn(etype, x, y, params)
         color = params.warning_color or C_DARK_PINK,
         duration_frames = params.warning_time or 20,
         hold_frames = params.hold_frames or 0,
-        len = params.len, -- spawn_enemy ya defaultea, no repetir aqui
-        ang = params.ang, -- idem
+        len = params.len,
+        ang = params.ang,
         ang_vel = 0
       }
     )
@@ -346,15 +331,6 @@ function spawn(etype, x, y, params)
     }
   )
 end
-
--- bulletspawner(x, y, target_x, target_y, params)
--- entra desde fuera de pantalla parpadeando pink/white, desacelera
--- hasta target_x/y, se queda quieto hold_frames, y al morir dispara
--- un burst de E_BULLET desde su posicion final.
--- bullet_emitter(x, y, target_x, target_y, params)
--- entra desde fuera de pantalla parpadeando, desacelera hasta
--- target_x/y, se queda quieto hold_frames, y al morir dispara
--- un anillo de E_BULLET desde su posicion final.
 
 function bullet_emitter(x, y, target_x, target_y, params)
   params = params or {}

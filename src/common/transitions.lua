@@ -18,6 +18,7 @@ local gradients_source = {
 }
 
 gradients = {}
+
 for i = 1, 16 do
     add(gradients, split(gradients_source[i]))
 end
@@ -54,3 +55,44 @@ function draw_fade()
         end
     end
 end
+
+-- Reveal square
+reveal_active = false
+reveal_t = 0
+reveal_frames = 30
+reveal_cx, reveal_cy = 64, 64
+
+function start_reveal(cx, cy, frames)
+    reveal_active = true
+    reveal_t = 0
+    reveal_frames = frames or 30
+    reveal_cx = cx or 64
+    reveal_cy = cy or 64
+end
+
+function update_reveal()
+    if reveal_active then
+        reveal_t += 1
+        if reveal_t >= reveal_frames then
+            reveal_active = false
+        end
+    end
+end
+
+function draw_reveal()
+    if not reveal_active then return end
+    fade_square(min(reveal_t/reveal_frames,1), reveal_cx, reveal_cy, 5)
+end
+
+function fade_square(progress, cx, cy, col)
+    if progress >= 1 then return end
+    col = col or 0
+    cx,cy = cx or 64, cy or 64
+    local h=64*progress
+    rectfill(0,0,127,cy-h-1,col)
+    rectfill(0,cy+h,127,127,col)
+    rectfill(0,cy-h,cx-h-1,cy+h,col)
+    rectfill(cx+h,cy-h,127,cy+h,col)
+end
+
+

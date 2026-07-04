@@ -1,7 +1,7 @@
--- ── lineales ──────────────────────────────────────
+-- lineales 
 function ease_linear(t)       return t end
 
--- ── quadraticas ───────────────────────────────────
+-- quadraticas 
 function ease_in_quad(t)      return t*t end
 function ease_out_quad(t)     t-=1 return 1-t*t end
 -- function ease_inout_quad(t)
@@ -13,7 +13,7 @@ function ease_out_quad(t)     t-=1 return 1-t*t end
 --   else t-=.5 return .5+t*t*2 end
 -- end
 
--- -- ── quarticas ─────────────────────────────────────
+-- quarticas 
 -- function ease_in_quart(t)     return t*t*t*t end
 -- function ease_out_quart(t)    t-=1 return 1-t*t*t*t end
 -- function ease_inout_quart(t)
@@ -25,7 +25,7 @@ function ease_out_quad(t)     t-=1 return 1-t*t end
 --   else t-=.5 return .5+8*t*t*t*t end
 -- end
 
--- -- ── overshoot ─────────────────────────────────────
+-- overshoot
 -- function ease_in_over(t)      return 2.7*t*t*t-1.7*t*t end
 -- function ease_out_over(t)     t-=1 return 1+2.7*t*t*t+1.7*t*t end
 -- function ease_inout_over(t)
@@ -37,7 +37,7 @@ function ease_out_quad(t)     t-=1 return 1-t*t end
 --   else t-=.5 return (2.7*8*t*t*t-1.7*4*t*t)/2+.5 end
 -- end
 
--- -- ── elastic ───────────────────────────────────────
+-- elastic
 -- function ease_in_elastic(t)
 --   if t==0 then return 0 end
 --   return 2^(10*t-10)*cos(2*t-2)
@@ -55,7 +55,7 @@ function ease_out_quad(t)     t-=1 return 1-t*t end
 --   else t-=.5 return 2^(10*2*t-10)*cos(2*2*t-2)/2+.5 end
 -- end
 
--- -- ── bounce ────────────────────────────────────────
+-- bounce
 -- function ease_out_bounce(t)
 --   local n,d=7.5625,2.75
 --   if     t<1/d   then return n*t*t
@@ -72,7 +72,7 @@ function ease_out_quad(t)     t-=1 return 1-t*t end
 --   else                t-=2.625/d return 1-n*t*t-.984375 end
 -- end
 
--- ── tabla de lookup ───────────────────────────────
+-- tabla de lookup
 ease_fns = {
   ["linear"]        = ease_linear,
   ["in_quad"]       = ease_in_quad,

@@ -1,8 +1,8 @@
 function init_game()
 	current_level = level_1
-	respawn_pending = false
 	run_level(current_level)
 	set_screen(update_game, draw_game)
+	init_particle()
 end
 
 function update_game()
@@ -39,6 +39,22 @@ function update_game()
 			)
 		end
 	end
+	-- if level_runtime_frames % 10 == 0 then
+	-- 	spawn_particle(
+	-- 		rnd(128), rnd(128), {
+	-- 			min_vel = 0.1,
+	-- 			max_vel = 0.6,
+	-- 			min_size = 1,
+	-- 			max_size = 1,
+	-- 			shrink = false,
+	-- 			square = (rnd() < 0.5),
+	-- 			cols = { C_DARK_BLUE, C_DARK_GRAY },
+	-- 			min_life = 40,
+	-- 			max_life = 100,
+	-- 			tag = "menu_bg"
+	-- 		}
+	-- 	)
+	-- end
 end
 
 function draw_game()
@@ -51,8 +67,13 @@ function draw_game()
 		draw_particle(part)
 	end
 
-	draw_enemies()
-	draw_player()
+	if p.is_dead or p.is_invulnerable or not real_danger_nearby() then
+		draw_enemies()
+		draw_player() 
+	else
+		draw_player()
+		draw_enemies()
+	end
 
 	camera()
 	draw_hud()
@@ -70,9 +91,9 @@ function _do_respawn()
 	orb = nil
 
 	init_player()
-	init_hitstop()
-	init_camera()
-	init_screen_flash()
+	-- init_hitstop()
+	-- init_camera()
+	-- init_screen_flash()
 	init_particle()
 	level_progress_frame = last_respawn_frame
 	hud_level_complete = false

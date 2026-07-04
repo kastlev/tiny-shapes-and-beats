@@ -24,7 +24,7 @@ local _hit_cfg = {
 }
 
 local _trail_cfg = {
-    cols = {C_DARK_BLUE }, -- C_DARK_BLUE, 
+    cols = {C_DARK_BLUE },
     min_vel = 0.1,
     max_vel = 0.3,
     min_life = 6,
@@ -36,6 +36,13 @@ local _trail_cfg = {
     shrink = true,
     tag = "trail"
 }
+
+TRAIL_COLOR_BY_BG = {
+    [C_BLACK]     = { C_DARK_BLUE },
+    [C_DARK_PINK] = { C_LAVENDER },
+    [C_LAVENDER]  = { C_DARK_PINK },
+}
+TRAIL_COLOR_DEFAULT = { C_DARK_BLUE }
 
 function trigger_hit_effect()
     trigger_hitstop()
@@ -62,5 +69,6 @@ function spawn_hit_particles(x, y, n)
 end
 
 function spawn_trail_particle(x, y, gx, gy)
+    _trail_cfg.cols = TRAIL_COLOR_BY_BG[bg_color_base] or TRAIL_COLOR_DEFAULT
     spawn_particle(x, y, _trail_cfg, gx, gy)
 end

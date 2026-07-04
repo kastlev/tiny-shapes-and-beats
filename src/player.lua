@@ -1,5 +1,6 @@
 function init_player()
 	p = {
+		-- health
 		hp = 4,
 		hp_max = 4,
 		-- position and movement
@@ -13,8 +14,8 @@ function init_player()
 		dy = 0,
 		max_dx = 2.5,
 		max_dy = 2.5,
-		-- sprite and drawing
-		sp = 0, -- sprite index
+		-- drawing
+		sp = 0,
 		flip_x = false,
 		flip_y = false,
 		scl_x = 1,
@@ -28,7 +29,7 @@ function init_player()
 		dash_timer = 0,
 		dash_force_max = 4,
 		dash_force = 0,
-		dash_cooldown_max = 16, -- 20 defalult
+		dash_cooldown_max = 16,
 		dash_cooldown_timer = 0,
 		dash_explosion_x = 0,
 		dash_explosion_y = 0,
@@ -48,7 +49,8 @@ function init_player()
 		--  timers
 		hit_iframes_timer = 0,
 		hit_iframes_timer_max = 40,
-		trail_active = false
+		trail_active = false,
+		in_danger = false
 	}
 end
 
@@ -158,13 +160,13 @@ function update_player()
 
 	-- stun
 	if not p.is_invulnerable then
-		local offset = 1
-		local px, py = flr(p.x), flr(p.y)
+		local x1, y1, x2, y2 = player_hitbox_points()
+		local hit_left = edge_hit(x1, y1, x1, y2)
+		local hit_right = edge_hit(x2, y1, x2, y2)
+		local hit_top = edge_hit(x1, y1, x2, y1)
+		local hit_bot = edge_hit(x1, y2, x2, y2)
 
-		local hit_left = pget(px - offset, py + p.h / 2) == C_PINK
-		local hit_right = pget(px + p.w + offset, py + p.h / 2) == C_PINK
-		local hit_top = pget(px + p.w / 2, py - offset) == C_PINK
-		local hit_bot = pget(px + p.w / 2, py + p.h + offset) == C_PINK
+		p.in_danger = hit_left or hit_right or hit_top or hit_bot
 
 		local force = 7.5
 		if hit_left then p.dx = force end
@@ -186,32 +188,31 @@ function update_player()
 		end
 	end
 
-	if p.dash_cooldown_timer > 0 then
-		p.dash_cooldown_timer -= 1
-	end
+	local timers = {
+		"dash_cooldown_timer",
+		"hit_iframes_timer",
+		"dash_buffer_timer",
+		"last_input_timer"
+	}
 
-	if p.hit_iframes_timer > 0 then
-		p.hit_iframes_timer -= 1
+	for t in all(timers) do
+		p[t] = max(0, p[t] - 1)
 	end
-
-	if p.dash_buffer_timer > 0 then
-		p.dash_buffer_timer -= 1
-	end
-
-	if p.last_input_timer > 0 then
-		p.last_input_timer -= 1
-	else
+	
+	if p.last_input_timer <= 0 then
 		p.last_input_x = 0
 		p.last_input_y = 0
 	end
 end
 
 function draw_player()
-
 	if p.is_dead then
 		draw_death_bullets()
 		return
 	end
+	-- -- debug hitbox
+	-- local x1, y1, x2, y2 = player_hitbox_points()
+	-- rect(x1, y1, x2, y2, 8)
 
 	p.flip_x = p.dx < 0
 	p.flip_y = p.dy < 0
@@ -237,12 +238,12 @@ function draw_player()
 
 	if p.is_dashing then
 		if abs(p.dash_dir_x) > 0 then
-			p.sp = 2 -- sprite estirado horizontal
+			p.sp = 2
 		elseif abs(p.dash_dir_y) > 0 then
-			p.sp = 3 -- sprite estirado vertical
+			p.sp = 3
 		end
 		if is_diagonal then
-			p.sp = 0 -- sprite estirado diagonal
+			p.sp = 0
 		end
 
 		local r = 6 - p.dash_timer - 1
@@ -257,7 +258,7 @@ function draw_player()
 				circ(ex, ey, r, C_BLUE)
 			end
 		end
-		-- dash trail: yellow echo of the sprite, offset behind the dash direction
+		-- dash trail
 		local trail_x = p.x - p.dash_dir_x * 1
 		local trail_y = p.y - p.dash_dir_y * 1
 
@@ -269,7 +270,6 @@ function draw_player()
 	else
 		p.sp = 1 -- sprite normal
 
-		-- diagonal stretch
 		if is_diagonal then
 			p.sp = 4
 		end
@@ -286,7 +286,6 @@ function draw_player()
 		end
 	end
 
-	-- draw player sprite
 	spr(p.sp, p.x - 1, p.y - 1, 1, 1, p.flip_x, p.flip_y)
 
 	if flicker then
@@ -319,3 +318,34 @@ function draw_player()
 	end
 end
 
+function player_hitbox_points()
+	local px, py = flr(p.x), flr(p.y)
+	return px + 1, py + 1, px + 4, py + 4
+end
+
+function edge_hit(x1, y1, x2, y2)
+	if x1 == x2 then
+		for y = y1, y2 do
+			if pget(x1, y) == C_PINK then return true end
+		end
+	else
+		for x = x1, x2 do
+			if pget(x, y1) == C_PINK then return true end
+		end
+	end
+	return false
+end
+
+function real_danger_nearby()
+	local cx, cy = p.x + 2, p.y + 2
+	for e in all(enemies) do
+		if e.color != C_DARK_PINK then
+			local dx, dy = cx - e.x, cy - e.y
+			local r = (e.size or 2) + 3
+			if dx * dx + dy * dy < r * r then
+				return true
+			end
+		end
+	end
+	return false
+end

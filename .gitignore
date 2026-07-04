@@ -1,3 +1,4 @@
 .vscode/
+exclude/
 .DS_Store
 Thumbs.dbgit

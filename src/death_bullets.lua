@@ -1,6 +1,4 @@
-DEATH_BULLET_SPRITE = 35
-death_sequence_started = false
-death_bullets = {}
+DEATH_BULLET_SPRITE, death_sequence_started, death_bullets = 32, false, {}
 
 function spawn_death_bullets(x, y, n, speed)
 	n = n or 6
