@@ -28,6 +28,11 @@ function callfromstring(l)
 	end
 end
 
+function _merge(base, over)
+  for k, v in pairs(over or {}) do base[k] = v end
+  return base
+end
+
 function cycling_color(colors, rate, t)
     local i = (t \ rate % #colors) + 1
     return colors[i]
@@ -57,5 +62,3 @@ function line_c(x, y, len, width, ang, col, centered)
     circfill(x + dirx * i, y + diry * i, hw, col)
   end
 end
-
-

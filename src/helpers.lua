@@ -1,33 +1,3 @@
-function ring_expand(n, col)
-    local pos = {
-        { 21, 21 }, { 64, 21 }, { 107, 21 },
-        { 21, 64 }, { 64, 64 }, { 107, 64 },
-        { 21, 107 }, { 64, 107 }, { 107, 107 }
-    }
-    for i = 1, n do
-        local b = pos[((i - 1) % 9) + 1]
-        local ox = rnd(14) - 7
-        local oy = rnd(14) - 7
-        spawn(
-            E_CIRCLE, b[1] + ox, b[2] + oy,
-            ptbl(
-                split "size,max_size,fill,grow,grow_px,duration_frames,color,warning",
-                { 2, 44, false, true, 1.6, 50, col or C_PINK, false }
-            )
-        )
-        wait_frames(18)
-    end
-end
-
-function four_corners(size)
-    sync(
-        function() spawn(E_CIRCLE, 18, 18, { size = size }) end,
-        function() spawn(E_CIRCLE, 109, 18, { size = size }) end,
-        function() spawn(E_CIRCLE, 18, 109, { size = size }) end,
-        function() spawn(E_CIRCLE, 109, 109, { size = size }) end
-    )
-end
-
 function burst_triangle(speed, count)
     count = count or 8
     sync(

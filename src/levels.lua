@@ -1,8 +1,10 @@
 function level_setup(cfg)
   hud_start(cfg.total_frames, cfg.checkpoints, cfg.song, cfg.name)
+  wait_for_card()
 end
 
 function finish_level(x, y)
+  wait_for_clear()
   level_final_frames = level_runtime_frames
   spawn_orb(x, y)
   wait_for_orb()
@@ -10,94 +12,134 @@ end
 
 function level_1()
   level_setup {
-    name = "level 1", song = "waves",
-    total_frames = 1142, checkpoints = { {0.4, C_DARK_PINK}, {0.72, C_LAVENDER} }
+    name = "lvl 1", song = "waves",
+    total_frames = 1142, checkpoints = { { 0.4, C_DARK_PINK }, { 0.72, C_LAVENDER } }
   }
-  wait_for_card()
 
-  spawn(
-    E_CIRCLE, 64, 0 + rnd(96), {
-      size = 2, size_max = 32,
-      ease_grow = "out_quad",
-      duration_frames = 60
-    }
-  )
+  spw_perimeter(8, { size = 2, chase = true, duration_frames = 100 })
 
-  bullet_emitter(-10, 40, 30, 40, {})
-  wait_frames(40)
-  bullet_emitter(138, 80, 98, 80, {})
+  -- spawn(
+  --   E_CIRCLE, 64, 0 + rnd(96), {
+  --     size = 2, size_max = 32,
+  --     ease_grow = "out_quad",
+  --     duration_frames = 60
+  --   }
+  -- )
 
-  wait_frames(25)
+  -- bullet_emitter(-10, 40, 30, 40, {})
+  -- wait_frames(40)
+  -- bullet_emitter(138, 80, 98, 80, {})
 
-  spawn(E_CIRCLE, 32, 64, { size = 10 })
-  wait_frames(20)
+  -- wait_frames(25)
 
-  spawn(E_CIRCLE, 96, 64, { size = 10 })
-  wait_frames(30)
+  -- spawn(E_CIRCLE, 32, 64, { size = 10 })
+  -- wait_frames(20)
 
-  spawn(E_BULLET, 64, 64, { count = 6, speed = 1.3 })
-  wait_frames(15)
+  -- spawn(E_CIRCLE, 96, 64, { size = 10 })
+  -- wait_frames(30)
 
-  spawn(E_CIRCLE, 64, 48, { size = 14 })
-  wait_frames(15)
-  
-  spawn(E_BULLET, 64, 64, { count = 8, speed = 1.5 })
-  wait_frames(20)
+  -- spawn(E_BULLET, 64, 64, { count = 6, speed = 1.3 })
+  -- wait_frames(15)
 
-  local basic = {size=10, duration_frames=40, warning=false}
+  -- spawn(E_CIRCLE, 64, 48, { size = 14 })
+  -- wait_frames(15)
 
-  meanwhile(function()
-    spawn(E_CIRCLE, 30, 60, basic)
-    wait_frames(20)
-    spawn(E_CIRCLE, 30, 80, basic)
-  end)
+  -- spawn(E_BULLET, 64, 64, { count = 8, speed = 1.5 })
+  -- wait_frames(20)
 
-  wait_frames(10)
-  spawn(E_CIRCLE, 90, 60, basic)
-  wait_frames(20)
-  spawn(E_CIRCLE, 90, 80, basic)
-  wait_frames(20)
+  -- local basic = { size = 10, duration_frames = 40, warning = false }
 
-  for i = 1, 3 do
-    spawn(E_CIRCLE, 64, 64, { size = 20 + i * 5, fill = false, duration_frames = 50, warning = false })
-    wait_frames(30)
-  end
-  wait_frames(20)
+  -- meanwhile(function()
+  --   spawn(E_CIRCLE, 30, 60, basic)
+  --   wait_frames(20)
+  --   spawn(E_CIRCLE, 30, 80, basic)
+  -- end)
 
-  sync(
-    function() spawn(E_CIRCLE, 40, 40, { size = 12 }) end,
-    function() spawn(E_CIRCLE, 88, 88, { size = 12 }) end
-  )
-  wait_frames(20)
+  -- wait_frames(10)
+  -- spawn(E_CIRCLE, 90, 60, basic)
+  -- wait_frames(20)
+  -- spawn(E_CIRCLE, 90, 80, basic)
+  -- wait_frames(20)
 
-  spawn(E_BULLET, 64, 64, { count = 10, speed = 1.8 })
-  wait_for_clear()
+  -- for i = 1, 3 do
+  --   spawn(E_CIRCLE, 64, 64, { size = 20 + i * 5, fill = false, duration_frames = 50, warning = false })
+  --   wait_frames(30)
+  -- end
+  -- wait_frames(20)
 
-  spawn(E_BULLET, 64, 64, { count = 12, speed = 2.1 })
-  wait_frames(10)
+  -- sync(
+  --   function() spawn(E_CIRCLE, 40, 40, { size = 12 }) end,
+  --   function() spawn(E_CIRCLE, 88, 88, { size = 12 }) end
+  -- )
+  -- wait_frames(20)
 
-  spawn(E_CIRCLE, 64, 64, { size = 16 })
-  wait_for_clear()
+  -- spawn(E_BULLET, 64, 64, { count = 10, speed = 1.8 })
+  -- wait_for_clear()
 
-  spawn(E_LINE_BI, 64, 64, { ang = 0.25, ang_vel = 0.01, duration_frames = 90, len = 90, size = 2 })
+  -- spawn(E_BULLET, 64, 64, { count = 12, speed = 2.1 })
+  -- wait_frames(10)
 
-  wait_for_clear()
+  -- spawn(E_CIRCLE, 64, 64, { size = 16 })
+  -- wait_for_clear()
+
+  -- spawn(E_LINE_BI, 64, 64, { ang = 0.25, ang_vel = 0.01, duration_frames = 90, len = 90, size = 2 })
+
   finish_level(64, 52)
 end
 
 function level_2()
   level_setup {
     name = "level 2", song = "flux",
-    total_frames = 2100, checkpoints = {0.25, 0.52, 0.78 }
+    total_frames = 2100, checkpoints = { 0.25, 0.52, 0.78 }
   }
-  wait_for_card()
 
-  meanwhile(function() ring_expand(3) end)
+  spawn(
+    E_CIRCLE, 0, 0, {
+      size = 8, near_player = true, near_range = 0,
+      delay_move = 20, -- se queda quieto 20 frames
+      chase = true,
+      duration_frames = 100
+    }
+  )
+  -- spawn(E_CIRCLE, 10, 10, {size = 6, size_max = 10, chase = true, duration_frames = 1000, delay_move = 100 })
+  spawn(
+    E_CIRCLE, 0, 0, {
+      size = 8, near_player = true, near_range = 0,
+      delay_move = 20, -- aparece quieto 20 frames antes de reaccionar/crecer
+      chase = true,
+      duration_frames = 100
+      -- ease_grow = "out_quad", size_max = 14
+    }
+  )
+  spawn(
+    E_CIRCLE, 0, 0, {
+      size = 8, near_player = true, near_range = 0,
+      delay_move = 20, -- aparece quieto 20 frames antes de reaccionar/crecer
+      chase = true,
+      duration_frames = 100
+      -- ease_grow = "out_quad", size_max = 14
+    }
+  )
+  spawn(
+    E_CIRCLE, 0, 0, {
+      size = 8, near_player = true, near_range = 24,
+      delay_move = 20 -- aparece quieto 20 frames antes de reaccionar/crecer
+      -- ease_grow = "out_quad", size_max = 14
+    }
+  )
+  spawn(
+    E_CIRCLE, 0, 0, {
+      size = 8, near_player = true, near_range = 24,
+      delay_move = 20 -- aparece quieto 20 frames antes de reaccionar/crecer
+      -- ease_grow = "out_quad", size_max = 14
+    }
+  )
+  meanwhile(function() ring_expand_rand(3) end)
   four_corners(14)
   wait_for_clear()
   wait_frames(25)
 
-  meanwhile(function() ring_expand(4) end)
+  meanwhile(function() ring_expand_rand(4) end)
   sweep_h(1)
   wait_frames(15)
   sweep_h(-1)
@@ -187,7 +229,5 @@ function level_2()
     end
   )
 
-  wait_for_clear()
   finish_level(64, 52)
 end
-

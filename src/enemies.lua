@@ -110,21 +110,24 @@ function spawn_enemy(enemy_type, x, y, settings)
   end
 
   local e = {
-    type = enemy_type,
+    type = enemy_type or E_CIRCLE,
     x = x, y = y,
 
     vx = settings.vx,
     vy = settings.vy,
     delay_move = settings.delay_move or 0,
     delay_move_total = settings.delay_move or 0,
-
+    delay_grow = settings.delay_grow or 0,
+    delay_grow_total = settings.delay_grow or 0,
     origin_x = x,
     origin_y = y,
     target_x = settings.target_x,
     target_y = settings.target_y,
     ease_move = settings.ease_move,
     lerp_factor = settings.lerp_factor or 0.1,
-
+    chase = settings.chase or false,
+    chase_speed = settings.chase_speed or 1.6,
+    chase_turn = settings.chase_turn or 0.06,
     fill = settings.fill ~= false,
     shape = settings.shape,
     size = s0,
@@ -174,6 +177,17 @@ function update_enemies()
 
     if e.delay_move > 0 then
       e.delay_move -= 1
+    elseif e.chase then
+      local dx, dy = p.x - e.x, p.y - e.y
+      local d = sqrt(dx * dx + dy * dy)
+      local tx, ty = 0, 0
+      if d > 0.01 then
+        tx, ty = (dx / d) * e.chase_speed, (dy / d) * e.chase_speed
+      end
+      e.vx = lerp_to(e.vx or 0, tx, e.chase_turn, 0.02)
+      e.vy = lerp_to(e.vy or 0, ty, e.chase_turn, 0.02)
+      e.x += e.vx
+      e.y += e.vy
     elseif e.target_x ~= nil or e.target_y ~= nil then
       if e.ease_move == "lerp" then
         if e.target_x ~= nil then e.x += (e.target_x - e.x) * e.lerp_factor end
@@ -192,11 +206,14 @@ function update_enemies()
 
     if e.ang_vel != 0 then e.ang += e.ang_vel end
 
-    if e.grow then
+    if e.delay_grow > 0 then
+      e.delay_grow -= 1
+    elseif e.grow then
       if e.grow_mode == "lerp" then
         e.size += (e.max_size - e.size) * e.grow_lerp
       elseif e.grow_mode == "curve" then
-        local t = min(1, e.age / e.duration_frames)
+        local growth_frames = max(1, e.duration_frames - e.delay_grow_total)
+        local t = min(1, (e.age - e.delay_grow_total) / growth_frames)
         e.size = e.size_start + (e.max_size - e.size_start) * _ease(t, e.ease_grow)
       else
         e.size = min(e.max_size, e.size + e.grow_px)
@@ -220,7 +237,6 @@ function draw_enemies()
     if t then t.draw(e) end
   end
 end
-
 
 -- size
 -- size_max
@@ -248,9 +264,23 @@ end
 -- lineas:  ang, ang_vel, len
 -- burst:   count, speed, angle_offset, size
 -- warning: warning, warning_time, warning_color
+-- flicker: flicker, flicker_colors, flicker_rate
+-- shape
+-- chase:   chase, chase_speed, chase_turn
+-- delay_grow
+-- delay_move
 
 function spawn(etype, x, y, params)
   params = params or {}
+
+  -- resolver near_player UNA vez, antes de armar warning y enemigo real:
+  -- si se resuelve mas tarde (o dos veces), el warning aparece en un lugar
+  -- y el enemigo real en otro -> se ve como si se teletransportara
+  if params.near_player then
+    local range = params.near_range or 20
+    x = mid(6, p.x + p.w / 2 + rnd(range * 2) - range, 121)
+    y = mid(6, p.y + p.h / 2 + rnd(range * 2) - range, 121)
+  end
 
   local is_burst = params.count ~= nil
   local is_bullet = etype == E_BULLET
@@ -307,11 +337,15 @@ function spawn(etype, x, y, params)
       vx = params.vx,
       vy = params.vy,
       delay_move = params.delay_move or 0,
+      delay_grow = params.delay_grow or 0,
       target_x = params.target_x,
       target_y = params.target_y,
       ease_move = params.ease_move,
       lerp_factor = params.lerp_factor,
       len = params.len,
+      chase = params.chase,
+      chase_speed = params.chase_speed,
+      chase_turn = params.chase_turn,
       ang = params.ang,
       ang_vel = params.ang_vel,
       shape = params.shape,
