@@ -17,7 +17,6 @@ __lua__
 #include src/enemies.lua
 #include src/enemy_types.lua
 #include src/patterns.lua
-#include src/helpers.lua
 #include src/menu.lua
 #include src/game.lua
 #include src/main.lua

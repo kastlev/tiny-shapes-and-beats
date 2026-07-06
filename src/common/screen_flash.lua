@@ -14,10 +14,6 @@ function update_screen_flash()
 	end
 end
 
-function is_screen_flash()
-	return screen_flash_timer > 0
-end
-
 function apply_screen_flash(default_bg, base_colors)
 	if fading then return default_bg end
 	pal()

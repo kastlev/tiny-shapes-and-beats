@@ -1,5 +1,5 @@
-E_CIRCLE,E_SQUARE,E_LINE,E_LINE_BI,E_CROSS,E_BULLET=
-unpack(split"circle,square,line,line_bi,cross,bullet")
+E_CIRCLE,E_SQUARE,E_LINE_BI,E_CROSS,E_BULLET=
+unpack(split"circle,square,line_bi,cross,bullet")
 
 C_BLACK,C_DARK_BLUE,C_DARK_PINK,C_DARK_GREEN,
 C_BROWN,C_DARK_GRAY,C_LIGHT_GRAY,C_WHITE,

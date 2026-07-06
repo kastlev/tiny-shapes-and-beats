@@ -115,10 +115,6 @@ function draw_menu()
     cls(bg_color)
     draw_particles()
 
-    -- pal(C_DARK_BLUE, C_DARK_BLUE + 128, 1)
-    -- pal(C_DARK_GRAY, C_DARK_GRAY + 128, 1)
-    -- pal(C_DARK_PINK, C_DARK_PINK + 128, 1)
-
     callfromstring"pal,C_DARK_BLUE,129,1/pal,C_DARK_GRAY,133,1/pal,C_DARK_PINK,130,1"
 
 

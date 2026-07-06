@@ -234,48 +234,56 @@ end
 function draw_enemies()
   for e in all(enemies) do
     local t = enemy_types[e.type]
-    if t then t.draw(e) end
+    assert(t, "unknown enemy type: " .. tostr(e.type))
+    t.draw(e)
   end
 end
 
+-- etype          default E_CIRCLE si se omite (nil)
+-- x, y           default posicion random en pantalla si se omiten (nil)
+--                (near_player, si esta activo, pisa este default)
+--
 -- size
 -- size_max
 -- fill
 -- color
 -- duration_frames
 -- hold_frames      frames extra quieto en estado final antes de morir
-
+--
 -- crecimiento — elegir uno:
 --   grow_px    crece N pixeles por frame hasta size_max
---              (default DEFAULT_GROWTH_RATE si hay size_max)
 --   ease_grow  nombre de curva en ease_fns — llega a size_max en duration_frames
---              ej: "out_quad" "out_bounce" "out_elastic"
 --   grow_lerp  factor 0.0–1.0 — cada frame se acerca ese % al size_max
---              ej: 0.1 = acercamiento suave, 0.3 = llega rapido
+-- delay_grow   frames antes de empezar a crecer (independiente de delay_move)
 --
 -- movimiento — elegir uno:
 --   vx, vy       velocidad constante
 --   target_x/y
---   delay_move
+--   chase        persigue al jugador (chase_speed, chase_turn)
+-- delay_move     frames quieto antes de moverse (independiente de delay_grow)
+-- ease_move      curva para target_x/y — nombre en ease_fns o "lerp"
+-- lerp_factor    factor para ease_move="lerp" (default 0.1)
 --
--- ease_move    curva para target_x/y — nombre en ease_fns o "lerp"
--- lerp_factor  factor para ease_move="lerp" (default 0.1)
+-- near_player, near_range   sobreescribe x,y a una posicion cercana al jugador
+--                           (resuelto UNA vez, antes del warning, para que
+--                            warning y enemigo real compartan posicion)
 --
 -- lineas:  ang, ang_vel, len
--- burst:   count, speed, angle_offset, size
+-- burst:   count, speed, angle_offset, size, burst_shape
+--          NOTA: burst siempre instancia E_BULLET internamente
+--          (fire_bullet_ring), sin importar el etype del emisor.
+--          usar burst_shape="square" para variar el aspecto visual
+--          de las balas, no etype.
 -- warning: warning, warning_time, warning_color
 -- flicker: flicker, flicker_colors, flicker_rate
 -- shape
--- chase:   chase, chase_speed, chase_turn
--- delay_grow
--- delay_move
 
 function spawn(etype, x, y, params)
   params = params or {}
+  etype = etype or E_CIRCLE
+  x = x or (10 + rnd(108))
+  y = y or (10 + rnd(108))
 
-  -- resolver near_player UNA vez, antes de armar warning y enemigo real:
-  -- si se resuelve mas tarde (o dos veces), el warning aparece en un lugar
-  -- y el enemigo real en otro -> se ve como si se teletransportara
   if params.near_player then
     local range = params.near_range or 20
     x = mid(6, p.x + p.w / 2 + rnd(range * 2) - range, 121)
@@ -361,37 +369,6 @@ function spawn(etype, x, y, params)
       burst_color = params.burst_color,
       burst_duration_frames = params.burst_duration_frames,
       burst_angle_offset = params.burst_angle_offset,
-      burst_shape = params.burst_shape
-    }
-  )
-end
-
-function bullet_emitter(x, y, target_x, target_y, params)
-  params = params or {}
-  return spawn(
-    E_CIRCLE, x, y, {
-      size = params.size or 4,
-      color = params.color,
-      shape = params.shape,
-      warning = false,
-
-      target_x = target_x,
-      target_y = target_y,
-      ease_move = params.ease_move or "out_quad",
-      duration_frames = params.duration_frames or 30,
-      hold_frames = params.hold_frames or 20,
-
-      flicker = true,
-      flicker_colors = params.flicker_colors,
-      flicker_rate = params.flicker_rate,
-
-      burst = true,
-      burst_count = params.burst_count,
-      burst_speed = params.burst_speed,
-      burst_size = params.burst_size,
-      burst_color = params.burst_color,
-      burst_duration_frames = params.burst_duration_frames,
-      burst_angle_offset = params.burst_angle_offset or rnd(1),
       burst_shape = params.burst_shape
     }
   )

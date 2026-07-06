@@ -22,7 +22,7 @@ function callfromstring(l)
 	for s in all(split(l,"/")) do
 		s=split(s)
 		for i,si in inext,s do
-			s[i]=_ENV[si] or si
+			s[i]=_ENV[si] or tonum(si) or si
 		end
 		deli(s,1)(unpack(s))
 	end
@@ -61,4 +61,26 @@ function line_c(x, y, len, width, ang, col, centered)
   for i = i0, len do
     circfill(x + dirx * i, y + diry * i, hw, col)
   end
+end
+
+function run(str)
+    for call in all(split(str, "/")) do
+        local parts = split(call, ";")
+        local fname = parts[1]
+        deli(parts, 1)
+
+        local cfg = {}
+        for pair in all(parts) do
+            local kv = split(pair, "=")
+            local k, v = kv[1], kv[2]
+            if v == "true" then v = true
+            elseif v == "false" then v = false
+            elseif tonum(v) then v = tonum(v)
+            elseif _ENV[v] ~= nil then v = _ENV[v]
+            end
+            cfg[k] = v
+        end
+
+        _ENV[fname](cfg)
+    end
 end

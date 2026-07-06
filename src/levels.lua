@@ -16,73 +16,42 @@ function level_1()
     total_frames = 1142, checkpoints = { { 0.4, C_DARK_PINK }, { 0.72, C_LAVENDER } }
   }
 
-  spw_perimeter(8, { size = 2, chase = true, duration_frames = 100 })
+  run("spw_loop;n=8;size=8;near_player=true;near_range=0;delay_move=10;chase=true;chase_speed=1.9;duration_frames=100")
+  run("spw_loop;n=8;size=1;size_max=200;fill=false;grow_px=1.8;duration_frames=60;warning_time=10;spawn_interval=15;n=6")
+  run"spw;enemy_type=E_CROSS;size=1;x=64;y=64;ang_vel=0.01;size_max=4;ease_grow=out_quad;duration_frames=60;burst=true;burst_count=10"
+  wait_for_clear()
+  run"spw_loop;enemy_type=E_BULLET;count=8;size=1;size_max=4;burst=true;burst_count=10;warning_time=30"--deberia ser spawnear despues de que termine lo anterioir
+  callfromstring"bullet_emitter,-1,40,15,40/wait_frames,40/bullet_emitter,129,80,119,80/wait_frames,25/bullet_emitter,-1,40,64,40/wait_frames,40/bullet_emitter,129,80,64,80/wait_frames,25"
+  -- run("spw_loop;pattern=perimeter;parallel=true;size=15;warning_time=40;n=8;delay_move=20;chase=true;chase_speed=1.6;duration_frames=100")
 
-  -- spawn(
-  --   E_CIRCLE, 64, 0 + rnd(96), {
-  --     size = 2, size_max = 32,
-  --     ease_grow = "out_quad",
-  --     duration_frames = 60
-  --   }
-  -- )
+  -- callfromstring("bullet_emitter,-10,40,30,40/wait_frames,40/bullet_emitter,138,80,98,80/wait_frames,25")
 
-  -- bullet_emitter(-10, 40, 30, 40, {})
-  -- wait_frames(40)
-  -- bullet_emitter(138, 80, 98, 80, {})
-
-  -- wait_frames(25)
-
-  -- spawn(E_CIRCLE, 32, 64, { size = 10 })
+  -- run("spw;x=32;y=64;size=10")
   -- wait_frames(20)
 
-  -- spawn(E_CIRCLE, 96, 64, { size = 10 })
+  -- run("spw;x=96;y=64;size=10")
   -- wait_frames(30)
 
-  -- spawn(E_BULLET, 64, 64, { count = 6, speed = 1.3 })
+  -- run("spw;x=64;y=64;enemy_type=E_BULLET;count=6;speed=1.3")
   -- wait_frames(15)
 
-  -- spawn(E_CIRCLE, 64, 48, { size = 14 })
+  -- run("spw;x=64;y=48;size=14")
   -- wait_frames(15)
 
-  -- spawn(E_BULLET, 64, 64, { count = 8, speed = 1.5 })
+  -- run("spw;x=64;y=64;enemy_type=E_BULLET;count=8;speed=1.5")
   -- wait_frames(20)
 
-  -- local basic = { size = 10, duration_frames = 40, warning = false }
 
-  -- meanwhile(function()
-  --   spawn(E_CIRCLE, 30, 60, basic)
-  --   wait_frames(20)
-  --   spawn(E_CIRCLE, 30, 80, basic)
-  -- end)
-
-  -- wait_frames(10)
-  -- spawn(E_CIRCLE, 90, 60, basic)
-  -- wait_frames(20)
-  -- spawn(E_CIRCLE, 90, 80, basic)
-  -- wait_frames(20)
-
-  -- for i = 1, 3 do
-  --   spawn(E_CIRCLE, 64, 64, { size = 20 + i * 5, fill = false, duration_frames = 50, warning = false })
-  --   wait_frames(30)
-  -- end
-  -- wait_frames(20)
-
-  -- sync(
-  --   function() spawn(E_CIRCLE, 40, 40, { size = 12 }) end,
-  --   function() spawn(E_CIRCLE, 88, 88, { size = 12 }) end
-  -- )
-  -- wait_frames(20)
-
-  -- spawn(E_BULLET, 64, 64, { count = 10, speed = 1.8 })
+  -- run("spw;x=64;y=64;enemy_type=E_BULLET;count=10;speed=1.8")
   -- wait_for_clear()
 
-  -- spawn(E_BULLET, 64, 64, { count = 12, speed = 2.1 })
+  -- run("spw;x=64;y=64;enemy_type=E_BULLET;count=12;speed=2.1")
   -- wait_frames(10)
 
-  -- spawn(E_CIRCLE, 64, 64, { size = 16 })
+  -- run("spw;x=64;y=64;size=16")
   -- wait_for_clear()
 
-  -- spawn(E_LINE_BI, 64, 64, { ang = 0.25, ang_vel = 0.01, duration_frames = 90, len = 90, size = 2 })
+  -- run("spw;x=64;y=64;enemy_type=E_LINE_BI;ang=0.25;ang_vel=0.01;duration_frames=90;len=90;size=2")
 
   finish_level(64, 52)
 end
@@ -93,141 +62,187 @@ function level_2()
     total_frames = 2100, checkpoints = { 0.25, 0.52, 0.78 }
   }
 
-  spawn(
-    E_CIRCLE, 0, 0, {
-      size = 8, near_player = true, near_range = 0,
-      delay_move = 20, -- se queda quieto 20 frames
-      chase = true,
-      duration_frames = 100
-    }
-  )
-  -- spawn(E_CIRCLE, 10, 10, {size = 6, size_max = 10, chase = true, duration_frames = 1000, delay_move = 100 })
-  spawn(
-    E_CIRCLE, 0, 0, {
-      size = 8, near_player = true, near_range = 0,
-      delay_move = 20, -- aparece quieto 20 frames antes de reaccionar/crecer
-      chase = true,
-      duration_frames = 100
-      -- ease_grow = "out_quad", size_max = 14
-    }
-  )
-  spawn(
-    E_CIRCLE, 0, 0, {
-      size = 8, near_player = true, near_range = 0,
-      delay_move = 20, -- aparece quieto 20 frames antes de reaccionar/crecer
-      chase = true,
-      duration_frames = 100
-      -- ease_grow = "out_quad", size_max = 14
-    }
-  )
-  spawn(
-    E_CIRCLE, 0, 0, {
-      size = 8, near_player = true, near_range = 24,
-      delay_move = 20 -- aparece quieto 20 frames antes de reaccionar/crecer
-      -- ease_grow = "out_quad", size_max = 14
-    }
-  )
-  spawn(
-    E_CIRCLE, 0, 0, {
-      size = 8, near_player = true, near_range = 24,
-      delay_move = 20 -- aparece quieto 20 frames antes de reaccionar/crecer
-      -- ease_grow = "out_quad", size_max = 14
-    }
-  )
-  meanwhile(function() ring_expand_rand(3) end)
-  four_corners(14)
-  wait_for_clear()
-  wait_frames(25)
+  -- spawn(
+  --   E_CIRCLE, 0, 0, {
+  --     size = 8, near_player = true, near_range = 0,
+  --     delay_move = 20, -- se queda quieto 20 frames
+  --     chase = true,
+  --     duration_frames = 100
+  --   }
+  -- )
+  -- -- spawn(E_CIRCLE, 10, 10, {size = 6, size_max = 10, chase = true, duration_frames = 1000, delay_move = 100 })
+  -- spawn(
+  --   E_CIRCLE, 0, 0, {
+  --     size = 8, near_player = true, near_range = 0,
+  --     delay_move = 20, -- aparece quieto 20 frames antes de reaccionar/crecer
+  --     chase = true,
+  --     duration_frames = 100
+  --     -- ease_grow = "out_quad", size_max = 14
+  --   }
+  -- )
+  -- spawn(
+  --   E_CIRCLE, 0, 0, {
+  --     size = 8, near_player = true, near_range = 0,
+  --     delay_move = 20, -- aparece quieto 20 frames antes de reaccionar/crecer
+  --     chase = true,
+  --     duration_frames = 100
+  --     -- ease_grow = "out_quad", size_max = 14
+  --   }
+  -- )
+  -- spawn(
+  --   E_CIRCLE, 0, 0, {
+  --     size = 8, near_player = true, near_range = 24,
+  --     delay_move = 20 -- aparece quieto 20 frames antes de reaccionar/crecer
+  --     -- ease_grow = "out_quad", size_max = 14
+  --   }
+  -- )
+  -- spawn(
+  --   E_CIRCLE, 0, 0, {
+  --     size = 8, near_player = true, near_range = 24,
+  --     delay_move = 20 -- aparece quieto 20 frames antes de reaccionar/crecer
+  --     -- ease_grow = "out_quad", size_max = 14
+  --   }
+  -- )
+  -- meanwhile(function() ring_expand_rand(3) end)
+  -- four_corners(14)
+  -- wait_for_clear()
+  -- wait_frames(25)
 
-  meanwhile(function() ring_expand_rand(4) end)
-  sweep_h(1)
-  wait_frames(15)
-  sweep_h(-1)
-  wait_for_clear()
-  wait_frames(15)
+  -- meanwhile(function() ring_expand_rand(4) end)
+  -- sweep_h(1)
+  -- wait_frames(15)
+  -- sweep_h(-1)
+  -- wait_for_clear()
+  -- wait_frames(15)
 
-  meanwhile(function() sweep_v(1, C_DARK_PINK) end)
-  sync(
-    function() spawn(E_CIRCLE, 18, 18, { size = 12 }) end,
-    function() spawn(E_CIRCLE, 109, 109, { size = 12 }) end
-  )
-  wait_for_clear()
-  wait_frames(20)
+  -- meanwhile(function() sweep_v(1, C_DARK_PINK) end)
+  -- sync(
+  --   function() spawn(E_CIRCLE, 18, 18, { size = 12 }) end,
+  --   function() spawn(E_CIRCLE, 109, 109, { size = 12 }) end
+  -- )
+  -- wait_for_clear()
+  -- wait_frames(20)
 
-  spawn(E_CROSS, 64, 64, { ang = 0, ang_vel = 0, duration_frames = 65, len = 90, size = 2 })
-  wait_frames(15)
+  -- spawn(E_CROSS, 64, 64, { ang = 0, ang_vel = 0, duration_frames = 65, len = 90, size = 2 })
+  -- wait_frames(15)
 
-  sync(
-    function()
-      spawn(E_LINE_BI, 64, 64, { ang = 0.125, ang_vel = 0, duration_frames = 75, len = 100, size = 2 })
-    end,
-    function()
-      wait_frames(15)
-      spawn(E_BULLET, 10, 64, { count = 6, speed = 1.5 })
-    end,
-    function()
-      wait_frames(15)
-      spawn(E_BULLET, 118, 64, { count = 6, speed = 1.5 })
-    end
-  )
-  wait_for_clear()
-  wait_frames(20)
+  -- sync(
+  --   function()
+  --     spawn(E_LINE_BI, 64, 64, { ang = 0.125, ang_vel = 0, duration_frames = 75, len = 100, size = 2 })
+  --   end,
+  --   function()
+  --     wait_frames(15)
+  --     spawn(E_BULLET, 10, 64, { count = 6, speed = 1.5 })
+  --   end,
+  --   function()
+  --     wait_frames(15)
+  --     spawn(E_BULLET, 118, 64, { count = 6, speed = 1.5 })
+  --   end
+  -- )
+  -- wait_for_clear()
+  -- wait_frames(20)
 
-  burst_triangle(1.5)
-  wait_frames(20)
+  -- burst_triangle(1.5)
+  -- wait_frames(20)
 
-  meanwhile(function() burst_triangle(1.8) end)
-  wait_frames(14)
-  burst_triangle(1.8)
-  wait_for_clear()
-  wait_frames(20)
+  -- meanwhile(function() burst_triangle(1.8) end)
+  -- wait_frames(14)
+  -- burst_triangle(1.8)
+  -- wait_for_clear()
+  -- wait_frames(20)
 
-  meanwhile(function()
-    for i = 1, 6 do
-      spawn(
-        E_CIRCLE, 64, 0 + rnd(96), {
-          size = 2, max_size = 72, fill = false,
-          grow = true, growth_rate = 2.6,
-          duration_frames = 60, warning = false
-        }
-      )
-      wait_frames(14)
-    end
-  end)
-  meanwhile(function() sweep_v(1, C_DARK_PINK) end)
-  sync(
-    function() spawn(E_CIRCLE, 18, 64, { size = 13 }) end,
-    function() spawn(E_CIRCLE, 109, 64, { size = 13 }) end
-  )
-  wait_frames(10)
-  sync(
-    function() spawn(E_CIRCLE, 64, 18, { size = 13 }) end,
-    function() spawn(E_CIRCLE, 64, 109, { size = 13 }) end
-  )
-  wait_for_clear()
-  wait_frames(20)
+  -- meanwhile(function()
+  --   for i = 1, 6 do
+  --     spawn(
+  --       E_CIRCLE, 64, 0 + rnd(96), {
+  --         size = 2, max_size = 72, fill = false,
+  --         grow = true, growth_rate = 2.6,
+  --         duration_frames = 60, warning = false
+  --       }
+  --     )
+  --     wait_frames(14)
+  --   end
+  -- end)
+  -- meanwhile(function() sweep_v(1, C_DARK_PINK) end)
+  -- sync(
+  --   function() spawn(E_CIRCLE, 18, 64, { size = 13 }) end,
+  --   function() spawn(E_CIRCLE, 109, 64, { size = 13 }) end
+  -- )
+  -- wait_frames(10)
+  -- sync(
+  --   function() spawn(E_CIRCLE, 64, 18, { size = 13 }) end,
+  --   function() spawn(E_CIRCLE, 64, 109, { size = 13 }) end
+  -- )
+  -- wait_for_clear()
+  -- wait_frames(20)
 
-  meanwhile(function() bullet_rain(10, 1.3) end)
-  spawn(E_CROSS, 64, 64, { ang = 0, ang_vel = 0.009, duration_frames = 130, len = 90, size = 2 })
-  wait_for_clear()
-  wait_frames(10)
+  -- meanwhile(function() bullet_rain(10, 1.3) end)
+  -- spawn(E_CROSS, 64, 64, { ang = 0, ang_vel = 0.009, duration_frames = 130, len = 90, size = 2 })
+  -- wait_for_clear()
+  -- wait_frames(10)
 
-  sync(
-    function()
-      spawn(E_CROSS, 64, 64, { ang = 0, ang_vel = 0.018, duration_frames = 110, len = 90, size = 2 })
-    end,
-    function()
-      for i = 1, 4 do
-        wait_frames(22)
-        spawn(E_BULLET, 64, 64, { count = 12, speed = 2.2 })
-      end
-    end,
-    function()
-      wait_frames(10)
-      meanwhile(function() sweep_h(1) end)
-      meanwhile(function() sweep_h(-1) end)
-    end
-  )
+  -- sync(
+  --   function()
+  --     spawn(E_CROSS, 64, 64, { ang = 0, ang_vel = 0.018, duration_frames = 110, len = 90, size = 2 })
+  --   end,
+  --   function()
+  --     for i = 1, 4 do
+  --       wait_frames(22)
+  --       spawn(E_BULLET, 64, 64, { count = 12, speed = 2.2 })
+  --     end
+  --   end,
+  --   function()
+  --     wait_frames(10)
+  --     meanwhile(function() sweep_h(1) end)
+  --     meanwhile(function() sweep_h(-1) end)
+  --   end
+  -- )
 
   finish_level(64, 52)
 end
+
+
+
+  -- no convertible: secuencia con wait_frames(20) A MITAD del patron
+  -- (spawn, esperar, spawn otra vez en distinta posicion) — spw_loop
+  -- aplica el mismo cfg a cada spawn del loop, no timing custom intercalado.
+  -- local basic = { size = 10, duration_frames = 40, warning = false }
+  -- meanwhile(function()
+  --   spawn(E_CIRCLE, 30, 60, basic)
+  --   wait_frames(20)
+  --   spawn(E_CIRCLE, 30, 80, basic)
+  -- end)
+  -- wait_frames(10)
+  -- spawn(E_CIRCLE, 90, 60, basic)
+  -- wait_frames(20)
+  -- spawn(E_CIRCLE, 90, 80, basic)
+  -- wait_frames(20)
+
+  -- no convertible: size = 20 + i*5 varia por iteracion con formula sobre i;
+  -- spw_loop pasa el MISMO cfg a cada spawn del loop, no soporta variacion
+  -- per-index sin extender la funcion.
+  -- for i = 1, 3 do
+  --   spawn(E_CIRCLE, 64, 64, { size = 20 + i * 5, fill = false, duration_frames = 50, warning = false })
+  --   wait_frames(30)
+  -- end
+  -- wait_frames(20)
+
+  -- no convertible: 2 puntos fijos especificos (40,40 y 88,88), no calzan
+  -- con los patterns existentes de _spw_pos (perimeter=4/8 pts fijos, rain,
+  -- random) — requeriria agregar un tercer pattern nuevo, fuera del alcance
+  -- de "solo usar run/callfromstring".
+  -- sync(
+  --   function() spawn(E_CIRCLE, 40, 40, { size = 12 }) end,
+  --   function() spawn(E_CIRCLE, 88, 88, { size = 12 }) end
+  -- )
+  -- wait_frames(20)
+
+ -- no convertible: rnd(96) es una expresion, _kv() no evalua expresiones,
+  -- solo bool/numero/global. requeriria spawn() real o extender _spw_pos.
+  -- spawn(
+  --   E_CIRCLE, 64, 0 + rnd(96), {
+  --     size = 2, size_max = 32,
+  --     ease_grow = "out_quad",
+  --     duration_frames = 60
+  --   }
+  -- )

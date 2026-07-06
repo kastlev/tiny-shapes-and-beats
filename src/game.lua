@@ -93,8 +93,6 @@ function _do_respawn()
 	callfromstring"init_player/init_hitstop/init_camera/init_screen_flash/init_particle"
 
 	level_progress_frame = last_respawn_frame
-	hud_level_complete = false
-
 	local target_frame = last_respawn_frame
 	local saved_frac = level_total_frames > 0 and (target_frame / level_total_frames) or 0
 
