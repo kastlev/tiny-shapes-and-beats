@@ -44,14 +44,6 @@ function level_1()
 end
 
 function level_2()
-  -- level_setup {
-  --   name = "level 2", song = "flux",
-  --   total_frames = 2100, checkpoints = { 0.25, 0.52, 0.78 }
-  -- }
   run"level_setup;name=lvl 2;song=flux;total=2100;point1=0.25;point1_color=C_DARK_PINK;point2=0.52;point2_color=C_LAVENDER;point3=0.78;point3_color=C_DARK_BLUE"
-  -- run"spw_loop;pattern=column;column_x=140;parallel=true;stagger=5;n=8;enemy_type=E_BULLET;vx=-4.5;size=3;duration_frames=30"
-  -- run"spw_loop;pattern=circle;n=16;radius=60;parallel=true;target_x=64;target_y=64;duration_frames=400;size=3"
-  -- run"spw_loop;pattern=point;n=16;parallel=true;stagger=5;chase=true;chase_speed=2.6;duration_frames=140;size=3"
 
-  spawn(E_BULLET, 118, 64, { count = 6, speed = 1.5 })
 end

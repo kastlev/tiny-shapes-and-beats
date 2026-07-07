@@ -91,7 +91,7 @@ function spawn_bullet_burst(e)
       size = e.burst_size,
       duration_frames = e.burst_duration_frames,
       color = e.burst_color,
-      shape = e.burst_shape,
+      shape = e.burst_shape
     }
   )
 end
@@ -219,9 +219,14 @@ end
 
 function draw_enemies()
   for e in all(enemies) do
-    local t = enemy_types[e.type]
-    assert(t, "unknown enemy type: " .. tostr(e.type))
-    t.draw(e)
+    if e.is_warning then
+      enemy_types[e.type].draw(e)
+    end
+  end
+  for e in all(enemies) do
+    if not e.is_warning then
+      enemy_types[e.type].draw(e)
+    end
   end
 end
 
@@ -259,7 +264,8 @@ function spawn(etype, x, y, params)
         hold_frames = params.hold_frames or 0,
         len = params.len,
         ang = params.ang,
-        ang_vel = 0
+        ang_vel = 0,
+        is_warning = true
       }
     ))
   end
@@ -353,13 +359,9 @@ function _create_enemy(enemy_type, x, y, settings)
     burst_size = settings.burst_size,
     burst_color = settings.burst_color,
     burst_duration_frames = settings.burst_duration_frames,
-    burst_shape = settings.burst_shape
+    burst_shape = settings.burst_shape,
+    is_warning = settings.is_warning or false
   }
-
-  if checkpoint_fast_forward_frames > 0 then
-    e.alive = false
-    return e
-  end
 
   add(enemies, e)
   return e

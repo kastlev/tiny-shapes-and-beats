@@ -122,6 +122,7 @@ function _do_respawn()
 		end
 	end
 
-	checkpoint_fast_forward_frames = 0
 	callfromstring "start_reveal,64,64,10"
+	p.hit_iframes_timer = 60
+	trigger_hitstop(10)
 end
