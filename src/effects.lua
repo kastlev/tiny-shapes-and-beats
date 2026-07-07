@@ -44,7 +44,8 @@ local _bounce_particle_cfg = {
     max_vel = 1.8,
     min_life = 8,
     max_life = 16,
-    gravity = 0.0
+    gravity = 0.0,
+    layer = "front"
 }
 
 TRAIL_COLOR_BY_BG = {
@@ -73,7 +74,7 @@ function draw_screen_fx()
 end
 
 function spawn_hit_particles(x, y, cfg)
-    n = rndb(8, 16)
+    local n = rndb(8, 16)
     cfg = cfg or _hit_cfg
     for i = 1, n do
         spawn_particle(x, y, cfg)

@@ -1,4 +1,5 @@
 .vscode/
 exclude/
+debug.txt
 .DS_Store
 Thumbs.dbgit

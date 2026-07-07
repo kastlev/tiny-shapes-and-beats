@@ -19,10 +19,8 @@ function level_setup(cfg)
 end
 
 function finish_level(x, y)
-  wait_for_clear()
   level_final_frames = level_runtime_frames
-  spawn_orb(x, y)
-  wait_for_orb()
+  run"wait_for_clear/spawn_orb/wait_for_orb"
 end
 
 function level_1()
@@ -32,14 +30,13 @@ function level_1()
   run"spw_loop;pattern=point;n=16;parallel=true;stagger=5;chase=true;chase_speed=2.6;duration_frames=140;size=3"
   run"spw_loop;pattern=row;n=20;random=true;parallel=true;stagger=5;vy=1.8;duration_frames=100;size=3"
   run"spw;vx=1.9;vy=1.9;duration_frames=300;size=3;bounce=true;bounce_speed_mult=1.09;bounce_size_mult=1.1"
-  -- o mismo que arriba pero direccion aleatoria
   run"spw_loop;pattern=column;margin=40;n=6;parallel=true;vx=1.8;duration_frames=140;size=3"
   run"spw_loop;pattern=point;x=-4;y=64;enemy_type=E_LINE_BI;n=8;parallel=true;stagger=30;duration_frames=140;len=128;size=5;vx=1.8;ang=0.75"
   run"spw_loop;pattern=perimeter;random=true;radius=50;n=16;parallel=true;stagger=5;chase=true;chase_speed=1.6;duration_frames=140;size=3"
   run("spw_loop;n=8;size=8;near_player=true;near_range=0;delay_move=10;chase=true;chase_speed=1.9;duration_frames=100")
-  run"spw_loop;n=8;size=1;size_max=200;fill=false;grow_px=1.8;duration_frames=60;warning_time=10;spawn_interval=15;n=6"
+  run"spw_loop;n=8;size=1;size_max=200;fill=false;grow_px=1.8;duration_frames=60;warning_time=10;spawn_interval=15;n=6/wait_for_clear"
   run"spw;enemy_type=E_CROSS;size=1;x=64;y=64;ang_vel=0.01;size_max=4;ease_grow=out_quad;duration_frames=60;burst=true;burst_count=10/wait_for_clear"
-  run"spw_loop;enemy_type=E_BULLET;count=8;size=1;size_max=4;burst=true;burst_count=10;warning_time=30"
+  run"spw_loop;enemy_type=E_BULLET;count=8;size=1;size_max=4;burst=true;burst_count=10;warning_time=10;min_player_dist=80;warning=true"
   run"emit;x=-1;y=40;target_x=15;target_y=40/wait_frames;n=40/emit;x=129;y=80;target_x=119;target_y=80"
   run("spw_loop;pattern=perimeter;parallel=true;size=15;warning_time=40;n=8;delay_move=20;chase=true;chase_speed=1.6;duration_frames=100")
 end

@@ -32,7 +32,6 @@ function wait_frames(n)
   end
 end
 
-
 function wait_until_enemy_dead(e)
   while e and e.alive do
     yield()

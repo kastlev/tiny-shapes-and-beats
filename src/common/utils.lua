@@ -88,3 +88,7 @@ function run(str)
     end
     return last
 end
+
+function lerp(a,b,t)
+    return a+(b-a)*t
+end

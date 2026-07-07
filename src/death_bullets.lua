@@ -28,8 +28,7 @@ end
 
 function draw_death_bullets()
 	for b in all(death_bullets) do
-		local t = 1 - min(b.age / 60, 1)
-		local size = 8 * t
+		local size = 8 * (1 - min(b.age / 60, 1))
 		if size > 0.5 then
 			local half = size / 2
 			sspr(

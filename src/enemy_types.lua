@@ -110,8 +110,11 @@ function _spw_loop_body(cfg)
     end
 end
 
-EMIT_DEFAULT = "enemy_type=E_CIRCLE;size=4;warning=false;ease_move=out_quad;duration_frames=30;hold_frames=20;flicker=true;burst=true"
+EMIT_DEFAULT_CFG = _kv_parts(split(
+    "enemy_type=E_CIRCLE;size=4;warning=false;ease_move=out_quad;duration_frames=30;hold_frames=20;flicker=true;burst=true",
+    ";"
+))
 
 function emit(cfg)
-    return spw(_merge(_kv_parts(split(EMIT_DEFAULT, ";")), cfg or {}))
+    return spw(_merge(_merge({}, EMIT_DEFAULT_CFG), cfg))
 end

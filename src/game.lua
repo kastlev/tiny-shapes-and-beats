@@ -12,11 +12,7 @@ function update_game()
 	end
 
 	update_player()
-
-	for part in all(ps) do
-		update_particle(part)
-	end
-
+	update_particles()
 	update_screen_flash()
 	update_enemies()
 	update_active_patterns()
@@ -63,7 +59,7 @@ function draw_game()
 
 	cls(bg_color)
 
-	draw_particles("back")
+	draw_particles"back"
 
 	if p.is_dead or p.is_invulnerable or not real_danger_nearby() then
 		draw_enemies()
@@ -73,7 +69,7 @@ function draw_game()
 		draw_enemies()
 	end
 
-	draw_particles("front")
+	draw_particles"front"
 
 	camera()
 	draw_hud()

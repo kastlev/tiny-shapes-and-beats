@@ -1,4 +1,6 @@
 DEATH_WARN_FRAMES = 1
+BOUNCE_VARIANCE = 0.03
+
 enemy_types = {
   [E_CIRCLE] = {
     draw = function(e)
@@ -51,16 +53,14 @@ enemies = {}
 
 function enemy_color(e)
   if e.flicker then
-    local colors = e.flicker_colors or { C_PINK, C_WHITE }
-    local rate = e.flicker_rate or 4
-    local i = (e.age \ rate % #colors) + 1
-    return colors[i]
+    local c = e.flicker_colors or { C_PINK, C_WHITE }
+    return c[e.age \ (e.flicker_rate or 4) % #c + 1]
   end
-  if enemy_remaining_frames(e) <= DEATH_WARN_FRAMES then
-    return C_DARK_PINK
-  end
-  return e.color or C_PINK
+  return enemy_remaining_frames(e) <= DEATH_WARN_FRAMES
+      and C_DARK_PINK
+      or e.color or C_PINK
 end
+
 function enemy_remaining_frames(e)
   return max(0, (e.duration_frames or 0) + (e.hold_frames or 0) - (e.age or 0))
 end
@@ -84,6 +84,7 @@ function fire_bullet_ring(x, y, count, speed, angle_offset, bullet_settings)
       }
     )
   end
+  spawn_hit_particles(x, y, _bounce_particle_cfg)
 end
 
 function spawn_bullet_burst(e)
@@ -126,8 +127,8 @@ function update_enemies()
         if e.target_y ~= nil then e.y = e.origin_y + (e.target_y - e.origin_y) * et end
       end
     else
-      if e.vx then e.x += e.vx end
-      if e.vy then e.y += e.vy end
+      e.x += e.vx or 0
+      e.y += e.vy or 0
     end
 
     if e.wave then
@@ -176,15 +177,22 @@ function update_enemies()
       end
 
       if bounced then
+        local jitter = rnd(BOUNCE_VARIANCE * 2) - BOUNCE_VARIANCE
+        local ca, sa = cos(jitter), sin(jitter)
+        e.vx, e.vy = e.vx * ca - e.vy * sa, e.vx * sa + e.vy * ca
+
         if e.bounce_speed_mult then
           if e.vx then e.vx *= e.bounce_speed_mult end
           if e.vy then e.vy *= e.bounce_speed_mult end
         end
+
         if e.bounce_size_mult then
           e.size *= e.bounce_size_mult
         end
+
         add_trauma(mid(0.1, e.size * 0.02, 0.6))
         spawn_hit_particles(e.x, e.y, _bounce_particle_cfg)
+        sfx(5)
       end
     end
 
@@ -205,7 +213,7 @@ function update_enemies()
     end
 
     local margin = (e.size or 0) + 16
-    out = false
+    local out = false
     if not e.wrap and not e.bounce then
       out = (e.x < -margin or e.x > 128 + margin or e.y < -margin or e.y > 128 + margin)
     end
@@ -238,6 +246,7 @@ function spawn(etype, x, y, params)
   if params.delay_spawn and params.delay_spawn > 0 then
     wait_frames(params.delay_spawn)
   end
+
   etype = etype or E_CIRCLE
   x = x or (10 + rnd(108))
   y = y or (10 + rnd(108))
@@ -258,6 +267,9 @@ function spawn(etype, x, y, params)
   end
 
   if do_warn then
+    if sz >= 40 then
+      add_trauma(0.1)
+    end
     wait_until_enemy_dead(_create_enemy(
       etype, x, y, {
         size = sz,
@@ -285,6 +297,14 @@ function spawn(etype, x, y, params)
     return
   end
 
+  if params.v_random then
+    local ang = rnd(1)
+    local vmin, vmax = params.v_speed_min or 1, params.v_speed_max or 3
+    local spd = vmin + rnd(vmax - vmin)
+    params.vx = cos(ang) * spd
+    params.vy = sin(ang) * spd
+  end
+
   params.size = sz
   params.size_max = params.size_max or sz
   params.duration_frames = params.duration_frames or 40
@@ -296,78 +316,54 @@ function _create_enemy(enemy_type, x, y, settings)
   settings = settings or {}
 
   local s0 = settings.size or (enemy_type == E_BULLET and 1 or 2)
-  local s1 = settings.size_max or s0
+  settings.type = enemy_type or E_CIRCLE
+  settings.x = x
+  settings.y = y
 
-  local grow_mode = "px"
-  if settings.grow_lerp ~= nil then
-    grow_mode = "lerp"
-  elseif settings.ease_grow ~= nil then
-    grow_mode = "curve"
-  end
+  settings.size = s0
+  settings.size_start = s0
+  settings.max_size = settings.size_max or s0
+  settings.grow = settings.max_size > s0
 
-  local e = {
-    type = enemy_type or E_CIRCLE,
-    x = x, y = y,
+  settings.origin_x = x
+  settings.origin_y = y
 
-    vx = settings.vx,
-    vy = settings.vy,
-    delay_move = settings.delay_move or 0,
-    delay_move_total = settings.delay_move or 0,
-    delay_grow = settings.delay_grow or 0,
-    delay_grow_total = settings.delay_grow or 0,
-    origin_x = x,
-    origin_y = y,
-    target_x = settings.target_x,
-    target_y = settings.target_y,
-    ease_move = settings.ease_move,
-    lerp_factor = settings.lerp_factor or 0.1,
-    chase = settings.chase or false,
-    chase_speed = settings.chase_speed or 1.6,
-    chase_turn = settings.chase_turn or 0.06,
-    fill = settings.fill ~= false,
-    wrap = settings.wrap or false,
-    bounce = settings.bounce or false,
-    bounce_speed_mult = settings.bounce_speed_mult,
-    bounce_size_mult = settings.bounce_size_mult,
-    shape = settings.shape,
-    size = s0,
-    size_start = s0,
-    max_size = s1,
-    grow = s1 > s0,
-    grow_mode = grow_mode,
-    grow_px = settings.grow_px or 0.5,
-    grow_lerp = settings.grow_lerp or 0.1,
-    ease_grow = settings.ease_grow,
-    wave = settings.wave or false,
-    wave_amp = settings.wave_amp or 10,
-    wave_freq = settings.wave_freq or 0.05,
-    wave_axis = settings.wave_axis or "y",
-    duration_frames = settings.duration_frames or 30,
-    hold_frames = settings.hold_frames or 0,
-    color = settings.color,
-    len = settings.len or 80,
-    ang = settings.ang or 0,
-    ang_vel = settings.ang_vel or 0,
-    age = 0,
-    alive = true,
+  settings.delay_move = settings.delay_move or 0
+  settings.delay_move_total = settings.delay_move
+  settings.delay_grow = settings.delay_grow or 0
+  settings.delay_grow_total = settings.delay_grow
 
-    flicker = settings.flicker or false,
-    flicker_colors = settings.flicker_colors,
-    flicker_rate = settings.flicker_rate,
+  settings.grow_mode = settings.grow_lerp and "lerp"
+      or settings.ease_grow and "curve"
+      or "px"
 
-    burst = settings.burst or false,
-    burst_count = settings.burst_count,
-    burst_speed = settings.burst_speed,
-    burst_angle_offset = settings.burst_angle_offset,
-    burst_size = settings.burst_size,
-    burst_color = settings.burst_color,
-    burst_duration_frames = settings.burst_duration_frames,
-    burst_shape = settings.burst_shape,
-    is_warning = settings.is_warning or false
-  }
+  settings.fill = settings.fill ~= false
+  settings.chase = settings.chase or false
+  settings.wrap = settings.wrap or false
+  settings.bounce = settings.bounce or false
+  settings.wave = settings.wave or false
+  settings.flicker = settings.flicker or false
+  settings.burst = settings.burst or false
+  settings.is_warning = settings.is_warning or false
+  settings.alive = true
+  settings.age = 0
 
-  add(enemies, e)
-  return e
+  settings.lerp_factor = settings.lerp_factor or .1
+  settings.chase_speed = settings.chase_speed or 1.6
+  settings.chase_turn = settings.chase_turn or .06
+  settings.grow_px = settings.grow_px or .5
+  settings.grow_lerp = settings.grow_lerp or .1
+  settings.wave_amp = settings.wave_amp or 10
+  settings.wave_freq = settings.wave_freq or .05
+  settings.wave_axis = settings.wave_axis or "y"
+  settings.duration_frames = settings.duration_frames or 30
+  settings.hold_frames = settings.hold_frames or 0
+  settings.len = settings.len or 80
+  settings.ang = settings.ang or 0
+  settings.ang_vel = settings.ang_vel or 0
+
+  add(enemies, settings)
+  return settings
 end
 
 -- etype          default E_CIRCLE si se omite (nil)

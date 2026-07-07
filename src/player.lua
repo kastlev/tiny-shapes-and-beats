@@ -53,10 +53,10 @@
 -- 	}
 
 function init_player()
-	p = ptbl(
-		split "hp,hp_max,x,y,input_x,input_y,acc,friction,dx,dy,max_dx,max_dy,sp,flip_x,flip_y,scl_x,scl_y,w,h,dash_dir_x,dash_dir_y,dash_timer_max,dash_timer,dash_force_max,dash_force,dash_cooldown_max,dash_cooldown_timer,dash_explosion_x,dash_explosion_y,dash_buffer_timer,dash_buffer_max,dash_wall_hit,last_input_x,last_input_y,last_input_timer,last_input_max,is_diagonal,is_dashing,is_invulnerable,is_stunned,is_dead,hit_iframes_timer,hit_iframes_timer_max,trail_active,in_danger",
-		{ 4, 4, 61, 61, 0, 0, .9, .8, 0, 0, 2.5, 2.5, 0, false, false, 1, 1, 4, 4, 0, 0, 8, 0, 4, 0, 16, 0, 0, 0, 0, 7, false, 0, 0, 0, 5, false, false, false, false, false, 0, 40, false, false }
-	)
+	p = _kv_parts(split(
+		"hp=4;hp_max=4;x=61;y=61;input_x=0;input_y=0;acc=0.9;friction=0.8;dx=0;dy=0;max_dx=2.5;max_dy=2.5;sp=0;flip_x=false;flip_y=false;scl_x=1;scl_y=1;w=4;h=4;dash_dir_x=0;dash_dir_y=0;dash_timer_max=8;dash_timer=0;dash_force_max=4;dash_force=0;dash_cooldown_max=16;dash_cooldown_timer=0;dash_explosion_x=0;dash_explosion_y=0;dash_buffer_timer=0;dash_buffer_max=7;dash_wall_hit=false;last_input_x=0;last_input_y=0;last_input_timer=0;last_input_max=5;is_diagonal=false;is_dashing=false;is_invulnerable=false;is_stunned=false;is_dead=false;hit_iframes_timer=0;hit_iframes_timer_max=40;trail_active=false;in_danger=false",
+		";"
+	))
 end
 
 function update_player()
@@ -196,15 +196,12 @@ function update_player()
 		end
 	end
 
-	local timers = {
-		"dash_cooldown_timer",
-		"hit_iframes_timer",
-		"dash_buffer_timer",
-		"last_input_timer"
-	}
+	player_timers = split(
+		"dash_cooldown_timer,hit_iframes_timer,dash_buffer_timer,last_input_timer", ","
+	)
 
 	-- decrement timers
-	for t in all(timers) do
+	for t in all(player_timers) do
 		p[t] = max(0, p[t] - 1)
 	end
 
@@ -296,7 +293,7 @@ function draw_player()
 
 	-- hit iframes flicker
 	local flicker = false
-	
+
 	if p.hit_iframes_timer > 0 then
 		local t = p.hit_iframes_timer / p.hit_iframes_timer_max
 		local max_interval = 4
@@ -313,7 +310,7 @@ function draw_player()
 	if flicker then
 		pal(0)
 	end
-	
+
 	-- sprite quadrants when taking HP
 	local rx, ry = p.x - 1, p.y - 1
 	local half = 4

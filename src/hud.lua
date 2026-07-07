@@ -40,8 +40,6 @@ function update_hud()
 
     local frac = level_progress_frame / level_total_frames
     for ck in all(checkpoints) do
-        printh("frac=" .. tostr(frac), "debug.txt")
-        printh("ck.frac=" .. tostr(ck.frac), "debug.txt")
         if not ck.hit and frac >= ck.frac then
             ck.hit = true
             add(active_checkpoint_markers, { x = 130, frac = ck.frac, color = ck.color })
@@ -132,16 +130,6 @@ function draw_hud()
         end
     end
 
-    -- if level_card_state != "idle" and level_card_state != "done" then
-    --     local cx = flr(level_card_position_x)
-    --     local cy = 128 - CARD_H - 4
-    --     rectfill(cx + 1, cy + 1, cx + CARD_W + 1, cy + CARD_H + 1, C_BLACK)
-    --     rectfill(cx, cy, cx + CARD_W, cy + CARD_H, C_DARK_BLUE)
-    --     rectfill(cx, cy, cx + 2, cy + CARD_H, C_LAVENDER)
-    --     print(level_name, cx + 5, cy + 3, C_LIGHT_GRAY)
-    --     print(card_song, cx + 5, cy + 9, C_WHITE)
-    -- end
-
     if level_card_state != "idle" and level_card_state != "done" then
         local cx = flr(level_card_position_x)
         local cy = 128 - CARD_H - 4
@@ -167,13 +155,12 @@ function draw_hud()
     end
 end
 
-function spawn_orb(x, y)
-    orb = {
-        x = x or 64, y = y or 52,
-        vx = 0.55, vy = 0.4,
-        pulse = 0,
-        collected = false
-    }
+function spawn_orb()
+    orb = _kv_parts(split(
+        "x=12;y=12;vx=0.55;vy=0.4;pulse=0;collected=false", ";"
+    ))
+    orb.x += rnd(104)
+    orb.y += rnd(104)
     waves = {}
 end
 
