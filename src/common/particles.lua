@@ -36,7 +36,8 @@ function spawn_particle(x, y, cfg, gx_ov, gy_ov)
         square = cfg.square or false,
         trail  = cfg.trail  or false,
         tag    = cfg.tag,
-        age_mult = 1
+        age_mult = 1,
+        layer = cfg.layer or "back"
     })
 end
 
@@ -84,9 +85,11 @@ function update_particles()
     end
 end
 
-function draw_particles()
-    for pt in all(ps) do
-        draw_particle(pt)
+function draw_particles(layer)
+    for p in all(ps) do
+        if p.layer == layer then
+            draw_particle(p)
+        end
     end
 end
 

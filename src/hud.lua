@@ -27,9 +27,6 @@ function hud_start(total_f, checkpoint_list, song, lvl)
     level_card_position_x = 128 + CARD_W
     orb = nil
     waves = {}
-    printh("frac=" .. tostr(frac), "debug.txt")
-    printh("current=" .. tostr(current), "debug.txt")
-    printh("total=" .. tostr(total), "debug.txt")
 end
 
 function update_hud()
@@ -54,7 +51,7 @@ function update_hud()
     for c in all(active_checkpoint_markers) do
         c.x -= checkpoint_marker_speed
 
-        if c.x >= p.x - 1 and c.x <= p.x + p.w + 1 then
+        if c.x >= p.x - 1 and c.x <= p.x + p.w + 1 and not p.is_dead then
             last_respawn_frame = level_progress_frame
             if c.color then
                 bg_color_base = c.color

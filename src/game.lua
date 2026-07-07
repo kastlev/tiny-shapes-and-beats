@@ -63,9 +63,7 @@ function draw_game()
 
 	cls(bg_color)
 
-	for part in all(ps) do
-		draw_particle(part)
-	end
+	draw_particles("back")
 
 	if p.is_dead or p.is_invulnerable or not real_danger_nearby() then
 		draw_enemies()
@@ -74,6 +72,8 @@ function draw_game()
 		draw_player()
 		draw_enemies()
 	end
+
+	draw_particles("front")
 
 	camera()
 	draw_hud()

@@ -1,3 +1,4 @@
+DEATH_WARN_FRAMES = 1
 enemy_types = {
   [E_CIRCLE] = {
     draw = function(e)
@@ -34,10 +35,8 @@ enemy_types = {
   },
   [E_BULLET] = {
     draw = function(e)
-      local remaining = e.duration_frames - e.age
-      local col = remaining <= 8 and C_DARK_PINK or enemy_color(e)
+      local col = enemy_color(e)
       local fx, fy = flr(e.x), flr(e.y)
-
       if e.shape == "square" then
         local s = e.size
         rectfill(fx - s, fy - s, fx + s, fy + s, col)
@@ -57,9 +56,11 @@ function enemy_color(e)
     local i = (e.age \ rate % #colors) + 1
     return colors[i]
   end
+  if enemy_remaining_frames(e) <= DEATH_WARN_FRAMES then
+    return C_DARK_PINK
+  end
   return e.color or C_PINK
 end
-
 function enemy_remaining_frames(e)
   return max(0, (e.duration_frames or 0) + (e.hold_frames or 0) - (e.age or 0))
 end
@@ -182,6 +183,8 @@ function update_enemies()
         if e.bounce_size_mult then
           e.size *= e.bounce_size_mult
         end
+        add_trauma(mid(0.1, e.size * 0.02, 0.6))
+        spawn_hit_particles(e.x, e.y, _bounce_particle_cfg)
       end
     end
 

@@ -26,12 +26,13 @@ function finish_level(x, y)
 end
 
 function level_1()
-  run"level_setup;name=lvl 1;song=waves;total=1552;point1=0.1;point1_color=C_DARK_PINK;point2=0.72;point2_color=C_LAVENDER"
+  run"level_setup;name=lvl 1;song=waves;total=1552;point1=0.3;point2=0.7"
   run"spw_loop;pattern=column;column_x=140;parallel=true;stagger=5;n=8;enemy_type=E_BULLET;vx=-4.5;size=3;duration_frames=30"
   run"spw_loop;pattern=circle;n=16;radius=60;parallel=true;target_x=64;target_y=64;duration_frames=400;size=3"
   run"spw_loop;pattern=point;n=16;parallel=true;stagger=5;chase=true;chase_speed=2.6;duration_frames=140;size=3"
   run"spw_loop;pattern=row;n=20;random=true;parallel=true;stagger=5;vy=1.8;duration_frames=100;size=3"
-  run"spw;vx=1.8;vy=1.8;duration_frames=300;size=3;bounce=true"
+  run"spw;vx=1.9;vy=1.9;duration_frames=300;size=3;bounce=true;bounce_speed_mult=1.09;bounce_size_mult=1.1"
+  -- o mismo que arriba pero direccion aleatoria
   run"spw_loop;pattern=column;margin=40;n=6;parallel=true;vx=1.8;duration_frames=140;size=3"
   run"spw_loop;pattern=point;x=-4;y=64;enemy_type=E_LINE_BI;n=8;parallel=true;stagger=30;duration_frames=140;len=128;size=5;vx=1.8;ang=0.75"
   run"spw_loop;pattern=perimeter;random=true;radius=50;n=16;parallel=true;stagger=5;chase=true;chase_speed=1.6;duration_frames=140;size=3"
