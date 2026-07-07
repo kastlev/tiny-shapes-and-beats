@@ -7,7 +7,14 @@ function beats(n)
 end
 
 function level_setup(cfg)
-  hud_start(cfg.total_frames, cfg.checkpoints, cfg.song, cfg.name)
+  local checkpoints = {}
+  for i = 1, 4 do
+    local frac = cfg["point" .. i]
+    if frac then
+      add(checkpoints, { frac = frac, color = cfg["point" .. i .. "_color"] })
+    end
+  end
+  hud_start(cfg.total, checkpoints, cfg.song, cfg.name)
   wait_for_card()
 end
 
@@ -19,34 +26,32 @@ function finish_level(x, y)
 end
 
 function level_1()
-  level_setup {
-    name = "lvl 1", song = "waves",
-    total_frames = 1142, checkpoints = { { 0.4, C_DARK_PINK }, { 0.72, C_LAVENDER } }
-  }
-  run("spw_loop;pattern=column;column_x=140;parallel=true;stagger=5;n=8;enemy_type=E_BULLET;vx=-4.5;size=3;duration_frames=30")-- con col_x=190 nunca aparece, con col_x=140 si aparece, cual es el limite?, si quisiera que aparesca una sola bola gitante delmamaño dela pantalla del otroo lado no podria sin que se viera antes
-  -- run("spw_loop;pattern=circle;n=16;radius=60;parallel=true;target_x=64;target_y=64;duration_frames=400;size=3")-- falta un ;wait_frames=10; una api que lo haga posible, una duda esta bien que target_x=64;target_y la velocidad a la que llega dependa de duration_frames=40? creo que si no porque si llega al target y lo pongo en x posicion tendria que calcular cuandtos frames llega ahi para poner manualmente duracion frames, y asignar manualmente una velocidad, siquiesiera que siguiera un rato mas podria poner un hold_frames, solo que me hacia esa pregunta de si era intuitivo
-  -- run("spw_loop;pattern=point;n=16;parallel=true;stagger=5;chase=true;chase_speed=2.6;duration_frames=140;size=3")
-  -- run("spw_loop;pattern=row;n=20;random=true;parallel=true;stagger=5;vy=1.8;duration_frames=100;size=3")
-  -- run("spw;vx=1.8;vy=1.8;duration_frames=300;size=3;bounce=true")
-  -- run("spw_loop;pattern=column;margin=40;n=6;parallel=true;vx=1.8;duration_frames=140;size=3")
-  -- run("spw_loop;pattern=point;x=-4;y=64;enemy_type=E_LINE_BI;n=8;parallel=true;stagger=30;duration_frames=140;len=128;size=5;vx=1.8;ang=0.75")
-  -- run("spw_loop;pattern=perimeter;random=true;radius=50;n=16;parallel=true;stagger=5;chase=true;chase_speed=1.6;duration_frames=140;size=3")
-  -- -- run("spw_loop;n=8;size=8;near_player=true;near_range=0;delay_move=10;chase=true;chase_speed=1.9;duration_frames=100")
-  -- run("spw_loop;n=8;size=1;size_max=200;fill=false;grow_px=1.8;duration_frames=60;warning_time=10;spawn_interval=15;n=6")
-  -- run"spw;enemy_type=E_CROSS;size=1;x=64;y=64;ang_vel=0.01;size_max=4;ease_grow=out_quad;duration_frames=60;burst=true;burst_count=10/wait_for_clear"
-  -- run"spw_loop;enemy_type=E_BULLET;count=8;size=1;size_max=4;burst=true;burst_count=10;warning_time=30"
-  -- callfromstring"bullet_emitter,-1,40,15,40/wait_frames,40/bullet_emitter,129,80,119,80/wait_frames,25/bullet_emitter,-1,40,64,40/wait_frames,40/bullet_emitter,129,80,64,80/wait_frames,25"
-  -- -- run("spw_loop;pattern=perimeter;parallel=true;size=15;warning_time=40;n=8;delay_move=20;chase=true;chase_speed=1.6;duration_frames=100")
-  finish_level(64, 52)
+  run"level_setup;name=lvl 1;song=waves;total=1552;point1=0.1;point1_color=C_DARK_PINK;point2=0.72;point2_color=C_LAVENDER"
+  run"spw_loop;pattern=column;column_x=140;parallel=true;stagger=5;n=8;enemy_type=E_BULLET;vx=-4.5;size=3;duration_frames=30"
+  run"spw_loop;pattern=circle;n=16;radius=60;parallel=true;target_x=64;target_y=64;duration_frames=400;size=3"
+  run"spw_loop;pattern=point;n=16;parallel=true;stagger=5;chase=true;chase_speed=2.6;duration_frames=140;size=3"
+  run"spw_loop;pattern=row;n=20;random=true;parallel=true;stagger=5;vy=1.8;duration_frames=100;size=3"
+  run"spw;vx=1.8;vy=1.8;duration_frames=300;size=3;bounce=true"
+  run"spw_loop;pattern=column;margin=40;n=6;parallel=true;vx=1.8;duration_frames=140;size=3"
+  run"spw_loop;pattern=point;x=-4;y=64;enemy_type=E_LINE_BI;n=8;parallel=true;stagger=30;duration_frames=140;len=128;size=5;vx=1.8;ang=0.75"
+  run"spw_loop;pattern=perimeter;random=true;radius=50;n=16;parallel=true;stagger=5;chase=true;chase_speed=1.6;duration_frames=140;size=3"
+  run("spw_loop;n=8;size=8;near_player=true;near_range=0;delay_move=10;chase=true;chase_speed=1.9;duration_frames=100")
+  run"spw_loop;n=8;size=1;size_max=200;fill=false;grow_px=1.8;duration_frames=60;warning_time=10;spawn_interval=15;n=6"
+  run"spw;enemy_type=E_CROSS;size=1;x=64;y=64;ang_vel=0.01;size_max=4;ease_grow=out_quad;duration_frames=60;burst=true;burst_count=10/wait_for_clear"
+  run"spw_loop;enemy_type=E_BULLET;count=8;size=1;size_max=4;burst=true;burst_count=10;warning_time=30"
+  run"emit;x=-1;y=40;target_x=15;target_y=40/wait_frames;n=40/emit;x=129;y=80;target_x=119;target_y=80"
+  run("spw_loop;pattern=perimeter;parallel=true;size=15;warning_time=40;n=8;delay_move=20;chase=true;chase_speed=1.6;duration_frames=100")
 end
 
 function level_2()
-  level_setup {
-    name = "level 2", song = "flux",
-    total_frames = 2100, checkpoints = { 0.25, 0.52, 0.78 }
-  }
+  -- level_setup {
+  --   name = "level 2", song = "flux",
+  --   total_frames = 2100, checkpoints = { 0.25, 0.52, 0.78 }
+  -- }
+  run"level_setup;name=lvl 2;song=flux;total=2100;point1=0.25;point1_color=C_DARK_PINK;point2=0.52;point2_color=C_LAVENDER;point3=0.78;point3_color=C_DARK_BLUE"
+  -- run"spw_loop;pattern=column;column_x=140;parallel=true;stagger=5;n=8;enemy_type=E_BULLET;vx=-4.5;size=3;duration_frames=30"
+  -- run"spw_loop;pattern=circle;n=16;radius=60;parallel=true;target_x=64;target_y=64;duration_frames=400;size=3"
+  -- run"spw_loop;pattern=point;n=16;parallel=true;stagger=5;chase=true;chase_speed=2.6;duration_frames=140;size=3"
 
-    spawn(E_BULLET, 118, 64, { count = 6, speed = 1.5 })
-
-  finish_level(64, 52)
+  spawn(E_BULLET, 118, 64, { count = 6, speed = 1.5 })
 end

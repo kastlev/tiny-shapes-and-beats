@@ -63,24 +63,28 @@ function line_c(x, y, len, width, ang, col, centered)
   end
 end
 
+function _kv_parts(parts)
+    local t = {}
+    for pair in all(parts) do
+        local kv = split(pair, "=")
+        local k, v = kv[1], kv[2]
+        if v == "true" then v = true
+        elseif v == "false" then v = false
+        elseif tonum(v) then v = tonum(v)
+        elseif _ENV[v] ~= nil then v = _ENV[v]
+        end
+        t[k] = v
+    end
+    return t
+end
+
 function run(str)
     local last
     for call in all(split(str, "/")) do
         local parts = split(call, ";")
         local fname = parts[1]
         deli(parts, 1)
-        local cfg = {}
-        for pair in all(parts) do
-            local kv = split(pair, "=")
-            local k, v = kv[1], kv[2]
-            if v == "true" then v = true
-            elseif v == "false" then v = false
-            elseif tonum(v) then v = tonum(v)
-            elseif _ENV[v] ~= nil then v = _ENV[v]
-            end
-            cfg[k] = v
-        end
-        last = _ENV[fname](cfg)
+        last = _ENV[fname](_kv_parts(parts))
     end
     return last
 end

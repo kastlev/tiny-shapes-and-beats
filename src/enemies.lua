@@ -91,7 +91,7 @@ function spawn_bullet_burst(e)
       size = e.burst_size,
       duration_frames = e.burst_duration_frames,
       color = e.burst_color,
-      shape = e.burst_shape
+      shape = e.burst_shape,
     }
   )
 end

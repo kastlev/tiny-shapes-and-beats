@@ -9,7 +9,10 @@ end
 
 function run_level(fn)
   active_patterns = {}
-  return meanwhile(fn)
+  return meanwhile(function()
+    fn()
+    finish_level(64, 52)
+  end)
 end
 
 function meanwhile(fn)

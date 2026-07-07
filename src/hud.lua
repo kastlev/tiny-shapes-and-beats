@@ -1,5 +1,5 @@
-HUD_X, HUD_Y, HUD_W, level_final_frames, checkpoint_marker_speed, card_timer = unpack(split"1,1,125,0,1.5,0")
-CARD_W, CARD_H, CARD_DISPLAY_TIME, CARD_REVEAL_FRAC, CART_SPEED_IN, CART_SPEED_OUT, ORB_R, ORB_HR  = unpack(split"72,14,30,1,0.2,0.07,5,8")
+HUD_X, HUD_Y, HUD_W, level_final_frames, checkpoint_marker_speed, card_timer = unpack(split "1,1,125,0,1.5,0")
+CARD_W, CARD_H, CARD_DISPLAY_TIME, CARD_REVEAL_FRAC, CART_SPEED_IN, CART_SPEED_OUT, ORB_R, ORB_HR = unpack(split "72,14,30,1,0.2,0.07,5,8")
 
 function hud_start(total_f, checkpoint_list, song, lvl)
     level_total_frames = total_f
@@ -9,7 +9,13 @@ function hud_start(total_f, checkpoint_list, song, lvl)
 
     for _, f in pairs(checkpoint_list or {}) do
         if type(f) == "table" then
-            add(checkpoints, { frac = f[1], color = f[2], hit = false })
+            add(
+                checkpoints, {
+                    frac = f.frac or f[1],
+                    color = f.color or f[2],
+                    hit = false
+                }
+            )
         else
             add(checkpoints, { frac = f, color = nil, hit = false })
         end
@@ -21,6 +27,9 @@ function hud_start(total_f, checkpoint_list, song, lvl)
     level_card_position_x = 128 + CARD_W
     orb = nil
     waves = {}
+    printh("frac=" .. tostr(frac), "debug.txt")
+    printh("current=" .. tostr(current), "debug.txt")
+    printh("total=" .. tostr(total), "debug.txt")
 end
 
 function update_hud()
@@ -34,6 +43,8 @@ function update_hud()
 
     local frac = level_progress_frame / level_total_frames
     for ck in all(checkpoints) do
+        printh("frac=" .. tostr(frac), "debug.txt")
+        printh("ck.frac=" .. tostr(ck.frac), "debug.txt")
         if not ck.hit and frac >= ck.frac then
             ck.hit = true
             add(active_checkpoint_markers, { x = 130, frac = ck.frac, color = ck.color })

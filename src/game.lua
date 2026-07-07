@@ -69,7 +69,7 @@ function draw_game()
 
 	if p.is_dead or p.is_invulnerable or not real_danger_nearby() then
 		draw_enemies()
-		draw_player() 
+		draw_player()
 	else
 		draw_player()
 		draw_enemies()
@@ -80,7 +80,6 @@ function draw_game()
 end
 
 function _do_respawn()
-	bg_color_base = BG_COLOR_DEFAULT
 	camera()
 	death_sequence_started = false
 	enemies = {}
@@ -90,21 +89,15 @@ function _do_respawn()
 	active_checkpoint_markers = {}
 	orb = nil
 
-	callfromstring"init_player/init_hitstop/init_camera/init_screen_flash/init_particle"
+	callfromstring "init_player/init_hitstop/init_camera/init_screen_flash/init_particle"
 
-	level_progress_frame = last_respawn_frame
 	local target_frame = last_respawn_frame
-	local saved_frac = level_total_frames > 0 and (target_frame / level_total_frames) or 0
 
-	for ck in all(checkpoints) do
-		ck.hit = ck.frac <= saved_frac
-	end
-
-	level_card_state = "done"
 	run_level(current_level)
 
 	local sim_frame = 0
 	while sim_frame < target_frame do
+		_update_card()
 		for co in all(active_patterns) do
 			if costatus(co) != "dead" then
 				coresume(co)
@@ -114,7 +107,21 @@ function _do_respawn()
 		sim_frame += 1
 	end
 
-	checkpoint_fast_forward_frames = 0
-	callfromstring"start_reveal,64,64,10"
+	local saved_frac = level_total_frames > 0 and (target_frame / level_total_frames) or 0
+	level_progress_frame = target_frame
+	last_respawn_frame = target_frame
+	level_started = true
+	level_card_state = "done"
+	level_card_position_x = 200
 
+	bg_color_base = BG_COLOR_DEFAULT
+	for ck in all(checkpoints) do
+		ck.hit = ck.frac <= saved_frac
+		if ck.hit and ck.color then
+			bg_color_base = ck.color
+		end
+	end
+
+	checkpoint_fast_forward_frames = 0
+	callfromstring "start_reveal,64,64,10"
 end

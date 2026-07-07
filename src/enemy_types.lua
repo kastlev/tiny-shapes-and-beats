@@ -110,33 +110,8 @@ function _spw_loop_body(cfg)
     end
 end
 
-function bullet_emitter(x, y, target_x, target_y, params)
-    params = params or {}
-    return spawn(
-        params.enemy_type or E_BULLET, x, y, {
-            size = params.size or 4,
-            color = params.color,
-            shape = params.shape,
-            warning = false,
+EMIT_DEFAULT = "enemy_type=E_CIRCLE;size=4;warning=false;ease_move=out_quad;duration_frames=30;hold_frames=20;flicker=true;burst=true"
 
-            target_x = target_x,
-            target_y = target_y,
-            ease_move = params.ease_move or "out_quad",
-            duration_frames = params.duration_frames or 30,
-            hold_frames = params.hold_frames or 20,
-
-            flicker = true,
-            flicker_colors = params.flicker_colors,
-            flicker_rate = params.flicker_rate,
-
-            burst = true,
-            burst_count = params.burst_count,
-            burst_speed = params.burst_speed,
-            burst_size = params.burst_size,
-            burst_color = params.burst_color,
-            burst_duration_frames = params.burst_duration_frames,
-            burst_angle_offset = params.burst_angle_offset or rnd(1),
-            burst_shape = params.burst_shape
-        }
-    )
+function emit(cfg)
+    return spw(_merge(_kv_parts(split(EMIT_DEFAULT, ";")), cfg or {}))
 end
