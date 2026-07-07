@@ -30,6 +30,7 @@ function update_active_patterns()
 end
 
 function wait_frames(n)
+  if type(n) == "table" then n = n.n end
   if checkpoint_fast_forward_frames >= n then
     checkpoint_fast_forward_frames -= n
     return

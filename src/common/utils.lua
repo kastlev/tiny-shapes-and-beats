@@ -64,11 +64,11 @@ function line_c(x, y, len, width, ang, col, centered)
 end
 
 function run(str)
+    local last
     for call in all(split(str, "/")) do
         local parts = split(call, ";")
         local fname = parts[1]
         deli(parts, 1)
-
         local cfg = {}
         for pair in all(parts) do
             local kv = split(pair, "=")
@@ -80,7 +80,7 @@ function run(str)
             end
             cfg[k] = v
         end
-
-        _ENV[fname](cfg)
+        last = _ENV[fname](cfg)
     end
+    return last
 end
