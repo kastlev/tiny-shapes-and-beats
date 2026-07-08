@@ -71,12 +71,14 @@ function ease_out_quad(t)     t-=1 return 1-t*t end
 --   elseif t<2.5/d then t-=2.25/d  return 1-n*t*t-.9375
 --   else                t-=2.625/d return 1-n*t*t-.984375 end
 -- end
+function ease_in_snap(t) return t*t*t*t*t*t end -- t^6
 
 -- tabla de lookup
 ease_fns = {
   ["linear"]        = ease_linear,
   ["in_quad"]       = ease_in_quad,
-  ["out_quad"]      = ease_out_quad
+  ["out_quad"]      = ease_out_quad,
+  ["in_snap"]  = ease_in_snap
   -- ["inout_quad"]    = ease_inout_quad,
   -- ["outin_quad"]    = ease_outin_quad,
   -- ["in_quart"]      = ease_in_quart,

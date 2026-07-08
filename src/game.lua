@@ -56,23 +56,38 @@ end
 function draw_game()
 	draw_screen_fx()
 	draw_camera()
-
 	cls(bg_color)
-
+	
 	draw_particles"back"
+	
+	draw_warnings()
 
 	if p.is_dead or p.is_invulnerable or not real_danger_nearby() then
-		draw_enemies()
+		draw_real_enemies()
+		-- poke(0x5f34,0x2)
+		-- circfill(64,64,50+cos(t()/4)*5,C_PINK | 0x1800)
 		draw_player()
 	else
 		draw_player()
-		draw_enemies()
+		-- poke(0x5f34,0x2)
+		-- circfill(64,64,50+cos(t()/4)*5,C_PINK | 0x1800)
+		draw_real_enemies()
 	end
-
+	-- poke(0x5f34, 0x2)
+	-- circfill(64, 64, 50 + cos(t()/4)*5, C_PINK | 0x1800)
+	-- poke(0x5f34, 0x0) -- 
 	draw_particles"front"
-
+	
 	camera()
 	draw_hud()
+	-- poke(0x5f2f,1)-- pausa el sonido de la musica
+-- poke(0x5f31,0xaa)
+-- poke(0x5f32,0xaa)
+-- poke(0x5f33,2)
+	-- poke(0x5f54, 0x60) 
+	-- sspr(0,0,128,128, 100,5,20,20)
+	-- poke(0x5f54, 0x00) 
+	-- pal() -- return to defaults
 end
 
 function _do_respawn()

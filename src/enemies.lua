@@ -46,7 +46,15 @@ enemy_types = {
         circfill(fx, fy, e.size, col)
       end
     end
-  }
+  },
+  [E_HOLE] = {
+    draw = function(e)
+      local col = enemy_color(e)
+      poke(0x5f34, 0x2)
+      circfill(e.x, e.y, e.size, col | 0x1800)
+      poke(0x5f34, 0x0)
+    end
+},
 }
 
 enemies = {}
@@ -84,6 +92,7 @@ function fire_bullet_ring(x, y, count, speed, angle_offset, bullet_settings)
       }
     )
   end
+  trigger_screen_flash(_hit_flash_cfg)
   spawn_hit_particles(x, y, _bounce_particle_cfg)
 end
 
@@ -213,6 +222,9 @@ function update_enemies()
     end
 
     local margin = (e.size or 0) + 16
+    if e.type == E_LINE_BI or e.type == E_CROSS then
+      margin += e.len or 0
+    end
     local out = false
     if not e.wrap and not e.bounce then
       out = (e.x < -margin or e.x > 128 + margin or e.y < -margin or e.y > 128 + margin)
@@ -228,12 +240,15 @@ function update_enemies()
   end
 end
 
-function draw_enemies()
+function draw_warnings()
   for e in all(enemies) do
     if e.is_warning then
       enemy_types[e.type].draw(e)
     end
   end
+end
+
+function draw_real_enemies()
   for e in all(enemies) do
     if not e.is_warning then
       enemy_types[e.type].draw(e)
