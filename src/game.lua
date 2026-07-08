@@ -1,5 +1,6 @@
+current_level = level_1
+
 function init_game()
-	current_level = level_1
 	run_level(current_level)
 	set_screen(update_game, draw_game)
 	init_particle()
@@ -57,36 +58,30 @@ function draw_game()
 	draw_screen_fx()
 	draw_camera()
 	cls(bg_color)
-	
-	draw_particles"back"
-	
+
+	draw_particles "back"
+
 	draw_warnings()
 
 	if p.is_dead or p.is_invulnerable or not real_danger_nearby() then
 		draw_real_enemies()
-		-- poke(0x5f34,0x2)
-		-- circfill(64,64,50+cos(t()/4)*5,C_PINK | 0x1800)
 		draw_player()
 	else
 		draw_player()
-		-- poke(0x5f34,0x2)
-		-- circfill(64,64,50+cos(t()/4)*5,C_PINK | 0x1800)
 		draw_real_enemies()
 	end
-	-- poke(0x5f34, 0x2)
-	-- circfill(64, 64, 50 + cos(t()/4)*5, C_PINK | 0x1800)
-	-- poke(0x5f34, 0x0) -- 
-	draw_particles"front"
-	
+	draw_particles "front"
+
 	camera()
 	draw_hud()
+
 	-- poke(0x5f2f,1)-- pausa el sonido de la musica
--- poke(0x5f31,0xaa)
--- poke(0x5f32,0xaa)
--- poke(0x5f33,2)
-	-- poke(0x5f54, 0x60) 
+	-- poke(0x5f31,0xaa)
+	-- poke(0x5f32,0xaa)
+	-- poke(0x5f33,2)
+	-- poke(0x5f54, 0x60)
 	-- sspr(0,0,128,128, 100,5,20,20)
-	-- poke(0x5f54, 0x00) 
+	-- poke(0x5f54, 0x00)
 	-- pal() -- return to defaults
 end
 
@@ -103,7 +98,7 @@ function _do_respawn()
 	callfromstring "init_player/init_hitstop/init_camera/init_screen_flash/init_particle"
 
 	local target_frame = last_respawn_frame
-
+	-- srand(level_seed)
 	run_level(current_level)
 
 	local sim_frame = 0
@@ -117,7 +112,7 @@ function _do_respawn()
 		update_enemies()
 		sim_frame += 1
 	end
-
+	init_particles()
 	local saved_frac = level_total_frames > 0 and (target_frame / level_total_frames) or 0
 	level_progress_frame = target_frame
 	last_respawn_frame = target_frame

@@ -1,35 +1,19 @@
-gradients_source = {
-    "0,0,0,0,0,0,0,0",
-    "1,1,0,0,0,0,0,0",
-    "2,1,0,0,0,0,0,0",
-    "3,5,1,0,0,0,0,0",
-    "4,2,1,0,0,0,0,0",
-    "5,1,0,0,0,0,0,0",
-    "6,13,5,1,0,0,0,0",
-    "7,6,13,5,1,0,0,0",
-    "8,4,2,1,0,0,0,0",
-    "9,8,4,2,1,0,0,0",
-    "10,9,8,4,2,1,0,0",
-    "11,3,1,0,0,0,0,0",
-    "12,1,0,0,0,0,0,0",
-    "13,5,1,0,0,0,0,0",
-    "14,2,1,0,0,0,0,0",
-    "15,14,2,1,0,0,0,0"
-}
-
 gradients = {}
 
-for i = 1, 16 do
-    add(gradients, split(gradients_source[i]))
+for row in all(split(
+  "0,0,0,0,0,0,0,0;1,1,0,0,0,0,0,0;2,1,0,0,0,0,0,0;3,5,1,0,0,0,0,0;"..
+  "4,2,1,0,0,0,0,0;5,1,0,0,0,0,0,0;6,13,5,1,0,0,0,0;7,6,13,5,1,0,0,0;"..
+  "8,4,2,1,0,0,0,0;9,8,4,2,1,0,0,0;10,9,8,4,2,1,0,0;11,3,1,0,0,0,0,0;"..
+  "12,1,0,0,0,0,0,0;13,5,1,0,0,0,0,0;14,2,1,0,0,0,0,0;15,14,2,1,0,0,0,0",
+  ";"
+)) do
+  add(gradients, split(row))
 end
 
-fading = false
-fade_t = 0
+fading, fade_t = false, 0
 
 function start_fade(from, to, frames, cb)
-    fade_from, fade_to = from, to
-    fade_frames, fade_timer = frames, 0
-    fade_cb, fading = cb, true
+    fade_from, fade_to, fade_frames, fade_timer, fade_cb, fading = from, to, frames, 0, cb, true
 end
 
 function start_fadein(frames) start_fade(8, 0, frames or 30) end
@@ -56,18 +40,8 @@ function draw_fade()
     end
 end
 
--- Reveal square
-reveal_active = false
-reveal_t = 0
-reveal_frames = 30
-reveal_cx, reveal_cy = 64, 64
-
 function start_reveal(cx, cy, frames)
-    reveal_active = true
-    reveal_t = 0
-    reveal_frames = frames or 30
-    reveal_cx = cx or 64
-    reveal_cy = cy or 64
+    reveal_active, reveal_t, reveal_frames, reveal_cx, reveal_cy = true, 0, frames or 30, cx or 64, cy or 64
 end
 
 function update_reveal()
@@ -87,12 +61,11 @@ end
 function fade_square(progress, cx, cy, col)
     if progress >= 1 then return end
     col = col or 0
-    cx,cy = cx or 64, cy or 64
-    local h=64*progress
-    rectfill(0,0,127,cy-h-1,col)
-    rectfill(0,cy+h,127,127,col)
-    rectfill(0,cy-h,cx-h-1,cy+h,col)
-    rectfill(cx+h,cy-h,127,cy+h,col)
+    cx, cy = cx or 64, cy or 64
+    local h = 64 * progress
+    poke(0x5f34, 0x2)
+    rectfill(cx-h, cy-h, cx+h, cy+h, col | 0x1800)
+    poke(0x5f34, 0x0)
 end
 
 

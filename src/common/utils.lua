@@ -79,18 +79,19 @@ function _kv_parts(parts)
 end
 
 function run(str)
-    local branches = split(str, "|")
-    if #branches > 1 then
-        local fns = {}
-        for b in all(branches) do add(fns, function() run(b) end) end
-        return sync(unpack(fns))
-    end
     local last
     for call in all(split(str, "/")) do
-        local parts = split(call, ";")
-        local fname = parts[1]
-        deli(parts, 1)
-        last = _ENV[fname](_kv_parts(parts))
+        local branches = split(call, "|")
+        if #branches > 1 then
+            local fns = {}
+            for b in all(branches) do add(fns, function() run(b) end) end
+            last = sync(unpack(fns))
+        else
+            local parts = split(call, ";")
+            local fname = parts[1]
+            deli(parts, 1)
+            last = _ENV[fname](_kv_parts(parts))
+        end
     end
     return last
 end

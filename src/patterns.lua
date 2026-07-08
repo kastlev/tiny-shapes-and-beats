@@ -4,7 +4,8 @@ function run_level(fn)
   active_patterns = {}
   return meanwhile(function()
     fn()
-    finish_level(64, 52)
+    level_final_frames = level_runtime_frames
+    run"wait_for_clear/spawn_orb/wait_for_orb"
   end)
 end
 

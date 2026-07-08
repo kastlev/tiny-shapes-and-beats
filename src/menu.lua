@@ -1,5 +1,3 @@
-current_level = nil
-
 function init_menu()
     menu_frame, menu_started = 0, false
     set_screen(update_menu, draw_menu)
@@ -74,7 +72,7 @@ function update_menu()
             45, function()
                 start_fadeout(
                     10, function()
-                        init_game()
+                        set_screen(update_selector, draw_selector)
                         start_fadein(10)
                     end
                 )
@@ -94,7 +92,6 @@ function update_menu()
     --             cols = { C_DARK_BLUE, C_DARK_GRAY },
     --             min_life = 40,
     --             max_life = 100,
-    --             tag = "menu_bg"
     --         }
     --     )
     -- end

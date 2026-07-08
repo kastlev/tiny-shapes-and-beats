@@ -54,19 +54,21 @@ enemy_types = {
       circfill(e.x, e.y, e.size, col | 0x1800)
       poke(0x5f34, 0x0)
     end
-},
+  }
 }
 
 enemies = {}
 
 function enemy_color(e)
   if e.flicker then
-    local c = e.flicker_colors or { C_PINK, C_WHITE }
-    return c[e.age \ (e.flicker_rate or 4) % #c + 1]
+    local c = e.flicker_colors or {C_PINK,C_WHITE}
+    return c[e.age\(e.flicker_rate or 4)%#c+1]
   end
-  return enemy_remaining_frames(e) <= DEATH_WARN_FRAMES
+
+  return e.draw_behind
       and C_DARK_PINK
-      or e.color or C_PINK
+      or e.color
+      or C_PINK
 end
 
 function enemy_remaining_frames(e)
@@ -110,7 +112,7 @@ end
 function update_enemies()
   for e in all(enemies) do
     e.age += 1
-
+    e.draw_behind = enemy_remaining_frames(e) <= DEATH_WARN_FRAMES
     if e.delay_move > 0 then
       e.delay_move -= 1
     elseif e.chase then
@@ -242,7 +244,7 @@ end
 
 function draw_warnings()
   for e in all(enemies) do
-    if e.is_warning then
+    if e.is_warning or e.draw_behind then
       enemy_types[e.type].draw(e)
     end
   end
@@ -250,7 +252,7 @@ end
 
 function draw_real_enemies()
   for e in all(enemies) do
-    if not e.is_warning then
+    if not e.is_warning and not e.draw_behind then
       enemy_types[e.type].draw(e)
     end
   end
