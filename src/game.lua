@@ -37,29 +37,13 @@ function update_game()
 			)
 		end
 	end
-	-- if level_runtime_frames % 10 == 0 then
-	-- 	spawn_particle(
-	-- 		rnd(128), rnd(128), {
-	-- 			min_vel = 0.1,
-	-- 			max_vel = 0.6,
-	-- 			min_size = 1,
-	-- 			max_size = 1,
-	-- 			shrink = false,
-	-- 			square = (rnd() < 0.5),
-	-- 			cols = { C_DARK_BLUE, C_DARK_GRAY },
-	-- 			min_life = 40,
-	-- 			max_life = 100,
-	-- 			tag = "menu_bg"
-	-- 		}
-	-- 	)
-	-- end
 end
 
 function draw_game()
 	draw_screen_fx()
 	draw_camera()
 	cls(bg_color)
-
+	spawn_bg_particles()
 	draw_particles "back"
 
 	draw_warnings()
@@ -138,9 +122,9 @@ function _do_respawn()
 end
 
 function trigger_hitstop(frames)
-    hitstop_timer = frames or 2
+	hitstop_timer = frames or 2
 end
 
 function is_hitstop()
-    return hitstop_timer > 0
+	return hitstop_timer > 0
 end

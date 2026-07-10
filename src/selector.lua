@@ -1,5 +1,8 @@
 function meta(i) return _kv_parts(split(LEVEL_META[i], ";")) end
 
+function init_selector()
+    -- draw bg selctor in the map
+end
 selector_idx, selector_cam_x = 1, 0
 
 function update_selector()
@@ -19,6 +22,13 @@ function update_selector()
 end
 
 function draw_selector()
-    callfromstring "cls,bg_color/camera,selector_cam_x,0/map,0,0,0,0,128,32/camera/spr,1,60,60"
+    for c in all(split "3,1,13,11,4") do
+        pal(c, c + 128, 1)
+    end
+
+    callfromstring "cls,1/camera,selector_cam_x,0"
+    callfromstring "circfill,50,110,40,3/circfill,20,110,20,3"
+    callfromstring "map,0,0,0,0,128,32/camera/spr,1,60,60"
+
     print(meta(selector_idx).name, 4, 110, C_WHITE)
 end

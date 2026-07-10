@@ -72,9 +72,7 @@ function ease_in_snap(t) return t*t*t*t*t*t end -- t^6
 
 -- tabla de lookup
 ease_fns = {
-  ["linear"]        = ease_linear,
-  ["in_quad"]       = ease_in_quad,
-  ["out_quad"]      = ease_out_quad,
+  ["out_quad"]  = ease_out_quad,
   ["in_snap"]  = ease_in_snap
   -- ["inout_quad"]    = ease_inout_quad,
   -- ["outin_quad"]    = ease_outin_quad,

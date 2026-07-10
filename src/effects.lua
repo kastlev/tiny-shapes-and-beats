@@ -27,7 +27,7 @@ _death_flash_cfg = cfg(
     }
 )
 
-_hit_cfg = cfg(
+_hit_particle_cfg = cfg(
     "min_vel=.8;max_vel=2.5;min_life=10;max_life=20;layer=front",
     {
         C_WHITE,
@@ -38,7 +38,7 @@ _hit_cfg = cfg(
     }
 )
 
-_trail_cfg = cfg(
+_trail_particle_cfg = cfg(
     "min_vel=.1;max_vel=.3;min_life=6;max_life=20;min_size=1;max_size=3;square=true;rate=2;shrink=true;tag=trail",
     {
         C_DARK_BLUE
@@ -51,6 +51,14 @@ _bounce_particle_cfg = cfg(
         C_WHITE,
         C_PINK,
         C_DARK_PINK
+    }
+)
+
+_bg_particle_cfg = cfg(
+    "min_vel=.1;max_vel=.6;min_size=1;max_size=1;min_life=40;max_life=100;shrink=false;tag=menu_bg",
+    {
+        C_DARK_BLUE,
+        C_DARK_GRAY
     }
 )
 
@@ -82,13 +90,20 @@ function draw_screen_fx()
 end
 
 function spawn_hit_particles(x, y, cfg)
-    cfg = cfg or _hit_cfg
+    cfg = cfg or _hit_particle_cfg
     for i = 1, rndb(8, 16) do
         spawn_particle(x, y, cfg)
     end
 end
 
 function spawn_trail_particle(x, y, gx, gy)
-    _trail_cfg.cols = TRAIL_COLOR_BY_BG[bg_color_base] or TRAIL_COLOR_DEFAULT
-    spawn_particle(x, y, _trail_cfg, gx, gy)
+    _trail_particle_cfg.cols = TRAIL_COLOR_BY_BG[bg_color_base] or TRAIL_COLOR_DEFAULT
+    spawn_particle(x, y, _trail_particle_cfg, gx, gy)
+end
+
+function spawn_bg_particles()
+    if frame % 10 == 0 then
+        _bg_particle_cfg.square = rnd() < .5
+        spawn_particle(rnd(128), rnd(128), _bg_particle_cfg)
+    end
 end

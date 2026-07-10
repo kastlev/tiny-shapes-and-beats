@@ -57,22 +57,6 @@ function update_menu()
             end
         )
     end
-
-    if menu_frame % 10 == 0 then
-        spawn_particle(
-            rnd(128), rnd(128), {
-                min_vel = 0.1,
-                max_vel = 0.6,
-                min_size = 1,
-                max_size = 1,
-                shrink = false,
-                square = (rnd() < 0.5),
-                cols = { C_DARK_BLUE, C_DARK_GRAY },
-                min_life = 40,
-                max_life = 100
-            }
-        )
-    end
     update_particles()
 end
 
@@ -87,10 +71,8 @@ function _draw_title()
 end
 
 function draw_menu()
-    cls(bg_color)
-    draw_particles()
-
-    callfromstring "pal,C_DARK_BLUE,129,1/pal,C_DARK_GRAY,133,1/pal,C_DARK_PINK,130,1"
+    
+    callfromstring "cls,bg_color/pal,C_DARK_BLUE,129,1/pal,C_DARK_GRAY,133,1/pal,C_DARK_PINK,130,1"
 
     for s in all(menu_shapes) do
         if s.kind == "square" then

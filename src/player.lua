@@ -167,37 +167,37 @@ function update_player()
 	p.is_invulnerable = p.is_dashing or p.hit_iframes_timer > 0
 
 	-- stun
-if not p.is_invulnerable then
-    local x1, y1, x2, y2 = player_hitbox_points()
-    local hit_left = edge_hit(x1, y1, x1, y2)
-    local hit_right = edge_hit(x2, y1, x2, y2)
-    local hit_top = edge_hit(x1, y1, x2, y1)
-    local hit_bot = edge_hit(x1, y2, x2, y2)
-    local edge_hit_any = hit_left or hit_right or hit_top or hit_bot
+	if not p.is_invulnerable then
+		local x1, y1, x2, y2 = player_hitbox_points()
+		local hit_left = edge_hit(x1, y1, x1, y2)
+		local hit_right = edge_hit(x2, y1, x2, y2)
+		local hit_top = edge_hit(x1, y1, x2, y1)
+		local hit_bot = edge_hit(x1, y2, x2, y2)
+		local edge_hit_any = hit_left or hit_right or hit_top or hit_bot
 
-    local force = 7.5
-    if hit_left then p.dx = force end
-    if hit_right then p.dx = -force end
-    if hit_top then p.dy = force end
-    if hit_bot then p.dy = -force end
+		local force = 7.5
+		if hit_left then p.dx = force end
+		if hit_right then p.dx = -force end
+		if hit_top then p.dy = force end
+		if hit_bot then p.dy = -force end
 
-    local hole_hit = not edge_hit_any and check_hole_danger(force)
+		local hole_hit = not edge_hit_any and check_hole_danger(force)
 
-    p.in_danger = edge_hit_any or hole_hit
+		p.in_danger = edge_hit_any or hole_hit
 
-    if p.in_danger then
-        p.is_stunned = true
-        p.hit_iframes_timer = p.hit_iframes_timer_max
-        p.hp -= 1
+		if p.in_danger then
+			p.is_stunned = true
+			p.hit_iframes_timer = p.hit_iframes_timer_max
+			p.hp -= 1
 
-        if p.hp <= 0 then
-            p.is_dead = true
-            spawn_death_bullets(p.x + p.w / 2, p.y + p.h / 2, 6)
-        end
+			if p.hp <= 0 then
+				p.is_dead = true
+				spawn_death_bullets(p.x + p.w / 2, p.y + p.h / 2, 6)
+			end
 
-        trigger_hit_effect()
-    end
-end
+			trigger_hit_effect()
+		end
+	end
 
 	player_timers = split(
 		"dash_cooldown_timer,hit_iframes_timer,dash_buffer_timer,last_input_timer", ","
@@ -360,16 +360,16 @@ function edge_hit(x1, y1, x2, y2)
 end
 
 function check_hole_danger(force)
-  for e in all(enemies) do
-    if e.type == E_HOLE and not e.is_warning then
-      local dx, dy = p.x + p.w/2 - e.x, p.y + p.h/2 - e.y
-      local d2 = dx*dx + dy*dy
-      if d2 > e.size * e.size then
-        local d = sqrt(d2)
-        p.dx, p.dy = -dx/d*force, -dy/d*force
-        return true
-      end
-    end
-  end
-  return false
+	for e in all(enemies) do
+		if e.type == E_HOLE and not e.is_warning then
+			local dx, dy = p.x + p.w / 2 - e.x, p.y + p.h / 2 - e.y
+			local d2 = dx * dx + dy * dy
+			if d2 > e.size * e.size then
+				local d = sqrt(d2)
+				p.dx, p.dy = -dx / d * force, -dy / d * force
+				return true
+			end
+		end
+	end
+	return false
 end
