@@ -1,27 +1,20 @@
 DEATH_WARN_FRAMES = 1
 BOUNCE_VARIANCE = 0.03
 
+function _draw_shape(x, y, s, fill, sq, col)
+  if sq then
+    if fill then rectfill(x-s,y-s,x+s,y+s,col) else rect(x-s,y-s,x+s,y+s,col) end
+  else
+    if fill then circfill(x,y,s,col) else circ(x,y,s,col) end
+  end
+end
+
 enemy_types = {
   [E_CIRCLE] = {
-    draw = function(e)
-      local col = enemy_color(e)
-      if e.fill then
-        circfill(e.x, e.y, e.size, col)
-      else
-        circ(e.x, e.y, e.size, col)
-      end
-    end
+    draw = function(e) _draw_shape(e.x, e.y, e.size, e.fill, false, enemy_color(e)) end
   },
   [E_SQUARE] = {
-    draw = function(e)
-      local col = enemy_color(e)
-      local s = e.size
-      if e.fill then
-        rectfill(e.x - s, e.y - s, e.x + s, e.y + s, col)
-      else
-        rect(e.x - s, e.y - s, e.x + s, e.y + s, col)
-      end
-    end
+    draw = function(e) _draw_shape(e.x, e.y, e.size, e.fill, true, enemy_color(e)) end
   },
   [E_LINE_BI] = {
     draw = function(e)
@@ -37,14 +30,7 @@ enemy_types = {
   },
   [E_BULLET] = {
     draw = function(e)
-      local col = enemy_color(e)
-      local fx, fy = flr(e.x), flr(e.y)
-      if e.shape == "square" then
-        local s = e.size
-        rectfill(fx - s, fy - s, fx + s, fy + s, col)
-      else
-        circfill(fx, fy, e.size, col)
-      end
+      _draw_shape(flr(e.x), flr(e.y), e.size, true, e.shape == "square", enemy_color(e))
     end
   },
   [E_HOLE] = {
@@ -61,8 +47,8 @@ enemies = {}
 
 function enemy_color(e)
   if e.flicker then
-    local c = e.flicker_colors or {C_PINK,C_WHITE}
-    return c[e.age\(e.flicker_rate or 4)%#c+1]
+    local c = e.flicker_colors or { C_PINK, C_WHITE }
+    return c[e.age \ (e.flicker_rate or 4) % #c + 1]
   end
 
   return e.draw_behind
@@ -110,11 +96,18 @@ function spawn_bullet_burst(e)
 end
 
 function update_enemies()
+  player_in_danger = false
+  local cx, cy = p.x + 2, p.y + 2
+
   for e in all(enemies) do
     e.age += 1
     e.draw_behind = enemy_remaining_frames(e) <= DEATH_WARN_FRAMES
     if e.delay_move > 0 then
       e.delay_move -= 1
+    elseif e.orbit then
+      e.orbit_ang += e.orbit_speed
+      e.x = e.orbit_cx + cos(e.orbit_ang) * e.orbit_radius
+      e.y = e.orbit_cy + sin(e.orbit_ang) * e.orbit_radius
     elseif e.chase then
       local dx, dy = p.x - e.x, p.y - e.y
       local d = sqrt(dx * dx + dy * dy)
@@ -223,6 +216,17 @@ function update_enemies()
       end
     end
 
+    if not e.is_warning then
+      local r = (e.size or 2) + 3
+      if e.type == E_LINE_BI or e.type == E_CROSS then
+        r += e.len or 0
+      end
+      local dx, dy = cx - e.x, cy - e.y
+      if dx * dx + dy * dy < r * r then
+        player_in_danger = true
+      end
+    end
+
     local margin = (e.size or 0) + 16
     if e.type == E_LINE_BI or e.type == E_CROSS then
       margin += e.len or 0
@@ -273,6 +277,16 @@ function spawn(etype, x, y, params)
     x = mid(6, p.x + p.w / 2 + rnd(range * 2) - range, 121)
     y = mid(6, p.y + p.h / 2 + rnd(range * 2) - range, 121)
   end
+
+  -- if params.min_player_dist then
+  --   local dx, dy = x - (p.x + p.w / 2), y - (p.y + p.h / 2)
+  --   local min_d = params.min_player_dist
+  --   if dx * dx + dy * dy < min_d * min_d then
+  --     local ang = atan2(dx, dy)
+  --     x = mid(6, p.x + p.w / 2 + cos(ang) * min_d, 121)
+  --     y = mid(6, p.y + p.h / 2 + sin(ang) * min_d, 121)
+  --   end
+  -- end
 
   local is_burst = params.count ~= nil
   local is_bullet = etype == E_BULLET
@@ -329,59 +343,44 @@ function spawn(etype, x, y, params)
   return _create_enemy(etype, x, y, params)
 end
 
+local BOOL_FIELDS = split("chase,wrap,bounce,wave,flicker,burst,is_warning,orbit", ",")
+local NUM_DEFAULTS = {
+  delay_move=0, delay_grow=0, lerp_factor=.1, chase_speed=1.6, chase_turn=.06,
+  grow_px=.5, grow_lerp=.1, wave_amp=10, wave_freq=.05, wave_axis="y",
+  duration_frames=30, hold_frames=0, len=80, ang=0, ang_vel=0,
+  orbit_radius=20, orbit_speed=.01
+}
+
 function _create_enemy(enemy_type, x, y, settings)
   settings = settings or {}
 
   local s0 = settings.size or (enemy_type == E_BULLET and 1 or 2)
   settings.type = enemy_type or E_CIRCLE
-  settings.x = x
-  settings.y = y
+  settings.x, settings.y = x, y
+  settings.origin_x, settings.origin_y = x, y
 
   settings.size = s0
   settings.size_start = s0
   settings.max_size = settings.size_max or s0
   settings.grow = settings.max_size > s0
 
-  settings.origin_x = x
-  settings.origin_y = y
+  for k in all(BOOL_FIELDS) do settings[k] = settings[k] or false end
+  for k, v in pairs(NUM_DEFAULTS) do settings[k] = settings[k] or v end
 
-  settings.delay_move = settings.delay_move or 0
   settings.delay_move_total = settings.delay_move
-  settings.delay_grow = settings.delay_grow or 0
   settings.delay_grow_total = settings.delay_grow
-
-  settings.grow_mode = settings.grow_lerp and "lerp"
-      or settings.ease_grow and "curve"
-      or "px"
-
+  settings.orbit_cx = settings.orbit_cx or x
+  settings.orbit_cy = settings.orbit_cy or y
+  settings.orbit_ang = settings.orbit_ang or rnd(1)
+  settings.grow_mode = settings.grow_lerp and "lerp" or settings.ease_grow and "curve" or "px"
   settings.fill = settings.fill ~= false
-  settings.chase = settings.chase or false
-  settings.wrap = settings.wrap or false
-  settings.bounce = settings.bounce or false
-  settings.wave = settings.wave or false
-  settings.flicker = settings.flicker or false
-  settings.burst = settings.burst or false
-  settings.is_warning = settings.is_warning or false
   settings.alive = true
   settings.age = 0
-
-  settings.lerp_factor = settings.lerp_factor or .1
-  settings.chase_speed = settings.chase_speed or 1.6
-  settings.chase_turn = settings.chase_turn or .06
-  settings.grow_px = settings.grow_px or .5
-  settings.grow_lerp = settings.grow_lerp or .1
-  settings.wave_amp = settings.wave_amp or 10
-  settings.wave_freq = settings.wave_freq or .05
-  settings.wave_axis = settings.wave_axis or "y"
-  settings.duration_frames = settings.duration_frames or 30
-  settings.hold_frames = settings.hold_frames or 0
-  settings.len = settings.len or 80
-  settings.ang = settings.ang or 0
-  settings.ang_vel = settings.ang_vel or 0
 
   add(enemies, settings)
   return settings
 end
+
 
 -- etype          default E_CIRCLE si se omite (nil)
 -- x, y           default posicion random en pantalla si se omiten (nil)

@@ -15,7 +15,6 @@ function spawn_particle(x, y, cfg, gx_ov, gy_ov)
 
     local min_s = cfg.min_size or 0
     local max_s = cfg.max_size or min_s
-    local size = cfg.shrink and max_s or (min_s + rnd(max_s - min_s))
 
     local cols = cfg.cols or { 7 }
 
@@ -30,7 +29,7 @@ function spawn_particle(x, y, cfg, gx_ov, gy_ov)
             cols = cols,
             gx = gx_ov or cfg.gx or 0,
             gy = gy_ov or cfg.gy or 0,
-            size = size,
+            size = cfg.shrink and max_s or (min_s + rnd(max_s - min_s)),
             size_max = max_s,
             size_min = min_s,
             shrink = cfg.shrink or false,

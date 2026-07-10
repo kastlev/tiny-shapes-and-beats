@@ -7,7 +7,6 @@ __lua__
 #include src/common/camera.lua
 #include src/common/particles.lua
 #include src/common/screen_flash.lua
-#include src/common/hitstop.lua
 #include src/common/transitions.lua
 #include src/common/delay.lua
 #include src/death_bullets.lua

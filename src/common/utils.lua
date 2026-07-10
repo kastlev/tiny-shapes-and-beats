@@ -11,13 +11,6 @@ function rndb(low, high)
     return flr(rnd(high - low + 1) + low)
 end
 
-function ptbl(keys, vals)
-    for i, k in pairs(keys) do
-        vals[k] = vals[i]
-    end
-    return vals
-end
-
 function callfromstring(l)
 	for s in all(split(l,"/")) do
 		s=split(s)
@@ -94,8 +87,4 @@ function run(str)
         end
     end
     return last
-end
-
-function lerp(a,b,t)
-    return a+(b-a)*t
 end

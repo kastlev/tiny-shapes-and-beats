@@ -1,52 +1,58 @@
-local _hit_flash_cfg = {
-    frames = 8,
-    bg_steps = {
-        { 0, C_DARK_PINK },
-        { 4, C_LAVENDER }
+function cfg(s, cols, bg)
+    local t = _kv_parts(split(s, ";"))
+    if cols then
+        t.cols = cols
+    end
+    if bg then
+        t.bg_steps = bg
+    end
+    return t
+end
+
+_hit_flash_cfg = cfg(
+    "frames=8",
+    nil,
+    {
+        {0, C_DARK_PINK},
+        {4, C_LAVENDER}
     }
-}
+)
 
-local _death_flash_cfg = {
-    frames = 8,
-    bg_steps = {
-        { 0, C_RED },
-        { 2, C_DARK_PINK }
+_death_flash_cfg = cfg(
+    "frames=8",
+    nil,
+    {
+        {0, C_RED},
+        {2, C_DARK_PINK}
     }
-}
+)
 
-local _hit_cfg = {
-    cols = { C_WHITE, C_LIGHT_GRAY, C_BLUE, C_BLUE, C_LAVENDER },
-    min_vel = 0.8,
-    max_vel = 2.5,
-    min_life = 10,
-    max_life = 20,
-    gravity = 0.0,
-    layer = "front"
-}
+_hit_cfg = cfg(
+    "min_vel=.8;max_vel=2.5;min_life=10;max_life=20;layer=front",
+    {
+        C_WHITE,
+        C_LIGHT_GRAY,
+        C_BLUE,
+        C_BLUE,
+        C_LAVENDER
+    }
+)
 
-local _trail_cfg = {
-    cols = { C_DARK_BLUE },
-    min_vel = 0.1,
-    max_vel = 0.3,
-    min_life = 6,
-    max_life = 20,
-    min_size = 1,
-    max_size = 3,
-    square = true,
-    rate = 2,
-    shrink = true,
-    tag = "trail"
-}
+_trail_cfg = cfg(
+    "min_vel=.1;max_vel=.3;min_life=6;max_life=20;min_size=1;max_size=3;square=true;rate=2;shrink=true;tag=trail",
+    {
+        C_DARK_BLUE
+    }
+)
 
-local _bounce_particle_cfg = {
-    cols = { C_WHITE, C_PINK, C_DARK_PINK },
-    min_vel = 0.5,
-    max_vel = 1.8,
-    min_life = 8,
-    max_life = 16,
-    gravity = 0.0,
-    layer = "front"
-}
+_bounce_particle_cfg = cfg(
+    "min_vel=.5;max_vel=1.8;min_life=8;max_life=16;layer=front",
+    {
+        C_WHITE,
+        C_PINK,
+        C_DARK_PINK
+    }
+)
 
 TRAIL_COLOR_BY_BG = {
     [C_BLACK] = { C_DARK_BLUE },
@@ -58,6 +64,7 @@ TRAIL_COLOR_DEFAULT = { C_DARK_BLUE }
 
 function trigger_hit_effect()
     trigger_screen_flash(p.hp > 0 and _hit_flash_cfg or _death_flash_cfg)
+
     if p.hp > 0 then
         trigger_hitstop()
         add_trauma(0.4)
@@ -66,6 +73,7 @@ function trigger_hit_effect()
         add_trauma(0.6)
         sfx(1)
     end
+
     spawn_hit_particles(p.x + p.w / 2, p.y + p.h / 2)
 end
 
@@ -74,9 +82,8 @@ function draw_screen_fx()
 end
 
 function spawn_hit_particles(x, y, cfg)
-    local n = rndb(8, 16)
     cfg = cfg or _hit_cfg
-    for i = 1, n do
+    for i = 1, rndb(8, 16) do
         spawn_particle(x, y, cfg)
     end
 end

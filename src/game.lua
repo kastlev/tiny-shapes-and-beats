@@ -1,3 +1,4 @@
+hitstop_timer = 0
 current_level = level_1
 
 function init_game()
@@ -8,7 +9,7 @@ end
 
 function update_game()
 	if is_hitstop() then
-		update_hitstop()
+		hitstop_timer -= 1
 		return
 	end
 
@@ -63,7 +64,7 @@ function draw_game()
 
 	draw_warnings()
 
-	if p.is_dead or p.is_invulnerable or not real_danger_nearby() then
+	if p.is_dead or p.is_invulnerable or not player_in_danger then
 		draw_real_enemies()
 		draw_player()
 	else
@@ -75,7 +76,6 @@ function draw_game()
 	camera()
 	draw_hud()
 
-	-- poke(0x5f2f,1)-- pausa el sonido de la musica
 	-- poke(0x5f31,0xaa)
 	-- poke(0x5f32,0xaa)
 	-- poke(0x5f33,2)
@@ -95,15 +95,19 @@ function _do_respawn()
 	active_checkpoint_markers = {}
 	orb = nil
 
-	callfromstring "init_player/init_hitstop/init_camera/init_screen_flash/init_particle"
+	callfromstring "init_player/init_camera/init_screen_flash/init_particle"
 
 	local target_frame = last_respawn_frame
-	-- srand(level_seed)
 	run_level(current_level)
 
-	local sim_frame = 0
+	-- forzar la primera ejecucion (level_setup incluido) antes del fast-forward,
+	-- sin importar si target_frame es 0
+	for co in all(active_patterns) do
+		if costatus(co) != "dead" then coresume(co) end
+	end
+
+	local sim_frame = 1
 	while sim_frame < target_frame do
-		_update_card()
 		for co in all(active_patterns) do
 			if costatus(co) != "dead" then
 				coresume(co)
@@ -112,7 +116,7 @@ function _do_respawn()
 		update_enemies()
 		sim_frame += 1
 	end
-	init_particles()
+	init_particle()
 	local saved_frac = level_total_frames > 0 and (target_frame / level_total_frames) or 0
 	level_progress_frame = target_frame
 	last_respawn_frame = target_frame
@@ -131,4 +135,12 @@ function _do_respawn()
 	callfromstring "start_reveal,64,64,10"
 	p.hit_iframes_timer = 60
 	trigger_hitstop(10)
+end
+
+function trigger_hitstop(frames)
+    hitstop_timer = frames or 2
+end
+
+function is_hitstop()
+    return hitstop_timer > 0
 end

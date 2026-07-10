@@ -5,9 +5,7 @@ function init_screen_flash()
 end
 
 function trigger_screen_flash(cfg)
-	screen_flash_timer = cfg.frames
-	screen_flash_timer_max = cfg.frames
-	screen_flash_cfg = cfg
+	screen_flash_timer, screen_flash_timer_max, screen_flash_cfg = cfg.frames, cfg.frames, cfg
 end
 
 function update_screen_flash()

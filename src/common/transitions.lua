@@ -24,8 +24,7 @@ function update_fade()
     fade_timer += 1
     fade_t = fade_from + (fade_to - fade_from) * fade_timer / fade_frames
     if fade_timer >= fade_frames then
-        fading = false
-        fade_t = fade_to
+        fading, fade_t = false, fade_to
         if fade_t <= 0 then pal() end
         if fade_cb then fade_cb() end
     end

@@ -1,6 +1,3 @@
--- lineales 
-function ease_linear(t)       return t end
-
 -- quadraticas 
 function ease_in_quad(t)      return t*t end
 function ease_out_quad(t)     t-=1 return 1-t*t end
@@ -98,7 +95,7 @@ ease_fns = {
 }
 
 function _ease(t, mode)
-  t = mid(0, t, 1)
-  local fn = ease_fns[mode] or ease_linear
-  return fn(t)
+    t = mid(0, t, 1)
+    local fn = ease_fns[mode]
+    return fn and fn(t) or t -- or linear
 end

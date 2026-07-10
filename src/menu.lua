@@ -20,37 +20,15 @@ function init_menu()
             }
         )
     end
+
     for i = 1, 4 do
-        local x, y
-        while true do
-            x = 10 + rnd(108)
-            y = 18 + rnd(85)
-
-            local found = false
-            for s in all(menu_shapes) do
-                if s.kind == "circle" then
-                    local dx = x - s.x
-                    local dy = y - s.base_y
-                    if dx * dx + dy * dy < 400 then
-                        found = true
-                        break
-                    end
-                end
-            end
-
-            if not found then break end
-        end
-
         add(
             menu_shapes, {
                 kind = "circle",
-                x = x, base_y = y, y = y,
-                size = 6 + rnd(3),
-                ang = 0, ang_vel = 0,
-                amp = 4 + rnd(5),
-                spd = 0.0008 + rnd(0.004),
-                phase = rnd(1),
-                col = C_DARK_PINK
+                x = 10 + rnd(108), base_y = 18 + rnd(85), y = 0,
+                size = 6 + rnd(3), ang = 0, ang_vel = 0,
+                amp = 4 + rnd(5), spd = 0.0008 + rnd(0.004),
+                phase = rnd(1), col = C_DARK_PINK
             }
         )
     end
@@ -80,21 +58,21 @@ function update_menu()
         )
     end
 
-    -- if menu_frame % 10 == 0 then
-    --     spawn_particle(
-    --         rnd(128), rnd(128), {
-    --             min_vel = 0.1,
-    --             max_vel = 0.6,
-    --             min_size = 1,
-    --             max_size = 1,
-    --             shrink = false,
-    --             square = (rnd() < 0.5),
-    --             cols = { C_DARK_BLUE, C_DARK_GRAY },
-    --             min_life = 40,
-    --             max_life = 100,
-    --         }
-    --     )
-    -- end
+    if menu_frame % 10 == 0 then
+        spawn_particle(
+            rnd(128), rnd(128), {
+                min_vel = 0.1,
+                max_vel = 0.6,
+                min_size = 1,
+                max_size = 1,
+                shrink = false,
+                square = (rnd() < 0.5),
+                cols = { C_DARK_BLUE, C_DARK_GRAY },
+                min_life = 40,
+                max_life = 100
+            }
+        )
+    end
     update_particles()
 end
 
@@ -112,8 +90,7 @@ function draw_menu()
     cls(bg_color)
     draw_particles()
 
-    callfromstring"pal,C_DARK_BLUE,129,1/pal,C_DARK_GRAY,133,1/pal,C_DARK_PINK,130,1"
-
+    callfromstring "pal,C_DARK_BLUE,129,1/pal,C_DARK_GRAY,133,1/pal,C_DARK_PINK,130,1"
 
     for s in all(menu_shapes) do
         if s.kind == "square" then

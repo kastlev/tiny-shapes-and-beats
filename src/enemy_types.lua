@@ -81,12 +81,21 @@ function _spw_loop_body(cfg)
 
     local function make_cfg(i)
         local s = _merge({}, cfg)
+
         if cfg.explode then
             local a = (cfg.angle_offset or 0) + (i - 1) / n
             local spd = cfg.speed or 1.5
             s.vx = cos(a) * spd
             s.vy = sin(a) * spd
         end
+
+        for k, v in pairs(cfg) do
+            if sub(k, 1, 8) == "stagger_" then
+                local field = sub(k, 9)
+                s[field] = (cfg[field] or 0) + v * (i - 1)
+            end
+        end
+
         return s
     end
 

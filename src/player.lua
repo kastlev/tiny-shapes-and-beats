@@ -359,23 +359,6 @@ function edge_hit(x1, y1, x2, y2)
 	return false
 end
 
-function real_danger_nearby()
-	local cx, cy = p.x + 2, p.y + 2
-	for e in all(enemies) do
-		if not e.is_warning then
-			local r = (e.size or 2) + 3
-			if e.type == E_LINE_BI or e.type == E_CROSS then
-				r += e.len or 0
-			end
-			local dx, dy = cx - e.x, cy - e.y
-			if dx * dx + dy * dy < r * r then
-				return true
-			end
-		end
-	end
-	return false
-end
-
 function check_hole_danger(force)
   for e in all(enemies) do
     if e.type == E_HOLE and not e.is_warning then
