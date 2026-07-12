@@ -3,12 +3,6 @@
 
 function _init()
 	frame = 0
-	menuitem(
-		1, "back to levels", function()
-			start_fadein(25)
-			set_screen(update_selector, draw_selector)
-		end
-	)
 	start_fadein(25)
 
 	bg_color_base = BG_COLOR_DEFAULT
@@ -30,7 +24,18 @@ function _draw()
 end
 
 function set_screen(u, d)
-	pal()
-	screen_update = u
-	screen_draw = d
+	callfromstring"pal/init_particle"
+	screen_update, screen_draw = u, d
+	
+	if u == update_game then
+		menuitem(
+			1, "back to levels", function()
+				level_chosen = false
+				start_fadein(20)
+				set_screen(update_selector, draw_selector)
+			end
+		)
+	else
+		menuitem(1)
+	end
 end

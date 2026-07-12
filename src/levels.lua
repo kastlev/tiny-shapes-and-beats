@@ -1,6 +1,6 @@
 LEVEL_META = {
-  "name=lvl 1;song=waves;track=0;total=1552;point1=0.3;point2=0.7;map_x=8",
-  "name=lvl 2;song=flux;track=1;total=2100;point1=0.25;point2=0.52;point3=0.78;map_x=16"
+  "name=LVL 1;song=waves;track=0;total=1552;point1=0.3;point2=0.7;map_x=8",
+  "name=LVL 2;song=flux;track=1;total=2100;point1=0.25;point2=0.52;point3=0.78;map_x=16"
 }
 
 LEVEL_COUNT = #LEVEL_META

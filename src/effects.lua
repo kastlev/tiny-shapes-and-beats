@@ -29,46 +29,31 @@ _death_flash_cfg = cfg(
 
 _hit_particle_cfg = cfg(
     "min_vel=.8;max_vel=2.5;min_life=10;max_life=20;layer=front",
-    {
-        C_WHITE,
-        C_LIGHT_GRAY,
-        C_BLUE,
-        C_BLUE,
-        C_LAVENDER
-    }
+    split"7,6,12,12,13"
 )
 
 _trail_particle_cfg = cfg(
     "min_vel=.1;max_vel=.3;min_life=6;max_life=20;min_size=1;max_size=3;square=true;rate=2;shrink=true;tag=trail",
-    {
-        C_DARK_BLUE
-    }
+    split"1"
 )
 
 _bounce_particle_cfg = cfg(
     "min_vel=.5;max_vel=1.8;min_life=8;max_life=16;layer=front",
-    {
-        C_WHITE,
-        C_PINK,
-        C_DARK_PINK
-    }
+    split"7,14,2"
 )
 
 _bg_particle_cfg = cfg(
     "min_vel=.1;max_vel=.6;min_size=1;max_size=1;min_life=40;max_life=100;shrink=false;tag=menu_bg",
-    {
-        C_DARK_BLUE,
-        C_DARK_GRAY
-    }
+    split"1,5"
 )
 
 TRAIL_COLOR_BY_BG = {
-    [C_BLACK] = { C_DARK_BLUE },
-    [C_DARK_PINK] = { C_LAVENDER },
-    [C_LAVENDER] = { C_DARK_PINK }
+    [C_BLACK] = split"1",
+    [C_DARK_PINK] = split"13",
+    [C_LAVENDER] = split"2"
 }
 
-TRAIL_COLOR_DEFAULT = { C_DARK_BLUE }
+TRAIL_COLOR_DEFAULT = split"1"
 
 function trigger_hit_effect()
     trigger_screen_flash(p.hp > 0 and _hit_flash_cfg or _death_flash_cfg)

@@ -2,9 +2,10 @@ hitstop_timer = 0
 current_level = level_1
 
 function init_game()
+	enemies, active_patterns, orb_waves, active_checkpoint_markers, orb = {}, {}, {}, {}, nil
+	init_player()
 	run_level(current_level)
 	set_screen(update_game, draw_game)
-	init_particle()
 end
 
 function update_game()
@@ -59,33 +60,16 @@ function draw_game()
 
 	camera()
 	draw_hud()
-
-	-- poke(0x5f31,0xaa)
-	-- poke(0x5f32,0xaa)
-	-- poke(0x5f33,2)
-	-- poke(0x5f54, 0x60)
-	-- sspr(0,0,128,128, 100,5,20,20)
-	-- poke(0x5f54, 0x00)
-	-- pal() -- return to defaults
 end
 
 function _do_respawn()
 	camera()
-	death_sequence_started = false
-	enemies = {}
-	active_patterns = {}
-	ps = {}
-	waves = {}
-	active_checkpoint_markers = {}
-	orb = nil
-
+	death_sequence_started, enemies, active_patterns, ps, orb_waves, active_checkpoint_markers, orb = false, {}, {}, {}, {}, {}, {}
 	callfromstring "init_player/init_camera/init_screen_flash/init_particle"
 
 	local target_frame = last_respawn_frame
 	run_level(current_level)
 
-	-- forzar la primera ejecucion (level_setup incluido) antes del fast-forward,
-	-- sin importar si target_frame es 0
 	for co in all(active_patterns) do
 		if costatus(co) != "dead" then coresume(co) end
 	end

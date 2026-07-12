@@ -25,8 +25,7 @@ function hud_start(total_f, checkpoint_list, song, lvl)
     level_name = lvl or "level 1"
     level_card_state = "in"
     level_card_position_x = 128 + CARD_W
-    orb = nil
-    waves = {}
+    orb, orb_waves = nil, {}
 end
 
 function update_hud()
@@ -34,7 +33,7 @@ function update_hud()
         if level_progress_frame < level_total_frames - 1 then level_progress_frame += 1 end
     end
 
-    if orb and #enemies == 0 and bg_color_base != BG_COLOR_DEFAULT then
+    if orb and #enemies == 0 then
         bg_color_base = BG_COLOR_DEFAULT
     end
 
@@ -88,15 +87,15 @@ function update_hud()
         end
     end
 
-    for w in all(waves) do
+    for w in all(orb_waves) do
         w.r += w.spd
-        if w.r > w.max_r then del(waves, w) end
+        if w.r > w.max_r then del(orb_waves, w) end
     end
 end
 
 function draw_hud()
     if level_started then
-        if progress_bar_drawing != true then
+        if not progress_bar_drawing then
             local frac = level_progress_frame / 25
             local fill_x = HUD_X + flr(frac * HUD_W)
             line(HUD_X, HUD_Y, fill_x, HUD_Y, C_DARK_GRAY)
@@ -109,7 +108,7 @@ function draw_hud()
 
         local frac = min(1, level_progress_frame / level_total_frames)
         local fill_x = HUD_X + flr(frac * HUD_W)
-        if fill_x > HUD_X and level_started then
+        if fill_x > HUD_X then
             line(HUD_X, HUD_Y, fill_x, HUD_Y, C_BLUE)
         end
         if progress_bar_drawing then
@@ -134,7 +133,7 @@ function draw_hud()
         local cx = flr(level_card_position_x)
         local cy = 128 - CARD_H - 4
         camera(-cx, -cy)
-        callfromstring "rectfill,1,1,73,15,C_BLACK/rectfill,0,0,72,14,C_DARK_BLUE/rectfill,0,0,2,14,C_LAVENDER/print,level_name,5,3,C_LIGHT_GRAY/print,card_song,5,9,C_WHITE"
+        callfromstring "rectfill,1,1,73,15,C_BLACK/rectfill,0,0,72,14,C_DARK_BLUE/rectfill,0,0,2,14,C_LAVENDER/print,level_name,5,9,C_LIGHT_GRAY/print,card_song,5,3,C_WHITE"
         camera()
     end
 
@@ -144,7 +143,7 @@ function draw_hud()
         draw_anim(ox + 8 / 2 - 16 / 2, oy + 8 / 2 - 16 / 2, level_runtime_frames, 21, 5, 6, 2, 2)
     end
 
-    for w in all(waves) do
+    for w in all(orb_waves) do
         if w.r > 0 then
             circ(flr(w.x), flr(w.y), flr(w.r), w.col)
         end
@@ -161,7 +160,7 @@ function spawn_orb()
     ))
     orb.x += rnd(104)
     orb.y += rnd(104)
-    waves = {}
+    orb_waves = {}
 end
 
 function orb_collected()
@@ -173,7 +172,7 @@ function _update_card()
         return
     end
 
-    local target_x = 128 - CARD_W - 0
+    local target_x = 128 - CARD_W
 
     if level_card_state == "in" then
         level_card_position_x += (target_x - level_card_position_x) * CART_SPEED_IN
@@ -210,10 +209,10 @@ function _update_card()
 end
 
 function _spawn_wave(cx, cy)
-    waves = {}
+    orb_waves = {}
     for i = 1, 6 do
         add(
-            waves, {
+            orb_waves, {
                 x = cx, y = cy,
                 r = i * 2, max_r = 24 + i * 14,
                 col = (i % 2 == 0) and C_LAVENDER or C_WHITE,
