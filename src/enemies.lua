@@ -3,9 +3,9 @@ BOUNCE_VARIANCE = 0.03
 
 function _draw_shape(x, y, s, fill, sq, col)
   if sq then
-    if fill then rectfill(x-s,y-s,x+s,y+s,col) else rect(x-s,y-s,x+s,y+s,col) end
+    if fill then rectfill(x - s, y - s, x + s, y + s, col) else rect(x - s, y - s, x + s, y + s, col) end
   else
-    if fill then circfill(x,y,s,col) else circ(x,y,s,col) end
+    if fill then circfill(x, y, s, col) else circ(x, y, s, col) end
   end
 end
 
@@ -345,10 +345,10 @@ end
 
 local BOOL_FIELDS = split("chase,wrap,bounce,wave,flicker,burst,is_warning,orbit", ",")
 local NUM_DEFAULTS = {
-  delay_move=0, delay_grow=0, lerp_factor=.1, chase_speed=1.6, chase_turn=.06,
-  grow_px=.5, grow_lerp=.1, wave_amp=10, wave_freq=.05, wave_axis="y",
-  duration_frames=30, hold_frames=0, len=80, ang=0, ang_vel=0,
-  orbit_radius=20, orbit_speed=.01
+  delay_move = 0, delay_grow = 0, lerp_factor = .1, chase_speed = 1.6, chase_turn = .06,
+  grow_px = .5, grow_lerp = .1, wave_amp = 10, wave_freq = .05, wave_axis = "y",
+  duration_frames = 30, hold_frames = 0, len = 80, ang = 0, ang_vel = 0,
+  orbit_radius = 20, orbit_speed = .01
 }
 
 function _create_enemy(enemy_type, x, y, settings)
@@ -364,15 +364,20 @@ function _create_enemy(enemy_type, x, y, settings)
   settings.max_size = settings.size_max or s0
   settings.grow = settings.max_size > s0
 
-  for k in all(BOOL_FIELDS) do settings[k] = settings[k] or false end
-  for k, v in pairs(NUM_DEFAULTS) do settings[k] = settings[k] or v end
+  settings.grow_mode = settings.grow_lerp and "lerp" or settings.ease_grow and "curve" or "px"
+
+  for k in all(BOOL_FIELDS) do
+    settings[k] = settings[k] or false
+  end
+  for k, v in pairs(NUM_DEFAULTS) do
+    settings[k] = settings[k] or v
+  end
 
   settings.delay_move_total = settings.delay_move
   settings.delay_grow_total = settings.delay_grow
   settings.orbit_cx = settings.orbit_cx or x
   settings.orbit_cy = settings.orbit_cy or y
   settings.orbit_ang = settings.orbit_ang or rnd(1)
-  settings.grow_mode = settings.grow_lerp and "lerp" or settings.ease_grow and "curve" or "px"
   settings.fill = settings.fill ~= false
   settings.alive = true
   settings.age = 0
@@ -380,7 +385,6 @@ function _create_enemy(enemy_type, x, y, settings)
   add(enemies, settings)
   return settings
 end
-
 
 -- etype          default E_CIRCLE si se omite (nil)
 -- x, y           default posicion random en pantalla si se omiten (nil)
