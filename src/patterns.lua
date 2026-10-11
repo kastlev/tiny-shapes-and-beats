@@ -5,7 +5,7 @@ function run_level(fn)
   return meanwhile(function()
     fn()
     level_final_frames = level_runtime_frames
-    run"wait_for_clear/spawn_orb/wait_for_orb"
+    run "wait_for_clear/spawn_orb/wait_for_orb"
   end)
 end
 
@@ -47,8 +47,6 @@ end
 
 function wait_until_pattern_finished(co)
   while costatus(co) != "dead" do
-    local ok, err = coresume(co)
-    assert(ok, err)
     yield()
   end
 end
