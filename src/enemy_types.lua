@@ -27,12 +27,6 @@ function _square_perimeter_pt(cx, cy, r, t)
     end
 end
 
-function spw(cfg)
-    local e, x, y = cfg.enemy_type, cfg.x, cfg.y
-    cfg.enemy_type, cfg.x, cfg.y = nil, nil, nil
-    return spawn(e, x, y, cfg)
-end
-
 function _dist(i, n, minv, maxv, random)
     return random
             and rnd(maxv - minv) + minv
@@ -70,11 +64,11 @@ function spw_loop(cfg)
     end
 end
 
-EMIT_DEFAULT_CFG = _kv_parts(split(
-    "enemy_type=E_CIRCLE;size=4;warning=false;ease_move=out_quad;duration_frames=30;hold_frames=20;flicker=true;burst=true",
-    ";"
-))
+-- EMIT_DEFAULT_CFG = _kv_parts(split(
+--     "enemy_type=E_CIRCLE;size=4;warning=false;ease_move=out_quad;duration_frames=30;hold_frames=20;flicker=true;burst=true",
+--     ";"
+-- ))
 
-function emit(cfg)
-    return spw(_merge(_merge({}, EMIT_DEFAULT_CFG), cfg))
-end
+-- function emit(cfg)
+--     return spw(_merge(_merge({}, EMIT_DEFAULT_CFG), cfg))
+-- end
