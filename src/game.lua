@@ -71,12 +71,10 @@ function _do_respawn()
 	local target_frame = last_respawn_frame
 	run_level(current_level)
 
-	-- 1er resume: corre level_setup -> hud_start (deja level_started=false)
 	for co in all(active_patterns) do
 		if costatus(co) != "dead" then coresume(co) end
 	end
 
-	-- CLAVE: desbloquear wait_for_card ANTES de simular
 	level_started = true
 	level_card_state = "done"
 	level_card_position_x = 200
@@ -92,7 +90,6 @@ function _do_respawn()
 	end
 	simulating = false
 
-	-- limpiar efectos generados durante la simulación
 	callfromstring "init_particle/init_camera/init_screen_flash"
 
 	local saved_frac = level_total_frames > 0 and (target_frame / level_total_frames) or 0

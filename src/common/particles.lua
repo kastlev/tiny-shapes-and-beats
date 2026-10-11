@@ -84,9 +84,6 @@ function draw_particles(layer)
     end
 end
 
--- acorta la vida restante de particulas con ese tag.
--- llamar cuando el emisor para: las existentes desaparecen
--- en max `remaining` frames en vez de su vida original.
 function expire_particles(tag, remaining)
     remaining = remaining or 8
     for pt in all(ps) do
