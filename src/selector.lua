@@ -6,10 +6,12 @@ level_chosen = false
 
 function update_selector()
     local cfg = meta(selector_idx)
-
+    local tx = cfg.map_x * 8 - 64
     local prev_x = selector_cam_x
-    selector_cam_x = lerp_to(selector_cam_x, cfg.map_x * 8 - 64, .15, .5)
+
+    selector_cam_x = lerp_to(selector_cam_x, tx, .15, .5)
     selector_vel = selector_cam_x - prev_x
+    if abs(prev_x - tx) >= 6 and not level_chosen then sfx(6) end
 
     can_move = not level_chosen
     can_move_frames += 1
@@ -18,6 +20,7 @@ function update_selector()
 
     if abs(selector_vel) > 1 then
         song, name, can_move, can_move_frames = nil, nil, false, 0
+        sfx(7)
     end
 
     if btnp(1) and selector_idx < LEVEL_COUNT and can_move then
