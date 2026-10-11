@@ -2,6 +2,7 @@ hitstop_timer = 0
 current_level = level_1
 
 function init_game()
+	simulating = false
 	enemies, active_patterns, orb_waves, active_checkpoint_markers, orb = {}, {}, {}, {}, nil
 	init_player()
 	run_level(current_level)
@@ -61,36 +62,42 @@ function draw_game()
 	camera()
 	draw_hud()
 end
-
 function _do_respawn()
 	camera()
-	death_sequence_started, enemies, active_patterns, ps, orb_waves, active_checkpoint_markers, orb = false, {}, {}, {}, {}, {}, {}
+	death_sequence_started = false
+	enemies, active_patterns, ps, orb_waves, active_checkpoint_markers, orb = {}, {}, {}, {}, {}, nil
 	callfromstring "init_player/init_camera/init_screen_flash/init_particle"
 
 	local target_frame = last_respawn_frame
 	run_level(current_level)
 
+	-- 1er resume: corre level_setup -> hud_start (deja level_started=false)
 	for co in all(active_patterns) do
 		if costatus(co) != "dead" then coresume(co) end
 	end
 
+	-- CLAVE: desbloquear wait_for_card ANTES de simular
+	level_started = true
+	level_card_state = "done"
+	level_card_position_x = 200
+
+	simulating = true
 	local sim_frame = 1
 	while sim_frame < target_frame do
 		for co in all(active_patterns) do
-			if costatus(co) != "dead" then
-				coresume(co)
-			end
+			if costatus(co) != "dead" then coresume(co) end
 		end
 		update_enemies()
 		sim_frame += 1
 	end
-	init_particle()
+	simulating = false
+
+	-- limpiar efectos generados durante la simulación
+	callfromstring "init_particle/init_camera/init_screen_flash"
+
 	local saved_frac = level_total_frames > 0 and (target_frame / level_total_frames) or 0
 	level_progress_frame = target_frame
 	last_respawn_frame = target_frame
-	level_started = true
-	level_card_state = "done"
-	level_card_position_x = 200
 
 	bg_color_base = BG_COLOR_DEFAULT
 	for ck in all(checkpoints) do
