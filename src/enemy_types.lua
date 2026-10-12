@@ -51,6 +51,14 @@ function spw_loop(cfg)
     for i = 1, n do
         local x, y = _spw_pos(cfg.pattern, i, n, cfg)
         local s = _merge({}, cfg)
+
+        for k, v in pairs(cfg) do
+            if sub(k, 1, 8) == "stagger_" then
+                local f = sub(k, 9)
+                s[f] = (cfg[f] or 0) + v * (i - 1)
+            end
+        end
+
         if cfg.parallel then
             s.delay_spawn = (cfg.stagger or 0) * (i - 1)
             add(coros, meanwhile(function() spawn(cfg.enemy_type, x, y, s) end))
