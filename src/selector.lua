@@ -4,6 +4,7 @@ selector_idx, selector_cam_x, selector_vel = 1, 0, 0
 can_move_frames = 0
 level_chosen = false
 selector_arrived = true
+
 function update_selector()
     local cfg = meta(selector_idx)
     local tx = cfg.map_x * 8 - 64
@@ -11,10 +12,12 @@ function update_selector()
 
     selector_cam_x = lerp_to(selector_cam_x, tx, .15, .5)
     selector_vel = selector_cam_x - prev_x
+
     if not selector_arrived
             and abs(selector_vel) < 0.1
             and abs(selector_cam_x - tx) < 0.5 then
         sfx(7)
+        music(meta(selector_idx).track)
         selector_arrived = true
     end
 
@@ -29,12 +32,10 @@ function update_selector()
 
     if btnp(1) and selector_idx < LEVEL_COUNT and can_move then
         selector_idx += 1
-        music(meta(selector_idx).track)
         sfx(6)
         selector_arrived = false
     elseif btnp(0) and selector_idx > 1 and can_move then
         selector_idx -= 1
-        music(meta(selector_idx).track)
         sfx(6)
         selector_arrived = false
     elseif (btnp(4) or btnp(5)) and can_move then

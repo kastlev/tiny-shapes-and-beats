@@ -29,9 +29,11 @@ function update_game()
 			death_sequence_started = true
 			delay(
 				45, function()
+					sfx(10)
 					start_fadeout(
 						30, function()
 							_do_respawn()
+							sfx(9)
 							death_sequence_started = false
 						end
 					)
