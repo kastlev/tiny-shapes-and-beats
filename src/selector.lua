@@ -14,10 +14,11 @@ function update_selector()
     selector_vel = selector_cam_x - prev_x
 
     if not selector_arrived
-            and abs(selector_vel) < 0.1
-            and abs(selector_cam_x - tx) < 0.5 then
+            and abs(selector_cam_x - tx) < 1 then
+        selector_cam_x = tx
+        selector_vel = 0
+
         sfx(7)
-        music(meta(selector_idx).track)
         selector_arrived = true
     end
 

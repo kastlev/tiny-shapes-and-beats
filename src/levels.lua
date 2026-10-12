@@ -1,7 +1,7 @@
 LEVEL_META = {
   "name=LVL 1;song=waves;track=0;total=1560;point1=0.27;point2=0.68;map_x=8",
-  "name=LVL 2;song=flux;track=1;total=2100;point1=0.23;point2=0.52;point3=0.78;map_x=16",
-  "name=LVL 3;song=zona;track=2;total=2400;point1=0.25;point2=0.55;map_x=24"
+  "name=LVL 2;song=flux;track=8;total=2100;point1=0.23;point2=0.52;point3=0.78;map_x=16",
+  "name=LVL 3;song=zona;track=16;total=2400;point1=0.25;point2=0.55;map_x=24"
 }
 
 LEVEL_COUNT = #LEVEL_META
@@ -80,6 +80,7 @@ function level_setup(n)
 
   hud_start(cfg.total, checkpoints, level_song, level_name)
   wait_for_card()
+  if not simulating then music(cfg.track) end
 end
 
 function level_1()
