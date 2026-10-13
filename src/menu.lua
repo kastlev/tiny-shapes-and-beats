@@ -32,7 +32,7 @@ function update_menu()
         s.y = s.base_y + sin(frame * s.spd + s.phase) * s.amp
     end
 
-    if not menu_started and any_button_pressed() and not fading then
+    if not menu_started and btnp()>0 and not fading then
         menu_started = true
         sfx(3)
         rate_color_title = 3

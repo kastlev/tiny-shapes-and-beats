@@ -38,15 +38,6 @@ function draw_anim(x, y, time_t, base_sp, t_frames, spd, w, h, step)
     spr(sp, x, y, w, h)
 end
 
-function any_button_pressed()
-    for i = 0, 5 do
-        if btnp(i) then
-            return true
-        end
-    end
-    return false
-end
-
 function line_c(x, y, len, width, ang, col, centered)
   local dirx, diry = cos(ang), sin(ang)
   local hw = width / 2

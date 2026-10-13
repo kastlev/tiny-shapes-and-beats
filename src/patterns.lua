@@ -13,20 +13,11 @@ function run_level(fn)
   end)
 end
 
-function meanwhile(fn)
-  local co = cocreate(fn)
-  add(active_patterns, co)
-  return co
-end
+function meanwhile(fn) add(active_patterns,cocreate(fn)) end
 
 function update_active_patterns()
   for co in all(active_patterns) do
-    if costatus(co) == "dead" then
-      del(active_patterns, co)
-    else
-      local ok, err = coresume(co)
-      assert(ok, err)
-    end
+    if costatus(co)=="dead" then del(active_patterns,co) else assert(coresume(co)) end
   end
 end
 

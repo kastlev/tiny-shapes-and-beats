@@ -5,7 +5,6 @@ function spw(cfg)
 end
 
 function _square_perimeter_pt(cx, cy, r, t)
-    -- t en [0,1)
     local d = t * (8 * r)
     if d < 2 * r then
         return cx - r + d, cy - r
@@ -65,12 +64,3 @@ function spw_loop(cfg)
         wait_until_pattern_finished(co)
     end
 end
-
--- EMIT_DEFAULT_CFG = _kv_parts(split(
---     "enemy_type=E_CIRCLE;size=4;warning=false;ease_move=out_quad;duration_frames=30;hold_frames=20;flicker=true;burst=true",
---     ";"
--- ))
-
--- function emit(cfg)
---     return spw(_merge(_merge({}, EMIT_DEFAULT_CFG), cfg))
--- end
