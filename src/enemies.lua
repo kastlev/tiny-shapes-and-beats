@@ -177,7 +177,7 @@ function spawn(etype,x,y,params)
     if sz>=40 then add_trauma(.1) end
     wait_until_enemy_dead(_create_enemy(etype,x,y,{
       size=sz,fill=params.fill,color=params.warning_color or C_DARK_PINK,
-      duration_frames=params.warning_time or 20,hold_frames=params.hold_frames or 0,
+      duration_frames=params.warning_frames or 20,hold_frames=params.hold_frames or 0,
       len=params.len,ang=params.ang,is_warning=true}))
   end
 
@@ -223,42 +223,3 @@ function _create_enemy(t,x,y,s)
   add(enemies,s)
   return s
 end
-
--- etype          default E_CIRCLE si se omite (nil)
--- x, y           default posicion random en pantalla si se omiten (nil)
---                (near_player, si esta activo, pisa este default)
---
--- size
--- size_max
--- fill
--- color
--- duration_frames
--- hold_frames      frames extra quieto en estado final antes de morir
---
--- crecimiento — elegir uno:
---   grow_px    crece N pixeles por frame hasta size_max
---   ease_grow  nombre de curva en ease_fns — llega a size_max en duration_frames
---   grow_lerp  factor 0.0–1.0 — cada frame se acerca ese % al size_max
--- delay_grow   frames antes de empezar a crecer (independiente de delay_move)
---
--- movimiento — elegir uno:
---   vx, vy       velocidad constante
---   target_x/y
---   chase        persigue al jugador (chase_speed, chase_turn)
--- delay_move     frames quieto antes de moverse (independiente de delay_grow)
--- ease_move      curva para target_x/y — nombre en ease_fns o "lerp"
--- lerp_factor    factor para ease_move="lerp" (default 0.1)
---
--- near_player, near_range   sobreescribe x,y a una posicion cercana al jugador
---                           (resuelto UNA vez, antes del warning, para que
---                            warning y enemigo real compartan posicion)
---
--- lineas:  ang, ang_vel, len (ang: 0= der  0.125=diagonal  0.25=abajo  0.5=izq  0.75=arriba)
--- burst:   count, speed, angle_offset, size, burst_shape --
---          NOTA: burst siempre instancia E_BULLET internamente
---          (fire_bullet_ring), sin importar el etype del emisor.
---          usar burst_shape="square" para variar el aspecto visual
---          de las balas, no etype.
--- warning: warning, warning_time, warning_color
--- flicker: flicker, flicker_colors, flicker_rate
--- shape

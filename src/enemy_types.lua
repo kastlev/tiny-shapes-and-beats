@@ -1,6 +1,6 @@
 function spw(cfg)
-  local e,x,y=cfg.enemy_type,cfg.x,cfg.y
-  cfg.enemy_type,cfg.x,cfg.y=nil,nil,nil
+  local e,x,y=cfg.type,cfg.x,cfg.y
+  cfg.type,cfg.x,cfg.y=nil,nil,nil
   return spawn(e,x,y,cfg)
 end
 
@@ -43,9 +43,9 @@ function spw_loop(cfg)
     end
     if cfg.parallel then
       s.delay_spawn=(cfg.stagger or 0)*(i-1)
-      add(coros,meanwhile(function() spawn(cfg.enemy_type,x,y,s) end))
+      add(coros,meanwhile(function() spawn(cfg.type,x,y,s) end))
     else
-      spawn(cfg.enemy_type,x,y,s)
+      spawn(cfg.type,x,y,s)
       wait_frames(cfg.spawn_interval or 15)
     end
   end
