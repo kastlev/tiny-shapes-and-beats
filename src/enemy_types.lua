@@ -14,6 +14,9 @@ function _spw_pos(pt,i,n,c)
     local r=c.radius or 46
     local u=(c.random and rnd() or (i-1)/n)*4
     return 64+r*mid(-1,2-2*abs(u-1.5),1),64+r*mid(-1,2-2*abs(u-2.5),1)
+  elseif pt=="circle" then
+    local r,a=c.radius or 50,(i-1)/n
+    return 64+cos(a)*r,64+sin(a)*r
   elseif pt=="row" then
     return _dist(i,n,m,128-m,c.random),c.row_y or -4
   elseif pt=="column" then
@@ -28,6 +31,10 @@ function spw_loop(cfg)
   for i=1,n do
     local x,y=_spw_pos(cfg.pattern,i,n,cfg)
     local s=_merge({},cfg)
+    if cfg.explode then
+      local a,v=(cfg.angle_offset or 0)+(i-1)/n,cfg.speed or 1.5
+      s.vx,s.vy=cos(a)*v,sin(a)*v
+    end
     for k,v in pairs(cfg) do
       if sub(k,1,8)=="stagger_" then
         local f=sub(k,9)

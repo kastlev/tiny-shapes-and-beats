@@ -1,45 +1,3 @@
-LEVEL_META = {
-  "name=LVL 1;song=waves;track=0;total=1560;point1=0.27;point2=0.68;map_x=8",
-  "name=LVL 2;song=flux;track=8;total=2100;point1=0.23;point2=0.52;point3=0.78;map_x=16",
-  "name=LVL 3;song=zona;track=16;total=2400;point1=0.25;point2=0.55;map_x=24"
-}
-
-LEVEL_COUNT = #LEVEL_META
-
--- plantillas: "funcion;clave=valor;..."
-T = {
-  h = "spw;enemy_type=E_LINE_BI;x=64;ang=0;len=72;size=3;warning_time=20;duration_frames=18",
-  v = "spw;enemy_type=E_LINE_BI;y=64;ang=0.25;len=72;size=3;warning_time=20;duration_frames=18",
-  x = "spw;enemy_type=E_CROSS;x=64;y=64;len=72;size=3;ang_vel=0.006;warning_time=30;duration_frames=210",
-  b = "spw;enemy_type=E_CIRCLE;size=5;warning_time=25;duration_frames=1;burst=true;burst_count=10;burst_speed=1.4;burst_size=2;burst_duration_frames=110",
-  r = "spw;size=1;size_max=70;fill=false;grow_px=1.8;warning_time=20;duration_frames=40",
-  c = "spw_loop;pattern=column;column_x=-4;random=true;parallel=true;enemy_type=E_BULLET;size=3;vx=3.4;n=9;duration_frames=45",
-  ch = "spw_loop;pattern=perimeter;parallel=true;chase=true;chase_turn=0.05;size=4;warning_time=30;duration_frames=130",
-  sq = "spw_loop;enemy_type=E_SQUARE;parallel=true;near_player=true;near_range=24;size=8;warning_time=45;duration_frames=25",
-  -- ===== ZONAS (E_HOLE: lo de FUERA del circulo es letal) =====
-  -- hl : zona quieta. size = radio seguro. Dura warning_time + duration_frames.
-  hl = "spw;enemy_type=E_HOLE;x=64;y=64;size=36;warning_time=45;duration_frames=195",
-  -- o  : zona que orbita. orbit_radius = tamano de la orbita, orbit_speed = vueltas/frame
-  --      (0.006 ~ 0.8 px/frame, 0.009 ~ 1.5 px/frame). x = punto de partida.
-  o = "spw;enemy_type=E_HOLE;orbit=true;orbit_cx=64;orbit_cy=64;orbit_ang=0;orbit_radius=22;orbit_speed=0.006;x=86;y=64;size=34;warning_time=45;duration_frames=315",
-  -- l  : mitad de un "lente". Se lanzan DOS con orbit_ang distinto y solo la interseccion es segura.
-  l = "spw;enemy_type=E_HOLE;orbit=true;orbit_cx=64;orbit_cy=64;orbit_radius=12;orbit_speed=0.006;y=64;size=36;warning_time=30;duration_frames=330",
-  -- j  : zona de salto. Nace en x,y, vive duration_frames y desaparece.
-  j = "spw;enemy_type=E_HOLE;size=28;warning_time=30;duration_frames=90",
-  -- k  : balas que caen desde arriba.
-  k = "spw_loop;pattern=row;random=true;n=3;parallel=true;enemy_type=E_BULLET;size=3;vy=1.5;duration_frames=100",
-  -- rz : anillo para usar DENTRO de una zona.
-  --   size_max        = radio del hoyo + 2. Mas grande no sirve: afuera ya es letal.
-  --   grow_px         = velocidad. Es la perilla principal de dificultad.
-  --   duration_frames = ceil(size_max / grow_px) + 1. Si es menor, el anillo muere a medio crecer.
-  --   warning_time    = frames que tienes para reaccionar antes de que empiece a crecer
-  --                     (el warning es solo un punto en el centro).
-  --   Tabla (size_max=30):  grow_px 0.7 -> duration 43 (facil)
-  --                         grow_px 0.9 -> duration 34 (normal)
-  --                         grow_px 1.2 -> duration 26 (dificil)
-  rz = "spw;size=1;size_max=30;fill=false;grow_px=0.9;warning_time=30;duration_frames=34"
-}
-
 function play(t)
   for l in all(t) do
     if type(l)=="number" then
@@ -76,6 +34,50 @@ function level_setup(n)
   wait_for_card()
   if not simulating then music(cfg.track) end
 end
+
+LEVEL_META = {
+  "name=LVL 1;song=waves;track=0;total=1560;point1=0.27;point2=0.68;map_x=8",
+  "name=LVL 2;song=flux;track=8;total=2100;point1=0.23;point2=0.52;point3=0.78;map_x=16",
+  "name=LVL 3;song=zona;track=16;total=2400;point1=0.25;point2=0.55;map_x=24"
+}
+
+LEVEL_COUNT = #LEVEL_META
+
+-- plantillas: "funcion;clave=valor;..."
+T = {
+  sp = "spw_loop;pattern=point;x=64;y=64;n=16;enemy_type=E_CIRCLE;size=3;color=13;warning=false;duration_frames=1;burst=true;burst_count=3;burst_speed=1.3;burst_size=2;burst_duration_frames=110;spawn_interval=5;stagger_burst_angle_offset=0.03;burst_quiet=true",
+  ai = "spw;enemy_type=E_BULLET;size=3;aim=2.2;duration_frames=120",
+  h = "spw;enemy_type=E_LINE_BI;x=64;ang=0;len=72;size=3;warning_time=20;duration_frames=18",
+  v = "spw;enemy_type=E_LINE_BI;y=64;ang=0.25;len=72;size=3;warning_time=20;duration_frames=18",
+  x = "spw;enemy_type=E_CROSS;x=64;y=64;len=72;size=3;ang_vel=0.006;warning_time=30;duration_frames=210",
+  b = "spw;enemy_type=E_CIRCLE;size=5;warning_time=25;duration_frames=1;burst=true;burst_count=10;burst_speed=1.4;burst_size=2;burst_duration_frames=110",
+  r = "spw;size=1;size_max=70;fill=false;grow_px=1.8;warning_time=20;duration_frames=40",
+  c = "spw_loop;pattern=column;column_x=-4;random=true;parallel=true;enemy_type=E_BULLET;size=3;vx=3.4;n=9;duration_frames=45",
+  ch = "spw_loop;pattern=perimeter;parallel=true;chase=true;chase_turn=0.05;size=4;warning_time=30;duration_frames=130",
+  sq = "spw_loop;enemy_type=E_SQUARE;parallel=true;near_player=true;near_range=24;size=8;warning_time=45;duration_frames=25",
+  -- ===== ZONAS (E_HOLE: lo de FUERA del circulo es letal) =====
+  -- hl : zona quieta. size = radio seguro. Dura warning_time + duration_frames.
+  hl = "spw;enemy_type=E_HOLE;x=64;y=64;size=36;warning_time=45;duration_frames=195",
+  -- o  : zona que orbita. orbit_radius = tamano de la orbita, orbit_speed = vueltas/frame
+  --      (0.006 ~ 0.8 px/frame, 0.009 ~ 1.5 px/frame). x = punto de partida.
+  o = "spw;enemy_type=E_HOLE;orbit=true;orbit_cx=64;orbit_cy=64;orbit_ang=0;orbit_radius=22;orbit_speed=0.006;x=86;y=64;size=34;warning_time=45;duration_frames=315",
+  -- l  : mitad de un "lente". Se lanzan DOS con orbit_ang distinto y solo la interseccion es segura.
+  l = "spw;enemy_type=E_HOLE;orbit=true;orbit_cx=64;orbit_cy=64;orbit_radius=12;orbit_speed=0.006;y=64;size=36;warning_time=30;duration_frames=330",
+  -- j  : zona de salto. Nace en x,y, vive duration_frames y desaparece.
+  j = "spw;enemy_type=E_HOLE;size=28;warning_time=30;duration_frames=90",
+  -- k  : balas que caen desde arriba.
+  k = "spw_loop;pattern=row;random=true;n=3;parallel=true;enemy_type=E_BULLET;size=3;vy=1.5;duration_frames=100",
+  -- rz : anillo para usar DENTRO de una zona.
+  --   size_max        = radio del hoyo + 2. Mas grande no sirve: afuera ya es letal.
+  --   grow_px         = velocidad. Es la perilla principal de dificultad.
+  --   duration_frames = ceil(size_max / grow_px) + 1. Si es menor, el anillo muere a medio crecer.
+  --   warning_time    = frames que tienes para reaccionar antes de que empiece a crecer
+  --                     (el warning es solo un punto en el centro).
+  --   Tabla (size_max=30):  grow_px 0.7 -> duration 43 (facil)
+  --                         grow_px 0.9 -> duration 34 (normal)
+  --                         grow_px 1.2 -> duration 26 (dificil)
+  rz = "spw;size=1;size_max=30;fill=false;grow_px=0.9;warning_time=30;duration_frames=34"
+}
 
 function level_1()
   level_setup(1)

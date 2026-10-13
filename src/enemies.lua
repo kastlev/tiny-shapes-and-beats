@@ -43,13 +43,15 @@ function fire_bullet_ring(x,y,count,speed,off,b)
     _create_enemy(E_BULLET,x,y,{vx=cos(a)*speed,vy=sin(a)*speed,size=b.size,
       duration_frames=b.duration_frames or 80,color=b.color,shape=b.shape})
   end
-  trigger_screen_flash(_hit_flash_cfg)
-  spawn_hit_particles(x,y,_bounce_particle_cfg)
+  if not b.quiet then
+    trigger_screen_flash(_hit_flash_cfg)
+    spawn_hit_particles(x,y,_bounce_particle_cfg)
+  end
 end
 
 function spawn_bullet_burst(e)
   fire_bullet_ring(e.x,e.y,e.burst_count,e.burst_speed,e.burst_angle_offset,
-    {size=e.burst_size,duration_frames=e.burst_duration_frames,color=e.burst_color,shape=e.burst_shape})
+    {size=e.burst_size,duration_frames=e.burst_duration_frames,color=e.burst_color,shape=e.burst_shape,quiet=e.burst_quiet})
 end
 
 function update_enemies()
@@ -192,6 +194,11 @@ function spawn(etype,x,y,params)
     local spd=vmin+rnd(vmax-vmin)
     params.vx=cos(ang)*spd
     params.vy=sin(ang)*spd
+  end
+
+   if params.aim then
+    local a=atan2(p.x+2-x,p.y+2-y)
+    params.vx,params.vy=cos(a)*params.aim,sin(a)*params.aim
   end
 
   params.size=sz
