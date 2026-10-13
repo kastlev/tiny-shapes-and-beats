@@ -177,7 +177,7 @@ function spawn(etype,x,y,params)
     if sz>=40 then add_trauma(.1) end
     wait_until_enemy_dead(_create_enemy(etype,x,y,{
       size=sz,fill=params.fill,color=params.warning_color or C_DARK_PINK,
-      duration_frames=params.warning_frames or 20,hold_frames=params.hold_frames or 0,
+      duration_frames=params.warning_frames or 20,
       len=params.len,ang=params.ang,is_warning=true}))
   end
 
