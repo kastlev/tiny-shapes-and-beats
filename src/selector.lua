@@ -1,35 +1,23 @@
 function meta(i) return _kv_parts(split(LEVEL_META[i], ";")) end
-
-selector_idx, selector_cam_x, selector_vel = 1, 0, 0
-can_move_frames = 0
-level_chosen = false
-selector_arrived = true
+selector_idx,selector_cam_x,can_move_frames,level_chosen,selector_arrived=1,0,0,false,true
 
 function update_selector()
-    local cfg = meta(selector_idx)
-    local tx = cfg.map_x * 8 - 64
-    local prev_x = selector_cam_x
+  local cfg=meta(selector_idx)
+  local tx=cfg.map_x*8-64
+  local prev=selector_cam_x
+  selector_cam_x=lerp_to(selector_cam_x,tx,.15,.5)
+  local v=selector_cam_x-prev
 
-    selector_cam_x = lerp_to(selector_cam_x, tx, .15, .5)
-    selector_vel = selector_cam_x - prev_x
+  if not selector_arrived and abs(selector_cam_x-tx)<1 then
+    selector_cam_x,v,selector_arrived=tx,0,true
+    sfx(7)
+  end
 
-    if not selector_arrived
-            and abs(selector_cam_x - tx) < 1 then
-        selector_cam_x = tx
-        selector_vel = 0
+  can_move=not level_chosen
+  can_move_frames+=1
+  song,name=cfg.song,cfg.name
 
-        sfx(7)
-        selector_arrived = true
-    end
-
-    can_move = not level_chosen
-    can_move_frames += 1
-    song = meta(selector_idx).song
-    name = meta(selector_idx).name
-
-    if abs(selector_vel) > 1 then
-        song, name, can_move, can_move_frames = nil, nil, false, 0
-    end
+  if abs(v)>1 then song,name,can_move,can_move_frames=nil,nil,false,0 end
 
     if btnp(1) and selector_idx < LEVEL_COUNT and can_move then
         selector_idx += 1
@@ -57,12 +45,9 @@ function draw_selector()
     callfromstring "map,0,0,0,0,128,32/camera"
     spr(1, 60, 64, 1, 1)
 
-    if can_move and can_move_frames > 10 then
-        local cx, cy = 64 - 50 / 2, 64 - 16 - 8
-        rectfill(cx, cy, cx + 50, cy + 16, 13) -- 2,5,13
-        local box_cx = cx + 25
-
-        print(song, box_cx - #song * 2, cy + 3, C_WHITE)
-        print(name, box_cx - #name * 2, cy + 9, C_LIGHT_GRAY)
-    end
+  if can_move and can_move_frames>10 then
+    rectfill(39,40,89,56,13)
+    print(song,64-#song*2,43,C_WHITE)
+    print(name,64-#name*2,49,C_LIGHT_GRAY)
+  end
 end

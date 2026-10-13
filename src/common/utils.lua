@@ -59,3 +59,5 @@ function run(str)
   end
   return last
 end
+
+function _ease(t) return mid(0,t,1) end

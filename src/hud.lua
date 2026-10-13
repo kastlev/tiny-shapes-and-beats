@@ -1,223 +1,142 @@
-HUD_X, HUD_Y, HUD_W, level_final_frames, checkpoint_marker_speed, card_timer = unpack(split "1,1,125,0,1.5,0")
-CARD_W, CARD_H, CARD_DISPLAY_TIME, CARD_REVEAL_FRAC, CART_SPEED_IN, CART_SPEED_OUT, ORB_R, ORB_HR = unpack(split "72,14,30,1,0.2,0.07,5,8")
+HUD_X,HUD_Y,HUD_W,level_final_frames,checkpoint_marker_speed,card_timer=unpack(split"1,1,125,0,1.5,0")
+CARD_W,CARD_H,CARD_DISPLAY_TIME,CARD_REVEAL_FRAC,CART_SPEED_IN,CART_SPEED_OUT,ORB_R,ORB_HR=unpack(split"72,14,30,1,0.2,0.07,5,8")
 
-function hud_start(total_f, checkpoint_list, song, lvl)
-    level_total_frames = total_f
-    level_progress_frame, level_runtime_frames, last_respawn_frame, level_started = 0, 0, 0, false
-    checkpoints, active_checkpoint_markers = {}, {}
-    bg_color_base = BG_COLOR_DEFAULT
-
-    for _, f in pairs(checkpoint_list or {}) do
-        if type(f) == "table" then
-            add(
-                checkpoints, {
-                    frac = f.frac or f[1],
-                    color = f.color or f[2],
-                    hit = false
-                }
-            )
-        else
-            add(checkpoints, { frac = f, color = nil, hit = false })
-        end
-    end
-
-    card_song = song or "no title"
-    level_name = lvl or "level 1"
-    level_card_state = "in"
-    level_card_position_x = 128 + CARD_W
-    orb, orb_waves = nil, {}
+function hud_start(total_f,list,song,lvl)
+  level_total_frames=total_f
+  level_progress_frame,level_runtime_frames,last_respawn_frame,level_started=0,0,0,false
+  checkpoints,active_checkpoint_markers,bg_color_base={},{},BG_COLOR_DEFAULT
+  for f in all(list) do
+    local t=type(f)=="table" and f or {f}
+    add(checkpoints,{frac=t.frac or t[1],color=t.color or t[2],hit=false})
+  end
+  card_song,level_name,level_card_state,level_card_position_x=song or "no title",lvl or "level 1","in",128+CARD_W
+  orb,orb_waves=nil,{}
 end
 
 function update_hud()
-    if level_started then
-        if level_progress_frame < level_total_frames - 1 then level_progress_frame += 1 end
+  if level_started and level_progress_frame<level_total_frames-1 then level_progress_frame+=1 end
+  if orb and #enemies==0 then bg_color_base=BG_COLOR_DEFAULT end
+
+  local frac=level_progress_frame/level_total_frames
+  for ck in all(checkpoints) do
+    if not ck.hit and frac>=ck.frac then
+      ck.hit=true
+      add(active_checkpoint_markers,{x=130,color=ck.color})
     end
+  end
 
-    if orb and #enemies == 0 then
-        bg_color_base = BG_COLOR_DEFAULT
+  for c in all(active_checkpoint_markers) do
+    c.x-=checkpoint_marker_speed
+    if abs(c.x-p.x-2)<=3 and not p.is_dead then
+      last_respawn_frame=level_progress_frame
+      bg_color_base=c.color or bg_color_base
+      sfx(4)
+      trigger_screen_flash(_hit_flash_cfg)
+      del(active_checkpoint_markers,c)
+    elseif c.x<-2 then
+      del(active_checkpoint_markers,c)
     end
+  end
 
-    local frac = level_progress_frame / level_total_frames
-    for ck in all(checkpoints) do
-        if not ck.hit and frac >= ck.frac then
-            ck.hit = true
-            add(active_checkpoint_markers, { x = 130, frac = ck.frac, color = ck.color })
-        end
+  _update_card()
+
+  if orb and not orb.collected then
+    orb.x+=orb.vx
+    orb.y+=orb.vy
+    local m=ORB_R+3
+    if orb.x<m or orb.x>127-m then orb.vx=-orb.vx orb.x=mid(m,orb.x,127-m) end
+    if orb.y<m+4 or orb.y>127-m then orb.vy=-orb.vy orb.y=mid(m+4,orb.y,127-m) end
+    local dx,dy=p.x+p.w/2-orb.x,p.y+p.h/2-orb.y
+    if dx*dx+dy*dy<ORB_HR*ORB_HR then
+      orb.collected=true
+      _spawn_wave(orb.x,orb.y)
+      sfx(3)
     end
+  end
 
-    for c in all(active_checkpoint_markers) do
-        c.x -= checkpoint_marker_speed
-
-        if c.x >= p.x - 1 and c.x <= p.x + p.w + 1 and not p.is_dead then
-            last_respawn_frame = level_progress_frame
-            if c.color then
-                bg_color_base = c.color
-            end
-            sfx(4)
-            trigger_screen_flash(_hit_flash_cfg)
-            del(active_checkpoint_markers, c)
-        elseif c.x < -2 then
-            del(active_checkpoint_markers, c)
-        end
-    end
-
-    _update_card()
-
-    if orb and not orb.collected then
-        orb.pulse += 0.06
-        orb.x += orb.vx
-        orb.y += orb.vy
-
-        local margin = ORB_R + 3
-        if orb.x < margin or orb.x > 127 - margin then
-            orb.vx = -orb.vx
-            orb.x = mid(margin, orb.x, 127 - margin)
-        end
-        if orb.y < margin + 4 or orb.y > 127 - margin then
-            orb.vy = -orb.vy
-            orb.y = mid(margin + 4, orb.y, 127 - margin)
-        end
-
-        local dx = (p.x + p.w / 2) - orb.x
-        local dy = (p.y + p.h / 2) - orb.y
-        if dx * dx + dy * dy < ORB_HR * ORB_HR then
-            orb.collected = true
-            _spawn_wave(orb.x, orb.y)
-            sfx(3)
-        end
-    end
-
-    for w in all(orb_waves) do
-        w.r += w.spd
-        if w.r > w.max_r then del(orb_waves, w) end
-    end
+  for w in all(orb_waves) do
+    w.r+=w.spd
+    if w.r>w.max_r then del(orb_waves,w) end
+  end
 end
 
 function draw_hud()
-    if level_started then
-        if not progress_bar_drawing then
-            local frac = level_progress_frame / 25
-            local fill_x = HUD_X + flr(frac * HUD_W)
-            line(HUD_X, HUD_Y, fill_x, HUD_Y, C_DARK_GRAY)
-            if fill_x == HUD_X + HUD_W then
-                progress_bar_drawing = true
-            end
-        else
-            line(HUD_X, HUD_Y, HUD_X + HUD_W, HUD_Y, C_DARK_GRAY)
-        end
+  if level_started then
+    local fx=HUD_X+flr((progress_bar_drawing and 1 or level_progress_frame/25)*HUD_W)
+    line(HUD_X,HUD_Y,fx,HUD_Y,C_DARK_GRAY)
+    progress_bar_drawing=progress_bar_drawing or fx==HUD_X+HUD_W
 
-        local frac = min(1, level_progress_frame / level_total_frames)
-        local fill_x = HUD_X + flr(frac * HUD_W)
-        if fill_x > HUD_X then
-            line(HUD_X, HUD_Y, fill_x, HUD_Y, C_BLUE)
-        end
-        if progress_bar_drawing then
-            for ck in all(checkpoints) do
-                local tx = HUD_X + flr(ck.frac * HUD_W)
-                local tc = ck.hit and C_WHITE or C_LIGHT_GRAY
-                line(tx, HUD_Y - 1, tx, HUD_Y + 1, tc)
-            end
-        end
+    fx=HUD_X+flr(min(1,level_progress_frame/level_total_frames)*HUD_W)
+    if fx>HUD_X then line(HUD_X,HUD_Y,fx,HUD_Y,C_BLUE) end
+    if progress_bar_drawing then
+      for ck in all(checkpoints) do
+        local tx=HUD_X+flr(ck.frac*HUD_W)
+        line(tx,HUD_Y-1,tx,HUD_Y+1,ck.hit and C_WHITE or C_LIGHT_GRAY)
+      end
     end
+  end
 
-    for c in all(active_checkpoint_markers) do
-        local lx = flr(c.x)
-        if lx >= 0 and lx <= 127 then
-            for y = 0, 127, 2 do
-                pset(lx, y, C_LIGHT_GRAY)
-            end
-        end
+  for c in all(active_checkpoint_markers) do
+    local lx=flr(c.x)
+    if lx>=0 and lx<=127 then
+      for y=0,127,2 do pset(lx,y,C_LIGHT_GRAY) end
     end
+  end
 
-    if level_card_state != "idle" and level_card_state != "done" then
-        local cx = flr(level_card_position_x)
-        local cy = 128 - CARD_H - 4
-        camera(-cx, -cy)
-        callfromstring "rectfill,1,1,73,15,C_BLACK/rectfill,0,0,72,14,C_DARK_BLUE/rectfill,0,0,2,14,C_LAVENDER/print,level_name,5,9,C_LIGHT_GRAY/print,card_song,5,3,C_WHITE"
-        camera()
-    end
+  if level_card_state!="idle" and level_card_state!="done" then
+    camera(-flr(level_card_position_x),CARD_H-124)
+    callfromstring "rectfill,1,1,73,15,C_BLACK/rectfill,0,0,72,14,C_DARK_BLUE/rectfill,0,0,2,14,C_LAVENDER/print,level_name,5,9,C_LIGHT_GRAY/print,card_song,5,3,C_WHITE"
+    camera()
+  end
 
-    if orb and not orb.collected then
-        local ox, oy = flr(orb.x) - 4, flr(orb.y) - 4
-        draw_anim(ox, oy, level_runtime_frames * 2, 5, 16, 8)
-        draw_anim(ox + 8 / 2 - 16 / 2, oy + 8 / 2 - 16 / 2, level_runtime_frames, 21, 5, 6, 2, 2)
-    end
+  if orb and not orb.collected then
+    local ox,oy=flr(orb.x)-4,flr(orb.y)-4
+    draw_anim(ox,oy,level_runtime_frames*2,5,16,8)
+    draw_anim(ox-4,oy-4,level_runtime_frames,21,5,6,2,2)
+  end
 
-    for w in all(orb_waves) do
-        if w.r > 0 then
-            circ(flr(w.x), flr(w.y), flr(w.r), w.col)
-        end
-    end
+  for w in all(orb_waves) do circ(flr(w.x),flr(w.y),flr(w.r),w.col) end
 
-    if level_final_frames > 0 then
-        print("frames: " .. level_final_frames, 2, 120, C_WHITE)
-    end
+  if level_final_frames>0 then print("frames: "..level_final_frames,2,120,C_WHITE) end
 end
 
 function spawn_orb()
-    orb = _kv_parts(split(
-        "x=12;y=12;vx=0.55;vy=0.4;pulse=0;collected=false", ";"
-    ))
-    orb.x += rnd(104)
-    orb.y += rnd(104)
-    orb_waves = {}
+  orb=_kv_parts(split("x=12;y=12;vx=0.55;vy=0.4;collected=false",";"))
+  orb.x+=rnd(104)
+  orb.y+=rnd(104)
+  orb_waves={}
 end
 
-function orb_collected()
-    return orb == nil or orb.collected
-end
+function orb_collected() return orb==nil or orb.collected end
 
 function _update_card()
-    if level_card_state == "idle" or level_card_state == "done" then
-        return
+  local s=level_card_state
+  if s=="idle" or s=="done" then return end
+  local tx,x=128-CARD_W,level_card_position_x
+  if s=="in" then
+    x+=(tx-x)*CART_SPEED_IN
+    if abs(x-tx)<.5 then
+      x=tx
+      if CARD_DISPLAY_TIME>0 then
+        level_card_state,card_timer="hold",CARD_DISPLAY_TIME
+      else
+        level_card_state,level_started="out",true
+      end
     end
-
-    local target_x = 128 - CARD_W
-
-    if level_card_state == "in" then
-        level_card_position_x += (target_x - level_card_position_x) * CART_SPEED_IN
-
-        if abs(level_card_position_x - target_x) < 0.5 then
-            level_card_position_x = target_x
-
-            if CARD_DISPLAY_TIME > 0 then
-                level_card_state = "hold"
-                card_timer = CARD_DISPLAY_TIME
-            else
-                level_card_state = "out"
-                level_started = true
-            end
-        end
-    elseif level_card_state == "hold" then
-        card_timer -= 1
-
-        if not level_started and card_timer <= CARD_DISPLAY_TIME * (1 - CARD_REVEAL_FRAC) then
-            level_started = true
-        end
-
-        if card_timer <= 0 then
-            level_card_state = "out"
-        end
-    elseif level_card_state == "out" then
-        level_card_position_x += (200 - level_card_position_x) * CART_SPEED_OUT
-
-        if abs(level_card_position_x - 200) < 0.5 then
-            level_card_position_x = 200
-            level_card_state = "done"
-        end
-    end
+  elseif s=="hold" then
+    card_timer-=1
+    if not level_started and card_timer<=CARD_DISPLAY_TIME*(1-CARD_REVEAL_FRAC) then level_started=true end
+    if card_timer<=0 then level_card_state="out" end
+  else
+    x+=(200-x)*CART_SPEED_OUT
+    if abs(x-200)<.5 then x,level_card_state=200,"done" end
+  end
+  level_card_position_x=x
 end
 
-function _spawn_wave(cx, cy)
-    orb_waves = {}
-    for i = 1, 6 do
-        add(
-            orb_waves, {
-                x = cx, y = cy,
-                r = i * 2, max_r = 24 + i * 14,
-                col = (i % 2 == 0) and C_LAVENDER or C_WHITE,
-                spd = 1.0 + i * 0.3
-            }
-        )
-    end
+function _spawn_wave(cx,cy)
+  orb_waves={}
+  for i=1,6 do
+    add(orb_waves,{x=cx,y=cy,r=i*2,max_r=24+i*14,col=i%2==0 and C_LAVENDER or C_WHITE,spd=1+i*.3})
+  end
 end

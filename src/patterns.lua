@@ -13,7 +13,7 @@ function run_level(fn)
   end)
 end
 
-function meanwhile(fn) add(active_patterns,cocreate(fn)) end
+function meanwhile(fn) return add(active_patterns,cocreate(fn)) end
 
 function update_active_patterns()
   for co in all(active_patterns) do
