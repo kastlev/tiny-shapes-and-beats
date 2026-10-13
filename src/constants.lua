@@ -1,6 +1,7 @@
 E_CIRCLE,E_SQUARE,E_LINE_BI,E_CROSS,E_BULLET,E_HOLE=
 unpack(split"circle,square,line_bi,cross,bullet,hole")
 
+-- colores a eliminar: C_DARK_GREEN, C_BROWN, C_ORANGE, C_YELLOW, C_GREEN, C_PEACH funciones:ease_in_quad
 C_BLACK,C_DARK_BLUE,C_DARK_PINK,C_DARK_GREEN,
 C_BROWN,C_DARK_GRAY,C_LIGHT_GRAY,C_WHITE,
 C_RED,C_ORANGE,C_YELLOW,C_GREEN,

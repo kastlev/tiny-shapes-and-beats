@@ -5,7 +5,11 @@ function run_level(fn)
   return meanwhile(function()
     fn()
     level_final_frames = level_runtime_frames
-    run "wait_for_clear/spawn_orb/wait_for_orb"
+    run "wait_for_clear/spawn_orb"
+    
+    while not orb_collected() do
+      yield()
+    end
   end)
 end
 
@@ -53,12 +57,6 @@ end
 
 function wait_for_card()
   while not level_started do
-    yield()
-  end
-end
-
-function wait_for_orb()
-  while not orb_collected() do
     yield()
   end
 end
