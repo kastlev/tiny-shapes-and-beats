@@ -74,6 +74,7 @@ function update_player()
       if p.hp<=0 then
         p.is_dead=true
         spawn_death_bullets(p.x+2,p.y+2)
+        music(-1, 900)
       end
       trigger_hit_effect()
     end

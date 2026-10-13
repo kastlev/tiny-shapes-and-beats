@@ -148,7 +148,6 @@ function update_enemies()
   end
 end
 
--- draw_enemies(true) = warnings y "draw_behind"; draw_enemies() = enemigos reales
 function draw_enemies(behind)
   for e in all(enemies) do
     if not(e.is_warning or e.draw_behind)==not behind then enemy_types[e.type](e) end

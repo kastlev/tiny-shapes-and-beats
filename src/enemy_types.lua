@@ -51,5 +51,3 @@ function spw_loop(cfg)
   end
   for co in all(coros) do wait_until_pattern_finished(co) end
 end
-
--- EMIT_DEFAULT_CFG falta
