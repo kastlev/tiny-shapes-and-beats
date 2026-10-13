@@ -106,7 +106,7 @@ function _do_respawn()
 		end
 	end
 
-	callfromstring "start_reveal,64,64,10"
+	reveal_t=0
 	p.hit_iframes_timer = 60
 	trigger_hitstop(10)
 end

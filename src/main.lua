@@ -12,7 +12,7 @@ end
 function _update()
 	frame += 1
 	update_fade()
-	update_reveal()
+	reveal_t=min(reveal_t+1,10)
 	update_delays()
 	screen_update()
 end

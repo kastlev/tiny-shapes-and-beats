@@ -10,7 +10,8 @@ for row in all(split(
   add(gradients, split(row))
 end
 
-fading, fade_t = false, 0
+fading, fade_t, reveal_t
+ = false, 0,10
 
 function start_fade(from, to, frames, cb)
     fade_from, fade_to, fade_frames, fade_timer, fade_cb, fading = from, to, frames, 0, cb, true
@@ -39,32 +40,13 @@ function draw_fade()
     end
 end
 
-function start_reveal(cx, cy, frames)
-    reveal_active, reveal_t, reveal_frames, reveal_cx, reveal_cy = true, 0, frames or 30, cx or 64, cy or 64
-end
-
-function update_reveal()
-    if reveal_active then
-        reveal_t += 1
-        if reveal_t >= reveal_frames then
-            reveal_active = false
-        end
-    end
-end
 
 function draw_reveal()
-    if not reveal_active then return end
-    fade_square(min(reveal_t/reveal_frames,1), reveal_cx, reveal_cy, 5)
+  if reveal_t<10 then
+    local h=reveal_t*6.4
+    poke(0x5f34,2)
+    rectfill(64-h,64-h,64+h,64+h,5|0x1800)
+    poke(0x5f34,0)
+  end
 end
-
-function fade_square(progress, cx, cy, col)
-    if progress >= 1 then return end
-    col = col or 0
-    cx, cy = cx or 64, cy or 64
-    local h = 64 * progress
-    poke(0x5f34, 0x2)
-    rectfill(cx-h, cy-h, cx+h, cy+h, col | 0x1800)
-    poke(0x5f34, 0x0)
-end
-
 
