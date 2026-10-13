@@ -4,12 +4,6 @@ function spw(cfg)
     return spawn(e, x, y, cfg)
 end
 
-function _dist(i, n, minv, maxv, random)
-    return random
-            and rnd(maxv - minv) + minv
-            or minv + (i - 1) * (maxv - minv) \ max(1, n - 1)
-end
-
 function _square_perimeter_pt(cx, cy, r, t)
     -- t en [0,1)
     local d = t * (8 * r)

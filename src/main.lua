@@ -30,7 +30,7 @@ function set_screen(u, d)
 	if u == update_game then
 		menuitem(
 			1, "back to levels", function()
-				level_chosen = false
+				delays,death_sequence_started, level_chosen={},false, false
 				start_fadein(20)
 				set_screen(update_selector, draw_selector)
 			end
