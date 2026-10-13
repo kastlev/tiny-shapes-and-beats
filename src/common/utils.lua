@@ -1,81 +1,61 @@
-function lerp_to(a, b, i, m)
-    local r = (1 - i) * a + i * b
-    if abs(b - r) < m then
-        return b
-    else
-        return r
-    end
+function lerp_to(a,b,i,m)
+  local r=(1-i)*a+i*b
+  return abs(b-r)<m and b or r
 end
 
-function rndb(low, high)
-    return flr(rnd(high - low + 1) + low)
+function rndb(low,high)
+  return flr(rnd(high-low+1)+low)
 end
 
 function callfromstring(l)
-	for s in all(split(l,"/")) do
-		s=split(s)
-		for i,si in inext,s do
-			s[i]=_ENV[si] or tonum(si) or si
-		end
-		deli(s,1)(unpack(s))
-	end
+  for s in all(split(l,"/")) do
+    s=split(s)
+    for i,v in inext,s do s[i]=_ENV[v] or tonum(v) or v end
+    deli(s,1)(unpack(s))
+  end
 end
 
-function _merge(base, over)
-  for k, v in pairs(over or {}) do base[k] = v end
+function _merge(base,over)
+  for k,v in pairs(over or {}) do base[k]=v end
   return base
 end
 
-function cycling_color(colors, rate, t)
-    local i = (t \ rate % #colors) + 1
-    return colors[i]
+function cycling_color(c,rate,t) return c[t\rate%#c+1] end
+
+function draw_anim(x,y,t,sp,n,spd,w,h,step)
+  w=w or 1
+  spr(sp+t\spd%n*(step or w),x,y,w,h or 1)
 end
 
-function draw_anim(x, y, time_t, base_sp, t_frames, spd, w, h, step)
-    w, h = w or 1, h or 1
-    step = step or w
-    local sp = base_sp + ((time_t \ spd) % t_frames) * step
-    spr(sp, x, y, w, h)
-end
-
-function line_c(x, y, len, width, ang, col, centered)
-  local dirx, diry = cos(ang), sin(ang)
-  local hw = width / 2
-  local i0 = centered and -len or 0
-  for i = i0, len do
-    circfill(x + dirx * i, y + diry * i, hw, col)
+function line_c(x,y,len,width,ang,col,centered)
+  local dx,dy=cos(ang),sin(ang)
+  for i=centered and -len or 0,len do
+    circfill(x+dx*i,y+dy*i,width/2,col)
   end
 end
 
 function _kv_parts(parts)
-    local t = {}
-    for pair in all(parts) do
-        local kv = split(pair, "=")
-        local k, v = kv[1], kv[2]
-        if v == "true" then v = true
-        elseif v == "false" then v = false
-        elseif tonum(v) then v = tonum(v)
-        elseif _ENV[v] ~= nil then v = _ENV[v]
-        end
-        t[k] = v
-    end
-    return t
+  local t={}
+  for pair in all(parts) do
+    local k,v=unpack(split(pair,"="))
+    t[k]=v=="true" or v!="false" and (tonum(v) or _ENV[v] or v)
+  end
+  return t
 end
 
 function run(str)
-    local last
-    for call in all(split(str, "/")) do
-        local branches = split(call, "|")
-        if #branches > 1 then
-            local fns = {}
-            for b in all(branches) do add(fns, function() run(b) end) end
-            last = sync(unpack(fns))
-        else
-            local parts = split(call, ";")
-            local fname = parts[1]
-            deli(parts, 1)
-            last = _ENV[fname](_kv_parts(parts))
-        end
+  local last
+  for call in all(split(str,"/")) do
+    local br=split(call,"|")
+    if #br>1 then
+      local fns={}
+      for b in all(br) do add(fns,function() run(b) end) end
+      last=sync(unpack(fns))
+    else
+      local parts=split(call,";")
+      local f=deli(parts,1)
+      last=_ENV[f](_kv_parts(parts))
     end
-    return last
+  end
+  return last
 end
