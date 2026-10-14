@@ -81,7 +81,7 @@ function _do_respawn()
   callfromstring "init_particle/init_camera/init_screen_flash"
 
   local saved=level_total_frames>0 and target/level_total_frames or 0
-  level_progress_frame=target
+  level_progress_frame,last_respawn_frame=target,target
   bg_color_base=BG_COLOR_DEFAULT
   for ck in all(checkpoints) do
     ck.hit=ck.frac<=saved
