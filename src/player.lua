@@ -1,6 +1,6 @@
 function init_player()
 	p = _kv_parts(split(
-		"hp=1;hp_max=4;x=61;y=61;input_x=0;input_y=0;acc=0.9;friction=0.8;dx=0;dy=0;max_dx=2.5;max_dy=2.5;sp=1;flip_x=false;flip_y=false;scl_x=1;scl_y=1;w=4;h=4;dash_dir_x=0;dash_dir_y=0;dash_timer_max=8;dash_timer=0;dash_force_max=4;dash_force=0;dash_cooldown_max=16;dash_cooldown_timer=0;dash_explosion_x=0;dash_explosion_y=0;dash_buffer_timer=0;dash_buffer_max=7;dash_wall_hit=false;last_input_x=0;last_input_y=0;last_input_timer=0;last_input_max=5;is_diagonal=false;is_dashing=false;is_invulnerable=false;is_stunned=false;is_dead=false;hit_iframes_timer=0;hit_iframes_timer_max=40;trail_active=false;in_danger=false",
+		"hp=4;hp_max=4;x=61;y=61;input_x=0;input_y=0;acc=0.9;friction=0.8;dx=0;dy=0;max_dx=2.5;max_dy=2.5;sp=1;flip_x=false;flip_y=false;scl_x=1;scl_y=1;w=4;h=4;dash_dir_x=0;dash_dir_y=0;dash_timer_max=8;dash_timer=0;dash_force_max=4;dash_force=0;dash_cooldown_max=16;dash_cooldown_timer=0;dash_explosion_x=0;dash_explosion_y=0;dash_buffer_timer=0;dash_buffer_max=7;dash_wall_hit=false;last_input_x=0;last_input_y=0;last_input_timer=0;last_input_max=5;is_diagonal=false;is_dashing=false;is_invulnerable=false;is_stunned=false;is_dead=false;hit_iframes_timer=0;hit_iframes_timer_max=40;trail_active=false;in_danger=false",
 		";"
 	))
 end

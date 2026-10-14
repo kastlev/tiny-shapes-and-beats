@@ -60,4 +60,13 @@ function run(str)
   return last
 end
 
-function _ease(t) return mid(0,t,1) end
+ease_fns={
+  out_quad=function(t) return 1-(1-t)^2 end,  -- arranca rápido y frena al final
+  in_snap=function(t) return t^6 end,         -- casi quieto y se dispara al final
+  smooth=function(t) return t*t*(3-2*t) end   -- arranca y frena suave
+}
+
+function _ease(t,m)
+  t=mid(0,t,1)
+  return ease_fns[m] and ease_fns[m](t) or t
+end

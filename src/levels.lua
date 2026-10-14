@@ -1,9 +1,8 @@
-
-
 LEVEL_META = {
   "name=LVL 1;song=waves;track=0;total=1560;point1=0.27;point2=0.68;map_x=8",
   "name=LVL 2;song=flux;track=8;total=2100;point1=0.23;point2=0.52;point3=0.78;map_x=16",
-  "name=LVL 3;song=zona;track=16;total=2400;point1=0.25;point2=0.55;map_x=24"
+  "name=LVL 3;song=zona;track=16;total=2400;point1=0.25;point2=0.55;map_x=24",
+  "name=LVL 4;song=test;track=0;total=4350;point1=0.423;point2=0.811;map_x=32"
 }
 LEVEL_COUNT = #LEVEL_META
 
@@ -24,7 +23,28 @@ T = {
   orbzone  = "spw;type=E_HOLE;orbit=true;orbit_cx=64;orbit_cy=64;orbit_ang=0;orbit_radius=22;orbit_speed=0.006;x=86;y=64;size=34;warning_frames=45;duration_frames=315",
   lens     = "spw;type=E_HOLE;orbit=true;orbit_cx=64;orbit_cy=64;orbit_radius=12;orbit_speed=0.006;y=64;size=36;warning_frames=30;duration_frames=330",
   jumpzone = "spw;type=E_HOLE;size=28;warning_frames=30;duration_frames=90",
-  zonering = "spw;size=1;size_max=30;fill=false;grow_px=0.9;warning_frames=30;duration_frames=34"
+  zonering = "spw;size=1;size_max=30;fill=false;grow_px=0.9;warning_frames=30;duration_frames=34",
+  sweep    = "spw;type=E_LINE_BI;y=64;ang=0.25;len=72;size=3;x=2;vx=1.8;warning_frames=25;duration_frames=80", -- linea vertical que barre de izq a der (al reves: x=126;vx=-1.8)
+  wiper    = "spw;type=E_LINE_BI;x=64;y=0;ang=0;len=144;size=2;ang_vel=0.004;warning_frames=30;duration_frames=125", -- limpiaparabrisas: media vuelta desde el borde superior (125 f = 0.5/ang_vel)
+    gun      = "spw_loop;pattern=point;x=-4;y=64;n=30;parallel=true;stagger=2;type=E_BULLET;size=2;v_random=true;v_speed_min=1.5;v_speed_max=3;duration_frames=120", -- metralleta desde un borde: direccion al azar, las que miran afuera mueren (otro borde: x=132)
+  core     = "spw;type=E_CIRCLE;x=64;y=64;size=7;color=13;warning_frames=30;duration_frames=125", -- nucleo inofensivo (color 13) en el centro; se lanza con fountain
+  fountain = "spw_loop;pattern=point;x=64;y=64;n=40;parallel=true;stagger=3;type=E_BULLET;size=2;v_random=true;v_speed_min=0.8;v_speed_max=2;duration_frames=150", -- chorro de balas desde el centro
+  ripple   = "spw_loop;pattern=column;column_x=-4;random=false;n=6;parallel=true;type=E_BULLET;size=3;vx=1.4;wave=true;wave_amp=12;wave_freq=0.03;duration_frames=130", -- muro de balas que ondula
+  pop      = "spw;count=12;speed=1.5;size=3;duration_frames=100;warning=true;warning_frames=20", -- anillo de balas sin emisor: solo aviso y ¡pum!
+  worm     = "spw_loop;pattern=point;x=-5;y=64;n=10;parallel=true;stagger=4;type=E_CIRCLE;size=3;vx=1.5;wave=true;wave_amp=10;wave_freq=0.02;warning=false;duration_frames=200", -- gusano: cada circulo repite el recorrido ondulado con retraso
+
+  -- ===== FORMAS ESTATICAS Y PERSEGUIDORAS =====
+  mine     = "spw;type=E_CIRCLE;size=9;near_player=true;near_range=18;warning_frames=30;duration_frames=45", -- circulo estatico junto al jugador
+  block    = "spw;type=E_SQUARE;size=9;warning_frames=30;duration_frames=45", -- cuadrado estatico en sitio aleatorio
+  stalker  = "spw;type=E_SQUARE;size=5;chase=true;chase_speed=1.3;chase_turn=0.04;warning_frames=30;duration_frames=150", -- un cuadrado perseguidor
+  strobe   = "spw;type=E_SQUARE;size=14;flicker=true;flicker_rate=8;warning_frames=30;duration_frames=120", -- parpadea rosa/blanco: solo hiere en los frames rosa
+
+  -- ===== MOVIMIENTOS ESPECIALES =====
+  bomb     = "spw;type=E_CIRCLE;size=2;size_max=16;grow_lerp=0.12;warning_frames=30;duration_frames=60;burst=true;burst_count=12;burst_speed=1.4;burst_size=2;burst_duration_frames=100", -- crece desde un punto y explota en balas
+  orbiter  = "spw;type=E_SQUARE;orbit=true;orbit_cx=64;orbit_cy=64;orbit_ang=0;orbit_radius=40;orbit_speed=0.008;x=104;y=64;size=5;warning_frames=30;duration_frames=150", -- satelite que gira alrededor del centro (~2 px/f)
+  bouncer  = "spw;x=20;y=20;vx=1.9;vy=1.5;size=3;warning_frames=30;duration_frames=180;bounce=true;bounce_speed_mult=1.05;bounce_size_mult=1.06", -- rebota, se acelera y crece
+  wrapper  = "spw;type=E_CIRCLE;size=4;vx=2;vy=0.9;wrap=true;warning_frames=30;duration_frames=150" -- sale por un borde y entra por el opuesto
+
 }
 
 function level_1()
@@ -108,3 +128,48 @@ function level_3()
     30                                                       -- f2370 ajuste hasta f2400
   }                                                          -- f2400 = total
 end
+
+function level_4()
+  level_setup(4)
+  play {
+    -- ===== LINEAS Y FORMAS =====
+    "hline;y=@;wait=45",                                       -- f0 linea horizontal sobre el jugador
+    "vline;x=@;wait=45",                                       -- f45 linea vertical
+    "cross;duration_frames=120;wait=150",                      -- f90 cruz giratoria
+    "ring;x=64;y=64;wait=75",                                  -- f240 anillo desde el centro: haz dash a traves
+    "mine;wait=80",                                            -- f315 circulo estatico junto a ti
+    "block;wait=80",                                           -- f395 cuadrado estatico
+    "stalker;wait=185",                                        -- f475 cuadrado perseguidor
+    "squares;n=4;stagger=15;wait=120",                         -- f660 cuadrados que caen cerca de ti
+    "chasers;n=4;radius=64;wait=170",                          -- f780 perseguidores desde las 4 esquinas
+    "bouncer;wait=210",                                        -- f950 bola que rebota y crece
+    "wrapper;wait=185",                                        -- f1160 sale por un borde, entra por el otro
+    "strobe;wait=160",                                         -- f1345 cuadrado parpadeante
+    "orbiter;wait=185",                                        -- f1505 satelite orbitando
+    "bomb;wait=150",                                           -- f1690 crece y explota
+    120,                                                       -- f1840 RESPIRO (checkpoint 1)
+
+    -- ===== BALAS =====
+    "column;wait=60",                                          -- f1960 columna de balas
+    "rain;n=6;wait=100",                                       -- f2020 lluvia
+    "ripple;wait=130",                                         -- f2120 muro ondulante
+    "5*aimed;x=3;y=@;warning=true;warning_frames=15;wait=32",  -- f2250 balas apuntadas desde el borde izquierdo
+    "burst;x=64;y=64;wait=110",                                -- f2410 emisor central que explota
+    "pop;x=?;y=?;wait=120",                                    -- f2520 anillo instantaneo
+    "gun;y=?;wait=120",                                        -- f2640 metralleta desde el borde izquierdo
+    "core;wait=30/fountain;wait=170",                          -- f2760 nucleo + chorro de balas (alejate del centro)
+    "spiral;wait=190",                                         -- f2960 espiral de 3 brazos
+    "emitter;x=-1;y=40;target_x=15;target_y=40;wait=110",      -- f3150 emisor que entra y suelta un anillo
+    "sweep;wait=110",                                          -- f3260 linea que barre
+    "wiper;wait=160",                                          -- f3370 limpiaparabrisas
+    120,                                                       -- f3530 RESPIRO (checkpoint 2)
+
+    -- ===== ZONAS: lo de FUERA del circulo es letal =====
+    "zone;duration_frames=100;wait=145",                       -- f3650 zona quieta (45 aviso + 100)
+    "orbzone;duration_frames=150;wait=195",                    -- f3795 zona que orbita (45 + 150)
+    "lens;orbit_ang=0;x=76;duration_frames=150/lens;orbit_ang=0.5;x=52;duration_frames=150;wait=180", -- f3990 lente: dos zonas, solo la interseccion es segura (30 + 150)
+    "jumpzone;x=40;y=40;wait=30/zonering;x=40;y=40;wait=90",   -- f4170 zona que salta + anillo dentro (30 + 90)
+    60                                                         -- f4290 ajuste hasta f4350
+  }                                                            -- f4350 = total
+end
+
