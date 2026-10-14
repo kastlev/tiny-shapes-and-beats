@@ -29,7 +29,7 @@ enemy_types={
 function enemy_color(e)
   if e.flicker then
     local c=e.flicker_colors or {C_PINK,C_WHITE}
-    return c[e.age\(e.flicker_rate or 4)%#c+1]
+    return c[e.age\(e.flicker_frames or 4)%#c+1]
   end
   return e.draw_behind and C_DARK_PINK or e.color or C_PINK
 end
@@ -50,8 +50,8 @@ function fire_bullet_ring(x,y,count,speed,off,b)
 end
 
 function spawn_bullet_burst(e)
-  fire_bullet_ring(e.x,e.y,e.burst_count,e.burst_speed,e.burst_angle_offset,
-    {size=e.burst_size,duration_frames=e.burst_duration_frames,color=e.burst_color,shape=e.burst_shape,quiet=e.burst_quiet})
+  fire_bullet_ring(e.x,e.y,e.burst_count,e.burst_speed,e.burst_ang,
+    {size=e.burst_size,duration_frames=e.burst_frames,color=e.burst_color,shape=e.burst_shape,quiet=e.burst_quiet})
 end
 
 function update_enemies()
@@ -62,10 +62,11 @@ function update_enemies()
     e.age+=1
     e.draw_behind=e.duration_frames+e.hold_frames-e.age<=DEATH_WARN_FRAMES
 
-    if e.delay_move>0 then
-      e.delay_move-=1
+    if e.move_delay>0 then
+      e.move_delay-=1
     elseif e.orbit then
       e.orbit_ang+=e.orbit_speed
+      e.orbit_radius+=e.orbit_grow
       e.x=e.orbit_cx+cos(e.orbit_ang)*e.orbit_radius
       e.y=e.orbit_cy+sin(e.orbit_ang)*e.orbit_radius
     elseif e.chase then
@@ -78,12 +79,12 @@ function update_enemies()
       e.x+=e.vx
       e.y+=e.vy
     elseif e.target_x or e.target_y then
-      if e.ease_move=="lerp" then
-        if e.target_x then e.x+=(e.target_x-e.x)*e.lerp_factor end
-        if e.target_y then e.y+=(e.target_y-e.y)*e.lerp_factor end
+      if e.move_ease=="lerp" then
+        if e.target_x then e.x+=(e.target_x-e.x)*e.move_lerp end
+        if e.target_y then e.y+=(e.target_y-e.y)*e.move_lerp end
       else
         local t=min(1,(e.age-e.delay_move_total)/(e.duration_frames-e.delay_move_total))
-        local et=_ease(t,e.ease_move)
+        local et=_ease(t,e.move_ease)
         if e.target_x then e.x=e.origin_x+(e.target_x-e.origin_x)*et end
         if e.target_y then e.y=e.origin_y+(e.target_y-e.origin_y)*et end
       end
@@ -119,15 +120,15 @@ function update_enemies()
 
     e.ang+=e.ang_vel
 
-    if e.delay_grow>0 then
-      e.delay_grow-=1
+    if e.grow_delay>0 then
+      e.grow_delay-=1
     elseif e.grow then
       local m=e.grow_mode
       if m=="lerp" then
         e.size+=(e.max_size-e.size)*e.grow_lerp
       elseif m=="curve" then
         local t=min(1,(e.age-e.delay_grow_total)/max(1,e.duration_frames-e.delay_grow_total))
-        e.size=e.size_start+(e.max_size-e.size_start)*_ease(t,e.ease_grow)
+        e.size=e.size_start+(e.max_size-e.size_start)*_ease(t,e.grow_ease)
       else
         e.size=min(e.max_size,e.size+e.grow_px)
       end
@@ -156,7 +157,7 @@ end
 
 function spawn(etype,x,y,params)
   params=params or {}
-  wait_frames(params.delay_spawn or 0)
+  wait_frames(params.spawn_delay or 0)
 
   etype=etype or E_CIRCLE
   x=x or 10+rnd(108)
@@ -170,34 +171,34 @@ function spawn(etype,x,y,params)
 
   local burst=params.count~=nil
   local sz=params.size or 10
-  local warn=params.warning
+  local warn=params.warn
   if warn==nil then warn=not burst and etype!=E_BULLET end
 
   if warn then
     if sz>=40 then add_trauma(.1) end
     wait_until_enemy_dead(_create_enemy(etype,x,y,{
-      size=params.warn_size or sz,fill=params.fill,color=params.warning_color or C_DARK_PINK,
-      duration_frames=params.warning_frames or 20,
+      size=params.warn_size or sz,fill=params.fill,color=params.warn_color or C_DARK_PINK,
+      duration_frames=params.warn_frames or 20,
       len=params.len,ang=params.ang,is_warning=true}))
   end
 
   if burst then
-    fire_bullet_ring(x,y,params.count,params.speed,params.angle_offset,
+    fire_bullet_ring(x,y,params.count,params.speed,params.ang,
       {size=params.size,duration_frames=params.duration_frames,color=params.color,shape=params.shape})
     return
   end
 
-  if params.v_random then
-    local ang=rnd(1)
-    local vmin,vmax=params.v_speed_min or 1,params.v_speed_max or 3
-    local spd=vmin+rnd(vmax-vmin)
-    params.vx=cos(ang)*spd
-    params.vy=sin(ang)*spd
+  if params.dir or params.dir_random then
+    local sp=params.dir_spread or 1
+    local a=(params.dir or 0)+(params.dir_random and rnd(sp)-sp/2 or 0)
+    local lo=params.speed_min or 1
+    local v=params.speed_random and lo+rnd((params.speed_max or 3)-lo) or params.speed or 1
+    params.vx,params.vy=cos(a)*v,sin(a)*v
   end
 
-   if params.aim then
+   if params.aim_speed then
     local a=atan2(p.x+2-x,p.y+2-y)
-    params.vx,params.vy=cos(a)*params.aim,sin(a)*params.aim
+    params.vx,params.vy=cos(a)*params.aim_speed,sin(a)*params.aim_speed
   end
 
   params.size=sz
@@ -205,16 +206,16 @@ function spawn(etype,x,y,params)
   return _create_enemy(etype,x,y,params)
 end
 
-local DEFAULTS=_kv_parts(split("chase=false;wrap=false;bounce=false;wave=false;flicker=false;burst=false;is_warning=false;orbit=false;delay_move=0;delay_grow=0;lerp_factor=.1;chase_speed=1.6;chase_turn=.06;grow_px=.5;grow_lerp=.1;wave_amp=10;wave_freq=.05;duration_frames=30;hold_frames=0;len=80;ang=0;ang_vel=0;orbit_radius=20;orbit_speed=.01",";"))
+local DEFAULTS=_kv_parts(split("chase=false;wrap=false;bounce=false;wave=false;flicker=false;burst=false;is_warning=false;orbit=false;move_delay=0;grow_delay=0;move_lerp=.1;chase_speed=1.6;chase_turn=.06;grow_px=.5;grow_lerp=.1;wave_amp=10;wave_freq=.05;duration_frames=30;hold_frames=0;len=80;ang=0;ang_vel=0;orbit_radius=20;orbit_speed=.01;orbit_grow=0",";"))
 
 function _create_enemy(t,x,y,s)
   local s0=s.size or (t==E_BULLET and 1 or 2)
   s.type,s.x,s.y,s.origin_x,s.origin_y=t or E_CIRCLE,x,y,x,y
   s.size,s.size_start,s.max_size=s0,s0,s.size_max or s0
   s.grow=s.max_size>s0
-  s.grow_mode=s.grow_lerp and "lerp" or s.ease_grow and "curve" or "px"
+  s.grow_mode=s.grow_lerp and "lerp" or s.grow_ease and "curve" or "px"
   for k,v in pairs(DEFAULTS) do s[k]=s[k] or v end
-  s.delay_move_total,s.delay_grow_total=s.delay_move,s.delay_grow
+  s.delay_move_total,s.delay_grow_total=s.move_delay,s.grow_delay
   s.orbit_cx=s.orbit_cx or x
   s.orbit_cy=s.orbit_cy or y
   s.orbit_ang=s.orbit_ang or rnd(1)
