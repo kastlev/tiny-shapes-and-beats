@@ -65,7 +65,7 @@ function update_enemies()
     if e.move_delay>0 then
       e.move_delay-=1
     elseif e.orbit then
-      e.orbit_ang+=e.orbit_speed
+      e.orbit_ang+=e.orbit_spin
       e.orbit_radius+=e.orbit_grow
       e.x=e.orbit_cx+cos(e.orbit_ang)*e.orbit_radius
       e.y=e.orbit_cy+sin(e.orbit_ang)*e.orbit_radius
@@ -118,7 +118,7 @@ function update_enemies()
       end
     end
 
-    e.ang+=e.ang_vel
+    e.ang+=e.spin
 
     if e.grow_delay>0 then
       e.grow_delay-=1
@@ -206,7 +206,7 @@ function spawn(etype,x,y,params)
   return _create_enemy(etype,x,y,params)
 end
 
-local DEFAULTS=_kv_parts(split("chase=false;wrap=false;bounce=false;wave=false;flicker=false;burst=false;is_warning=false;orbit=false;move_delay=0;grow_delay=0;move_lerp=.1;chase_speed=1.6;chase_turn=.06;grow_px=.5;grow_lerp=.1;wave_amp=10;wave_freq=.05;duration_frames=30;hold_frames=0;len=80;ang=0;ang_vel=0;orbit_radius=20;orbit_speed=.01;orbit_grow=0",";"))
+local DEFAULTS=_kv_parts(split("chase=false;wrap=false;bounce=false;wave=false;flicker=false;burst=false;is_warning=false;orbit=false;move_delay=0;grow_delay=0;move_lerp=.1;chase_speed=1.6;chase_turn=.06;grow_px=.5;grow_lerp=.1;wave_amp=10;wave_freq=.05;duration_frames=30;hold_frames=0;len=80;ang=0;spin=0;orbit_radius=20;orbit_spin=.01;orbit_grow=0",";"))
 
 function _create_enemy(t,x,y,s)
   local s0=s.size or (t==E_BULLET and 1 or 2)
