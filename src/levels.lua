@@ -11,7 +11,7 @@ T = {
   vline   = "spw;type=E_LINE_BI;y=64;ang=0.25;len=72;size=3;warn_frames=20;frames=18",
   cross   = "spw;type=E_CROSS;x=64;y=64;len=72;size=3;spin=0.006;warn_frames=30;frames=210",
   ring    = "spw;size=1;size_max=70;fill=false;grow_px=1.8;warn_frames=20;frames=40",
-  burst   = "spw;type=E_CIRCLE;size=5;warn_frames=25;frames=1;burst=true;burst_count=10;burst_speed=1.4;burst_size=2;burst_frames=110",
+  burst   = "spw;type=E_SQUARE;size=5;warn_frames=25;frames=1;burst=true;burst_count=10;burst_speed=1.4;burst_size=2;burst_frames=110",
   column  = "spw_loop;pattern=column;column_x=-4;pos_random=true;parallel=true;type=E_BULLET;size=3;vx=3.4;n=9;frames=45",
   rain    = "spw_loop;pattern=row;pos_random=true;n=3;parallel=true;type=E_BULLET;size=3;vy=1.5;frames=100",
   aimed   = "spw;type=E_BULLET;size=3;aim_speed=2.2;frames=120",
@@ -20,8 +20,8 @@ T = {
   chasers = "spw_loop;pattern=perimeter;parallel=true;chase=true;chase_turn=0.05;size=4;warn_frames=30;frames=130",
   squares = "spw_loop;type=E_SQUARE;parallel=true;near_player=true;near_range=24;size=8;warn_frames=45;frames=25",
   zone     = "spw;type=E_HOLE;x=64;y=64;size=36;warn_frames=45;frames=195",
-  orbzone  = "spw;type=E_HOLE;orbit=true;orbit_cx=64;orbit_cy=64;orbit_ang=0;orbit_radius=22;orbit_spin=0.006;x=86;y=64;size=34;warn_frames=45;frames=315",
-  lens     = "spw;type=E_HOLE;orbit=true;orbit_cx=64;orbit_cy=64;orbit_radius=12;orbit_spin=0.006;y=64;size=36;warn_frames=30;frames=330",
+  orbzone  = "spw;type=E_HOLE;orbit=true;orbit_cx=64;orbit_cy=64;ang_offset=0;orbit_radius=22;spin=0.006;x=86;y=64;size=34;warn_frames=45;frames=315",
+  lens     = "spw;type=E_HOLE;orbit=true;orbit_cx=64;orbit_cy=64;orbit_radius=12;spin=0.006;y=64;size=36;warn_frames=30;frames=330",
   jumpzone = "spw;type=E_HOLE;size=28;warn_frames=30;frames=90",
   zonering = "spw;size=1;size_max=30;fill=false;grow_px=0.9;warn_frames=30;frames=34",
   sweep    = "spw;type=E_LINE_BI;y=64;ang=0.25;len=72;size=3;x=2;vx=1.8;warn_frames=25;frames=80", -- linea vertical que barre de izq a der (al reves: x=126;vx=-1.8)
@@ -36,16 +36,16 @@ gun      = "spw_loop;pattern=point;x=-4;y=64;n=30;parallel=true;stagger=2;type=E
   -- ===== FORMAS ESTATICAS Y PERSEGUIDORAS =====
   mine     = "spw;type=E_CIRCLE;size=9;near_player=true;near_range=18;warn_frames=30;frames=45", -- circulo estatico junto al jugador
   block    = "spw;type=E_SQUARE;size=9;warn_frames=30;frames=45", -- cuadrado estatico en sitio aleatorio
-  stalker  = "spw;type=E_SQUARE;size=5;chase=true;chase_speed=1.3;chase_turn=0.04;warn_frames=30;frames=150", -- un cuadrado perseguidor
+  stalker  = "spw;type=E_SQUARE;size=5;chase=true;speed=1.3;chase_turn=0.04;warn_frames=30;frames=150", -- un cuadrado perseguidor
   strobe   = "spw;type=E_SQUARE;size=14;flicker=true;flicker_frames=8;warn_frames=30;frames=120", -- parpadea rosa/blanco: solo hiere en los frames rosa
 
   -- ===== MOVIMIENTOS ESPECIALES =====
   bomb     = "spw;type=E_CIRCLE;size=2;size_max=16;grow_lerp=0.12;warn_frames=30;frames=60;burst=true;burst_count=12;burst_speed=1.4;burst_size=2;burst_frames=100", -- crece desde un punto y explota en balas
-  orbiter  = "spw;type=E_SQUARE;orbit=true;orbit_cx=64;orbit_cy=64;orbit_ang=0;orbit_spin=0.008;x=104;y=64;size=5;warn_frames=30;frames=150", -- satelite que gira alrededor del centro (~2 px/f)
+  orbiter  = "spw;type=E_SQUARE;orbit=true;orbit_cx=64;orbit_cy=64;ang_offset=0.2;spin=0.03;x=64;y=64;size=5;warn_frames=30;frames=150", -- satelite que gira alrededor del centro (~2 px/f)
   bouncer  = "spw;x=20;y=20;vx=1.9;vy=1.5;size=3;warn_frames=30;frames=180;bounce=true;bounce_speed_mult=1.05;bounce_size_mult=1.06", -- rebota, se acelera y crece
   wrapper  = "spw;type=E_CIRCLE;size=4;vx=2;vy=0.9;wrap=true;warn_frames=30;frames=150", -- sale por un borde y entra por el opuesto
-  orbring = "spw_loop;pattern=circle;n=12;parallel=true;type=E_BULLET;size=2;orbit=true;orbit_cx=64;orbit_cy=64;orbit_radius=30;orbit_spin=0.006;warn=true;warn_frames=30;frames=240",
-belt = "spw_loop;pattern=row;row_y=40;n=9;parallel=true;type=E_BULLET;size=2;vx=1;wrap=true;warn=true;warn_frames=30;frames=300"
+  orbring = "spw_loop;pattern=circle;n=12;parallel=true;type=E_BULLET;size=2;orbit=true;orbit_cx=0;orbit_cy=64;radius=30;spin=0.006;warn=true;warn_frames=30;frames=240",
+  belt = "spw_loop;pattern=row;row_y=40;n=9;parallel=true;type=E_BULLET;size=2;vx=1;wrap=true;warn=true;warn_frames=30;frames=300"
 
 }
 
@@ -57,9 +57,9 @@ function level_1()
     "squares;n=2;stagger=30/squares;n=2;stagger=30;wait=60", -- f240 cuadrados de dos en dos
     "spw_loop;pattern=point;x=64;y=64;n=2;parallel=true;stagger=30;size=1;size_max=92;fill=false;grow_px=1.4;warn_frames=30;frames=70;wait=120", -- f300 anillos
     120,                                                     -- f420 RESPIRO (checkpoint 1)
-    "chasers;n=4;stagger=30;chase_speed=0.9;wait=120",       -- f540 perseguidores x4
-    "chasers;n=8;stagger=15;chase_speed=1.0;wait=120",       -- f660 x8
-    "chasers;n=12;stagger=5;chase_speed=1.1;wait=60",        -- f780 x12
+    "chasers;n=4;stagger=30;speed=0.9;wait=120",       -- f540 perseguidores x4
+    "chasers;n=8;stagger=15;speed=1.0;wait=120",       -- f660 x8
+    "chasers;n=12;stagger=5;speed=1.1;wait=60",        -- f780 x12
     "4*column;column_x=140;n=5;vx=-2.2;frames=80;wait=30", -- f840 columnas
     "4*column;column_x=140;n=7;vx=-2.6;frames=80;wait=30", -- f960 columnas +
     60,                                                      -- f1080 RESPIRO (checkpoint 2)
@@ -86,10 +86,10 @@ function level_2()
     "3*column;wait=15/hline;y=@;warn_frames=18;wait=15/column;column_x=140;vx=-3.4;wait=15/vline;x=@;warn_frames=18;wait=15", -- f900 columnas alternas + lineas
     120,                                                     -- f1080 RESPIRO (checkpoint 2)
     "spw;x=20;y=20;vx=2.2;vy=1.7;size=4;warn_frames=25;frames=300;bounce=true;bounce_speed_mult=1.04;bounce_size_mult=1.04", -- f1200 bola rebota (sin wait)
-    "chasers;n=8;stagger=7;chase_speed=1.5;warn_frames=25;frames=150", -- f1200 perseguidores x8 (sin wait)
+    "chasers;n=8;stagger=7;speed=1.5;warn_frames=25;frames=150", -- f1200 perseguidores x8 (sin wait)
     "2*hline;y=@;wait=30/vline;x=@;wait=30",                 -- f1200 lineas
     "2*ring/vline;x=?;size=4;wait=30/ring/hline;y=?;size=4;wait=30", -- f1320 anillos + lineas gruesas
-    "chasers;n=6;stagger=7;chase_speed=1.6;warn_frames=25;frames=120", -- f1440 perseguidores x6 (sin wait)
+    "chasers;n=6;stagger=7;speed=1.6;warn_frames=25;frames=120", -- f1440 perseguidores x6 (sin wait)
     "6*hline;y=@;warn_frames=18;wait=15/vline;x=@;warn_frames=18;wait=15", -- f1440 lineas rapidas
     120,                                                     -- f1620 RESPIRO (checkpoint 3)
     "cross;spin=0.007;wait=30",                           -- f1740 FINAL cruz giratoria
@@ -117,14 +117,14 @@ function level_3()
     "jumpzone;x=92;y=92;wait=30/zonering;x=92;y=92;wait=30/rain;wait=60", -- f1080 salto abajo-der
     "jumpzone;x=36;y=92;wait=30/zonering;x=36;y=92;wait=30/rain;wait=60", -- f1200 salto abajo-izq
     120,                                                     -- f1320 RESPIRO (checkpoint 2)
-    "orbzone;orbit_radius=26;x=90;orbit_spin=0.009;size=28;warn_frames=30;frames=330;wait=30", -- f1440 zona chica y rapida (dura 360)
+    "orbzone;orbit_radius=26;x=90;spin=0.009;size=28;warn_frames=30;frames=330;wait=30", -- f1440 zona chica y rapida (dura 360)
     "2*hline;y=@;wait=30/vline;x=@;wait=30",                 -- f1470 lineas
-    "chasers;n=4;stagger=15;chase_speed=1.2;warn_frames=25;frames=130;wait=60", -- f1590 perseguidores
+    "chasers;n=4;stagger=15;speed=1.2;warn_frames=25;frames=130;wait=60", -- f1590 perseguidores
     "2*hline;y=@;wait=30/vline;x=@;wait=30",                 -- f1650 lineas
     "zonering;x=64;y=64;wait=30",                            -- f1770 anillo lento
-    "lens;orbit_ang=0;x=76/lens;orbit_ang=0.5;x=52;wait=30", -- f1800 LENTE (dura 360)
+    "lens;ang_offset=0;x=76/lens;ang_offset=0.5;x=52;wait=30", -- f1800 LENTE (dura 360)
     "3*zonering;x=64;y=64;size_max=34;frames=38;wait=45/rain;wait=45", -- f1830 anillos + lluvia
-    "chasers;n=3;stagger=15;chase_speed=1.2;warn_frames=25;frames=100;wait=60", -- f2100 perseguidores
+    "chasers;n=3;stagger=15;speed=1.2;warn_frames=25;frames=100;wait=60", -- f2100 perseguidores
     "zone;size=28;warn_frames=30;frames=210/cross;wait=30", -- f2160 FINAL zona chica + cruz (dura 240)
     "2*burst;x=64;y=64;burst_count=12;burst_speed=1.4;burst_ang=?;warn_frames=20;wait=45/column;column_x=140;vx=-2.2;n=4;frames=90;wait=45", -- f2190 bursts + columnas
     30                                                       -- f2370 ajuste hasta f2400
@@ -135,6 +135,8 @@ function level_4()
   level_setup(4)
   play {
     -- ===== LINEAS Y FORMAS =====
+    "orbiter;wait=185",                                        -- f1505 satelite orbitando
+    "7*burst;burst_ang=2;warn_frames=20;wait=30", -- f630 bursts (la cruz sigue)
     "orbring;n=10;wait=270",
     "chasers;n=4;radius=4;wait=170",     
     "belt;row_y=36/belt;row_y=64;vx=-1/belt;row_y=92;wait=330",
@@ -172,7 +174,7 @@ function level_4()
     -- ===== ZONAS: lo de FUERA del circulo es letal =====
     "zone;frames=100;wait=145",                       -- f3650 zona quieta (45 aviso + 100)
     "orbzone;frames=150;wait=195",                    -- f3795 zona que orbita (45 + 150)
-    "lens;orbit_ang=0;x=76;frames=150/lens;orbit_ang=0.5;x=52;frames=150;wait=180", -- f3990 lente: dos zonas, solo la interseccion es segura (30 + 150)
+    "lens;ang_offset=0;x=76;frames=150/lens;ang_offset=0.5;x=52;frames=150;wait=180", -- f3990 lente: dos zonas, solo la interseccion es segura (30 + 150)
     "jumpzone;x=40;y=40;wait=30/zonering;x=40;y=40;wait=90",   -- f4170 zona que salta + anillo dentro (30 + 90)
     60                                                         -- f4290 ajuste hasta f4350
   }                                                            -- f4350 = total
