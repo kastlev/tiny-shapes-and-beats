@@ -41,7 +41,7 @@ function fire_bullet_ring(x,y,count,speed,off,b)
   for i=0,count-1 do
     local a=(off or 0)+i/count
     _create_enemy(E_BULLET,x,y,{vx=cos(a)*speed,vy=sin(a)*speed,size=b.size,
-      duration_frames=b.duration_frames or 80,color=b.color,shape=b.shape})
+      frames=b.frames or 80,color=b.color,shape=b.shape})
   end
   if not b.quiet then
     trigger_screen_flash(_hit_flash_cfg)
@@ -51,7 +51,7 @@ end
 
 function spawn_bullet_burst(e)
   fire_bullet_ring(e.x,e.y,e.burst_count,e.burst_speed,e.burst_ang,
-    {size=e.burst_size,duration_frames=e.burst_frames,color=e.burst_color,shape=e.burst_shape,quiet=e.burst_quiet})
+    {size=e.burst_size,frames=e.burst_frames,color=e.burst_color,shape=e.burst_shape,quiet=e.burst_quiet})
 end
 
 function update_enemies()
@@ -60,7 +60,7 @@ function update_enemies()
 
   for e in all(enemies) do
     e.age+=1
-    e.draw_behind=e.duration_frames+e.hold_frames-e.age<=DEATH_WARN_FRAMES
+    e.draw_behind=e.frames+e.hold_frames-e.age<=DEATH_WARN_FRAMES
 
     if e.move_delay>0 then
       e.move_delay-=1
@@ -83,7 +83,7 @@ function update_enemies()
         if e.target_x then e.x+=(e.target_x-e.x)*e.move_lerp end
         if e.target_y then e.y+=(e.target_y-e.y)*e.move_lerp end
       else
-        local t=min(1,(e.age-e.delay_move_total)/(e.duration_frames-e.delay_move_total))
+        local t=min(1,(e.age-e.delay_move_total)/(e.frames-e.delay_move_total))
         local et=_ease(t,e.move_ease)
         if e.target_x then e.x=e.origin_x+(e.target_x-e.origin_x)*et end
         if e.target_y then e.y=e.origin_y+(e.target_y-e.origin_y)*et end
@@ -127,7 +127,7 @@ function update_enemies()
       if m=="lerp" then
         e.size+=(e.max_size-e.size)*e.grow_lerp
       elseif m=="curve" then
-        local t=min(1,(e.age-e.delay_grow_total)/max(1,e.duration_frames-e.delay_grow_total))
+        local t=min(1,(e.age-e.delay_grow_total)/max(1,e.frames-e.delay_grow_total))
         e.size=e.size_start+(e.max_size-e.size_start)*_ease(t,e.grow_ease)
       else
         e.size=min(e.max_size,e.size+e.grow_px)
@@ -141,7 +141,7 @@ function update_enemies()
     local mg=e.size+16+l
     local out=not e.wrap and not e.bounce and (abs(e.x-64)>64+mg or abs(e.y-64)>64+mg)
 
-    if e.age>e.duration_frames+e.hold_frames or out then
+    if e.age>e.frames+e.hold_frames or out then
       if e.burst and not out then spawn_bullet_burst(e) end
       e.alive=false
       del(enemies,e)
@@ -178,13 +178,13 @@ function spawn(etype,x,y,params)
     if sz>=40 then add_trauma(.1) end
     wait_until_enemy_dead(_create_enemy(etype,x,y,{
       size=params.warn_size or sz,fill=params.fill,color=params.warn_color or C_DARK_PINK,
-      duration_frames=params.warn_frames or 20,
+      frames=params.warn_frames or 20,
       len=params.len,ang=params.ang,is_warning=true}))
   end
 
   if burst then
     fire_bullet_ring(x,y,params.count,params.speed,params.ang,
-      {size=params.size,duration_frames=params.duration_frames,color=params.color,shape=params.shape})
+      {size=params.size,frames=params.frames,color=params.color,shape=params.shape})
     return
   end
 
@@ -202,11 +202,11 @@ function spawn(etype,x,y,params)
   end
 
   params.size=sz
-  params.duration_frames=params.duration_frames or 40
+  params.frames=params.frames or 40
   return _create_enemy(etype,x,y,params)
 end
 
-local DEFAULTS=_kv_parts(split("chase=false;wrap=false;bounce=false;wave=false;flicker=false;burst=false;is_warning=false;orbit=false;move_delay=0;grow_delay=0;move_lerp=.1;chase_speed=1.6;chase_turn=.06;grow_px=.5;grow_lerp=.1;wave_amp=10;wave_freq=.05;duration_frames=30;hold_frames=0;len=80;ang=0;spin=0;orbit_radius=20;orbit_spin=.01;orbit_grow=0",";"))
+local DEFAULTS=_kv_parts(split("chase=false;wrap=false;bounce=false;wave=false;flicker=false;burst=false;is_warning=false;orbit=false;move_delay=0;grow_delay=0;move_lerp=.1;chase_speed=1.6;chase_turn=.06;grow_px=.5;grow_lerp=.1;wave_amp=10;wave_freq=.05;frames=30;hold_frames=0;len=80;ang=0;spin=0;orbit_radius=20;orbit_spin=.01;orbit_grow=0",";"))
 
 function _create_enemy(t,x,y,s)
   local s0=s.size or (t==E_BULLET and 1 or 2)
