@@ -11,11 +11,11 @@ end
 function _spw_pos(pt,i,n,c)
   local m=c.pos_margin or 10
   if pt=="perimeter" then
-    local r=c.radius or 46
+    local r=c.pos_radius or 46
     local u=(c.pos_random and rnd() or (i-1)/n)*4
     return 64+r*mid(-1,2-2*abs(u-1.5),1),64+r*mid(-1,2-2*abs(u-2.5),1)
   elseif pt=="circle" then
-    local r,a=c.radius or 50,(i-1)/n
+    local r,a=c.pos_radius or 50,(i-1)/n
     return 64+cos(a)*r,64+sin(a)*r
   elseif pt=="row" then
     return _dist(i,n,m,128-m,c.pos_random),c.row_y or -4

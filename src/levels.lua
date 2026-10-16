@@ -41,10 +41,10 @@ gun      = "spw_loop;pattern=point;x=-4;y=64;n=30;parallel=true;stagger=2;type=E
 
   -- ===== MOVIMIENTOS ESPECIALES =====
   bomb     = "spw;type=E_CIRCLE;size=2;size_max=16;grow_lerp=0.12;warn_frames=30;frames=60;burst=true;burst_count=12;burst_speed=1.4;burst_size=2;burst_frames=100", -- crece desde un punto y explota en balas
-  orbiter  = "spw;type=E_SQUARE;orbit=true;orbit_cx=64;orbit_cy=64;ang_offset=0.2;spin=0.03;x=64;y=64;size=5;warn_frames=30;frames=150", -- satelite que gira alrededor del centro (~2 px/f)
+  orbiter  = "spw;type=E_SQUARE;orbit=true;orbit_cx=64;orbit_cy=64;orbit_radius=40;spin=0.03;x=90;y=90;size=5;warn_frames=10;frames=150", -- satelite que gira alrededor del centro (~2 px/f)
   bouncer  = "spw;x=20;y=20;vx=1.9;vy=1.5;size=3;warn_frames=30;frames=180;bounce=true;bounce_speed_mult=1.05;bounce_size_mult=1.06", -- rebota, se acelera y crece
   wrapper  = "spw;type=E_CIRCLE;size=4;vx=2;vy=0.9;wrap=true;warn_frames=30;frames=150", -- sale por un borde y entra por el opuesto
-  orbring = "spw_loop;pattern=circle;n=12;parallel=true;type=E_BULLET;size=2;orbit=true;orbit_cx=0;orbit_cy=64;radius=30;spin=0.006;warn=true;warn_frames=30;frames=240",
+  orbring = "spw_loop;pattern=circle;n=12;parallel=true;type=E_BULLET;size=2;orbit=true;orbit_cx=0;orbit_cy=64;pos_radius=30;spin=0.006;warn=true;warn_frames=30;frames=240",
   belt = "spw_loop;pattern=row;row_y=40;n=9;parallel=true;type=E_BULLET;size=2;vx=1;wrap=true;warn=true;warn_frames=30;frames=300"
 
 }
@@ -138,7 +138,7 @@ function level_4()
     "orbiter;wait=185",                                        -- f1505 satelite orbitando
     "7*burst;burst_ang=2;warn_frames=20;wait=30", -- f630 bursts (la cruz sigue)
     "orbring;n=10;wait=270",
-    "chasers;n=4;radius=4;wait=170",     
+    "chasers;n=4;pos_radius=4;wait=170",     
     "belt;row_y=36/belt;row_y=64;vx=-1/belt;row_y=92;wait=330",
     "hline;y=@;wait=45",                                       -- f0 linea horizontal sobre el jugador
     "vline;x=@;wait=45",                                       -- f45 linea vertical
@@ -148,7 +148,7 @@ function level_4()
     "block;wait=80",                                           -- f395 cuadrado estatico
     "stalker;wait=185",                                        -- f475 cuadrado perseguidor
     "squares;n=4;stagger=15;wait=120",                         -- f660 cuadrados que caen cerca de ti
-    "chasers;n=4;radius=64;wait=170",                          -- f780 perseguidores desde las 4 esquinas
+    "chasers;n=4;pos_radius=64;wait=170",                          -- f780 perseguidores desde las 4 esquinas
     "bouncer;wait=210",                                        -- f950 bola que rebota y crece
     "wrapper;wait=185",                                        -- f1160 sale por un borde, entra por el otro
     "strobe;wait=160",                                         -- f1345 cuadrado parpadeante
