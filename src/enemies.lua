@@ -64,23 +64,25 @@ function update_enemies()
     e.draw_behind=e.frames+e.hold_frames-e.age<=1
 
     local d=e.age-e.move_delay
-    if d>0 and (d-1)%(e.stop_every+e.stop_for)<e.stop_every then
-      e.mt+=1
+    local ph=(d-1)%(e.stop_every+e.stop_for)
+    local k=d>0 and ph<e.stop_every and min(min((ph+1)/e.start_ease,(e.stop_every-ph)/e.stop_ease),1) or 0
+    if k>0 then
+      e.mt+=k
       if e.orbit then
-        e.ang_offset+=e.orbit_spin
-        e.orbit_radius+=e.orbit_grow
+        e.ang_offset+=e.orbit_spin*k
+        e.orbit_radius+=e.orbit_grow*k
         e.x=e.orbit_cx+cos(e.ang_offset)*e.orbit_radius
         e.y=e.orbit_cy+sin(e.ang_offset)*e.orbit_radius
       elseif e.chase then
         local a=atan2(p.x-e.x,p.y-e.y)
         e.vx=lerp_to(e.vx,cos(a)*e.speed,e.chase_turn,.02)
         e.vy=lerp_to(e.vy,sin(a)*e.speed,e.chase_turn,.02)
-        e.x+=e.vx
-        e.y+=e.vy
+        e.x+=e.vx*k
+        e.y+=e.vy*k
       elseif e.target_x or e.target_y then
         if e.move_ease=="lerp" then
-          if e.target_x then e.x+=(e.target_x-e.x)*e.move_lerp end
-          if e.target_y then e.y+=(e.target_y-e.y)*e.move_lerp end
+          if e.target_x then e.x+=(e.target_x-e.x)*e.move_lerp*k end
+          if e.target_y then e.y+=(e.target_y-e.y)*e.move_lerp*k end
         else
           local et=_ease(e.mt/(e.frames-e.move_delay),e.move_ease)
           if e.target_x then e.x=e.origin_x+(e.target_x-e.origin_x)*et end
@@ -88,12 +90,15 @@ function update_enemies()
         end
       else
         if e.pull then
-          local a=atan2(cx-e.x,cy-e.y)
-          e.vx+=cos(a)*e.pull
-          e.vy+=sin(a)*e.pull
+          local dx,dy=(cx-e.x)/8,(cy-e.y)/8
+          if dx*dx+dy*dy<(e.pull_radius/8)^2 then
+            local a=atan2(dx,dy)
+            e.vx+=cos(a)*e.pull*k
+            e.vy+=sin(a)*e.pull*k
+          end
         end
-        e.x+=e.vx
-        e.y+=e.vy
+        e.x+=e.vx*k
+        e.y+=e.vy*k
       end
 
       if e.wave then
@@ -215,7 +220,7 @@ function spawn(etype,x,y,params)
   return _create_enemy(etype,x,y,params)
 end
 
-local DEFAULTS=_kv_parts(split("chase=false;wrap=false;bounce=false;wave=false;flicker=false;burst=false;is_warning=false;orbit=false;move_delay=0;grow_delay=0;move_lerp=.1;speed=1.6;chase_turn=.06;grow_px=.5;grow_lerp=.1;wave_amp=10;wave_freq=.05;wave_axis=y;frames=30;hold_frames=0;len=80;ang=0;spin=0;orbit_spin=.01;orbit_grow=0;vx=0;vy=0;bounce_speed_mult=1;bounce_size_mult=1;stop_every=1;stop_for=0;mt=0",";"))
+local DEFAULTS=_kv_parts(split("chase=false;wrap=false;bounce=false;wave=false;flicker=false;burst=false;is_warning=false;orbit=false;move_delay=0;grow_delay=0;move_lerp=.1;speed=1.6;chase_turn=.06;grow_px=.5;grow_lerp=.1;wave_amp=10;wave_freq=.05;wave_axis=y;frames=30;hold_frames=0;len=80;ang=0;spin=0;orbit_spin=.01;orbit_grow=0;vx=0;vy=0;bounce_speed_mult=1;bounce_size_mult=1;stop_every=1;stop_for=0;stop_ease=1;start_ease=1;pull_radius=999;mt=0",";"))
 
 function _create_enemy(t,x,y,s)
   local s0=s.size or (t==E_BULLET and 1 or 2)
