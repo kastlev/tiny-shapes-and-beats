@@ -1,4 +1,3 @@
-DEATH_WARN_FRAMES,BOUNCE_VARIANCE=1,.03
 enemies={}
 
 function _draw_shape(x,y,s,fill,sq,col)
@@ -34,14 +33,12 @@ function enemy_color(e)
   return e.draw_behind and C_DARK_PINK or e.color or C_PINK
 end
 
-function fire_bullet_ring(x,y,count,speed,off,b)
-  count=count or 8
-  speed=speed or 1.5
-  b=b or {}
-  for i=0,count-1 do
-    local a=(off or 0)+i/count
-    _create_enemy(E_BULLET,x,y,{vx=cos(a)*speed,vy=sin(a)*speed,size=b.size,
-      frames=b.frames or 80,color=b.color,shape=b.shape})
+-- b: count,speed,ang,type(def E_BULLET),quiet + cualquier parametro de enemigo
+function fire_bullet_ring(x,y,b)
+  local n,v=b.count or 8,b.speed or 1.5
+  for i=0,n-1 do
+    local a=(b.ang or 0)+i/n
+    _create_enemy(b.type or E_BULLET,x,y,_merge({vx=cos(a)*v,vy=sin(a)*v,frames=80},b))
   end
   if not b.quiet then
     trigger_screen_flash(_hit_flash_cfg)
@@ -49,9 +46,13 @@ function fire_bullet_ring(x,y,count,speed,off,b)
   end
 end
 
+-- todo burst_X del emisor pasa a ser X del hijo (burst_type, burst_chase, burst_size...)
 function spawn_bullet_burst(e)
-  fire_bullet_ring(e.x,e.y,e.burst_count,e.burst_speed,e.burst_ang,
-    {size=e.burst_size,frames=e.burst_frames,color=e.burst_color,shape=e.burst_shape,quiet=e.burst_quiet})
+  local b={}
+  for k,v in pairs(e) do
+    if sub(k,1,6)=="burst_" then b[sub(k,7)]=v end
+  end
+  fire_bullet_ring(e.x,e.y,b)
 end
 
 function update_enemies()
@@ -60,22 +61,18 @@ function update_enemies()
 
   for e in all(enemies) do
     e.age+=1
-    e.draw_behind=e.frames+e.hold_frames-e.age<=DEATH_WARN_FRAMES
+    e.draw_behind=e.frames+e.hold_frames-e.age<=1
 
-    if e.move_delay>0 then
-      e.move_delay-=1
+    if e.age<=e.move_delay then
     elseif e.orbit then
-      e.ang_offset+=e.spin
+      e.ang_offset+=e.orbit_spin
       e.orbit_radius+=e.orbit_grow
       e.x=e.orbit_cx+cos(e.ang_offset)*e.orbit_radius
       e.y=e.orbit_cy+sin(e.ang_offset)*e.orbit_radius
     elseif e.chase then
-      local dx,dy=p.x-e.x,p.y-e.y
-      local d=sqrt(dx*dx+dy*dy)
-      local tx,ty=0,0
-      if d>.01 then tx,ty=dx/d*e.speed,dy/d*e.speed end
-      e.vx=lerp_to(e.vx or 0,tx,e.chase_turn,.02)
-      e.vy=lerp_to(e.vy or 0,ty,e.chase_turn,.02)
+      local a=atan2(p.x-e.x,p.y-e.y)
+      e.vx=lerp_to(e.vx,cos(a)*e.speed,e.chase_turn,.02)
+      e.vy=lerp_to(e.vy,sin(a)*e.speed,e.chase_turn,.02)
       e.x+=e.vx
       e.y+=e.vy
     elseif e.target_x or e.target_y then
@@ -83,35 +80,34 @@ function update_enemies()
         if e.target_x then e.x+=(e.target_x-e.x)*e.move_lerp end
         if e.target_y then e.y+=(e.target_y-e.y)*e.move_lerp end
       else
-        local t=min(1,(e.age-e.delay_move_total)/(e.frames-e.delay_move_total))
+        local t=min(1,(e.age-e.move_delay)/(e.frames-e.move_delay))
         local et=_ease(t,e.move_ease)
         if e.target_x then e.x=e.origin_x+(e.target_x-e.origin_x)*et end
         if e.target_y then e.y=e.origin_y+(e.target_y-e.origin_y)*et end
       end
     else
-      e.x+=e.vx or 0
-      e.y+=e.vy or 0
+      e.x+=e.vx
+      e.y+=e.vy
     end
 
     if e.wave then
       local o=sin(e.age*e.wave_freq)*e.wave_amp
-      local a=e.wave_axis=="x" and "x" or "y"
-      e[a]+=o-(e.wave_last_off or 0)
+      e[e.wave_axis]+=o-(e.wave_last_off or 0)
       e.wave_last_off=o
     end
 
     if e.wrap then
       if e.x<-8 then e.x=136 elseif e.x>136 then e.x=-8 end
       if e.y<-8 then e.y=136 elseif e.y>136 then e.y=-8 end
-    elseif e.bounce and (e.vx or e.vy) then
+    elseif e.bounce then
       local b
       if e.x<0 or e.x>128 then e.vx,e.x,b=sgn(64-e.x)*abs(e.vx),mid(0,e.x,128),1 end
       if e.y<0 or e.y>128 then e.vy,e.y,b=sgn(64-e.y)*abs(e.vy),mid(0,e.y,128),1 end
       if b then
-        local j=rnd(BOUNCE_VARIANCE*2)-BOUNCE_VARIANCE
-        local ca,sa,m=cos(j),sin(j),e.bounce_speed_mult or 1
+        local j=rnd(.06)-.03
+        local ca,sa,m=cos(j),sin(j),e.bounce_speed_mult
         e.vx,e.vy=(e.vx*ca-e.vy*sa)*m,(e.vx*sa+e.vy*ca)*m
-        e.size*=e.bounce_size_mult or 1
+        e.size*=e.bounce_size_mult
         add_trauma(mid(.1,e.size*.02,.6))
         spawn_hit_particles(e.x,e.y,_bounce_particle_cfg)
         sfx(5)
@@ -120,17 +116,16 @@ function update_enemies()
 
     e.ang+=e.spin
 
-    if e.grow_delay>0 then
-      e.grow_delay-=1
+    if e.age<=e.grow_delay then
     elseif e.grow then
       local m=e.grow_mode
       if m=="lerp" then
-        e.size+=(e.max_size-e.size)*e.grow_lerp
+        e.size+=(e.size_max-e.size)*e.grow_lerp
       elseif m=="curve" then
-        local t=min(1,(e.age-e.delay_grow_total)/max(1,e.frames-e.delay_grow_total))
-        e.size=e.size_start+(e.max_size-e.size_start)*_ease(t,e.grow_ease)
+        local t=min(1,(e.age-e.grow_delay)/max(1,e.frames-e.grow_delay))
+        e.size=e.size_start+(e.size_max-e.size_start)*_ease(t,e.grow_ease)
       else
-        e.size=min(e.max_size,e.size+e.grow_px)
+        e.size=min(e.size_max,e.size+e.grow_px)
       end
     end
 
@@ -159,6 +154,7 @@ function spawn(etype,x,y,params)
   params=params or {}
   wait_frames(params.spawn_delay or 0)
 
+  params.type=etype
   etype=etype or E_CIRCLE
   x=x or 10+rnd(108)
   y=y or 10+rnd(108)
@@ -169,7 +165,14 @@ function spawn(etype,x,y,params)
     y=mid(6,p.y+p.h/2+rnd(r*2)-r,121)
   end
 
-  local burst=params.count~=nil
+  -- orbit: x,y = CENTRO. El enemigo (y su aviso) nace ya sobre la orbita, sin salto
+  if params.orbit then
+    local a,r=params.ang_offset or rnd(),params.orbit_radius or 20
+    params.ang_offset,params.orbit_radius,params.orbit_cx,params.orbit_cy=a,r,params.orbit_cx or x,params.orbit_cy or y
+    x,y=params.orbit_cx+cos(a)*r,params.orbit_cy+sin(a)*r
+  end
+
+  local burst=params.count
   local sz=params.size or 10
   local warn=params.warn
   if warn==nil then warn=not burst and etype!=E_BULLET end
@@ -183,8 +186,7 @@ function spawn(etype,x,y,params)
   end
 
   if burst then
-    fire_bullet_ring(x,y,params.count,params.speed,params.ang,
-      {size=params.size,frames=params.frames,color=params.color,shape=params.shape})
+    fire_bullet_ring(x,y,params)
     return
   end
 
@@ -196,7 +198,7 @@ function spawn(etype,x,y,params)
     params.vx,params.vy=cos(a)*v,sin(a)*v
   end
 
-   if params.aim_speed then
+  if params.aim_speed then
     local a=atan2(p.x+2-x,p.y+2-y)
     params.vx,params.vy=cos(a)*params.aim_speed,sin(a)*params.aim_speed
   end
@@ -206,19 +208,15 @@ function spawn(etype,x,y,params)
   return _create_enemy(etype,x,y,params)
 end
 
-local DEFAULTS=_kv_parts(split("chase=false;wrap=false;bounce=false;wave=false;flicker=false;burst=false;is_warning=false;orbit=false;move_delay=0;grow_delay=0;move_lerp=.1;speed=1.6;chase_turn=.06;grow_px=.5;grow_lerp=.1;wave_amp=10;wave_freq=.05;frames=30;hold_frames=0;len=80;ang=0;spin=0;orbit_radius=20;spin=.01;orbit_grow=0",";"))
+local DEFAULTS=_kv_parts(split("chase=false;wrap=false;bounce=false;wave=false;flicker=false;burst=false;is_warning=false;orbit=false;move_delay=0;grow_delay=0;move_lerp=.1;speed=1.6;chase_turn=.06;grow_px=.5;grow_lerp=.1;wave_amp=10;wave_freq=.05;wave_axis=y;frames=30;hold_frames=0;len=80;ang=0;spin=0;orbit_spin=.01;orbit_grow=0;vx=0;vy=0;bounce_speed_mult=1;bounce_size_mult=1",";"))
 
 function _create_enemy(t,x,y,s)
   local s0=s.size or (t==E_BULLET and 1 or 2)
-  s.type,s.x,s.y,s.origin_x,s.origin_y=t or E_CIRCLE,x,y,x,y
-  s.size,s.size_start,s.max_size=s0,s0,s.size_max or s0
-  s.grow=s.max_size>s0
+  s.type,s.x,s.y,s.origin_x,s.origin_y=t,x,y,x,y
+  s.size,s.size_start,s.size_max=s0,s0,s.size_max or s0
+  s.grow=s.size_max>s0
   s.grow_mode=s.grow_lerp and "lerp" or s.grow_ease and "curve" or "px"
   for k,v in pairs(DEFAULTS) do s[k]=s[k] or v end
-  s.delay_move_total,s.delay_grow_total=s.move_delay,s.grow_delay
-  s.orbit_cx=s.orbit_cx or x
-  s.orbit_cy=s.orbit_cy or y
-  s.ang_offset=s.ang_offset or rnd(1)
   s.fill=s.fill~=false
   s.alive,s.age=true,0
   add(enemies,s)

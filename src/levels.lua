@@ -26,7 +26,7 @@ T = {
   zonering = "spw;size=1;size_max=30;fill=false;grow_px=0.9;warn_frames=30;frames=34",
   sweep    = "spw;type=E_LINE_BI;y=64;ang=0.25;len=72;size=3;x=2;vx=1.8;warn_frames=25;frames=80", -- linea vertical que barre de izq a der (al reves: x=126;vx=-1.8)
   wiper    = "spw;type=E_LINE_BI;x=64;y=0;ang=0;len=144;size=2;spin=0.004;warn_frames=30;frames=125", -- limpiaparabrisas: media vuelta desde el borde superior (125 f = 0.5/spin)
-gun      = "spw_loop;pattern=point;x=-4;y=64;n=30;parallel=true;stagger=2;type=E_BULLET;size=2;dir_random=true;speed_random=true;speed_min=1.5;speed_max=3;frames=120",
+  gun      = "spw_loop;pattern=point;x=-4;y=64;n=30;parallel=true;stagger=2;type=E_BULLET;size=2;dir_random=true;speed_random=true;speed_min=1.5;speed_max=3;frames=120",
   core     = "spw;type=E_CIRCLE;x=64;y=64;size=7;color=13;warn_frames=30;frames=125", -- nucleo inofensivo (color 13) en el centro; se lanza con fountain
   fountain = "spw_loop;pattern=point;x=64;y=64;n=40;parallel=true;stagger=3;type=E_BULLET;size=2;dir_random=true;speed_random=true;speed_min=0.8;speed_max=2;frames=150",
   ripple   = "spw_loop;pattern=column;column_x=-4;pos_random=false;n=6;parallel=true;type=E_BULLET;size=3;vx=1.4;wave=true;wave_amp=12;wave_freq=0.03;frames=130", -- muro de balas que ondula
@@ -41,10 +41,10 @@ gun      = "spw_loop;pattern=point;x=-4;y=64;n=30;parallel=true;stagger=2;type=E
 
   -- ===== MOVIMIENTOS ESPECIALES =====
   bomb     = "spw;type=E_CIRCLE;size=2;size_max=16;grow_lerp=0.12;warn_frames=30;frames=60;burst=true;burst_count=12;burst_speed=1.4;burst_size=2;burst_frames=100", -- crece desde un punto y explota en balas
-  orbiter  = "spw;type=E_SQUARE;orbit=true;orbit_cx=64;orbit_cy=64;orbit_radius=40;spin=0.03;x=90;y=90;size=5;warn_frames=10;frames=150", -- satelite que gira alrededor del centro (~2 px/f)
+  orbiter  = "spw;type=E_SQUARE;orbit=true;orbit_cx=64;orbit_cy=64;orbit_radius=40;spin=0.03;size=5;warn_frames=10;frames=150", -- satelite que gira alrededor del centro (~2 px/f)
   bouncer  = "spw;x=20;y=20;vx=1.9;vy=1.5;size=3;warn_frames=30;frames=180;bounce=true;bounce_speed_mult=1.05;bounce_size_mult=1.06", -- rebota, se acelera y crece
   wrapper  = "spw;type=E_CIRCLE;size=4;vx=2;vy=0.9;wrap=true;warn_frames=30;frames=150", -- sale por un borde y entra por el opuesto
-  orbring = "spw_loop;pattern=circle;n=12;parallel=true;type=E_BULLET;size=2;orbit=true;orbit_cx=0;orbit_cy=64;pos_radius=30;spin=0.006;warn=true;warn_frames=30;frames=240",
+  orbring = "spw_loop;pattern=circle;n=12;parallel=true;type=E_BULLET;size=2;orbit=true;orbit_cx=64;orbit_cy=64;pos_radius=30;spin=0.006;warn=true;warn_frames=30;frames=240",
   belt = "spw_loop;pattern=row;row_y=40;n=9;parallel=true;type=E_BULLET;size=2;vx=1;wrap=true;warn=true;warn_frames=30;frames=300"
 
 }
@@ -136,8 +136,8 @@ function level_4()
   play {
     -- ===== LINEAS Y FORMAS =====
     "orbiter;wait=185",                                        -- f1505 satelite orbitando
-    "7*burst;burst_ang=2;warn_frames=20;wait=30", -- f630 bursts (la cruz sigue)
     "orbring;n=10;wait=270",
+    "7*burst;burst_ang=2;warn_frames=20;wait=30", -- f630 bursts (la cruz sigue)
     "chasers;n=4;pos_radius=4;wait=170",     
     "belt;row_y=36/belt;row_y=64;vx=-1/belt;row_y=92;wait=330",
     "hline;y=@;wait=45",                                       -- f0 linea horizontal sobre el jugador
