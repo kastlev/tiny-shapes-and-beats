@@ -63,42 +63,44 @@ function update_enemies()
     e.age+=1
     e.draw_behind=e.frames+e.hold_frames-e.age<=1
 
-    if e.age<=e.move_delay then
-    elseif e.orbit then
-      e.ang_offset+=e.orbit_spin
-      e.orbit_radius+=e.orbit_grow
-      e.x=e.orbit_cx+cos(e.ang_offset)*e.orbit_radius
-      e.y=e.orbit_cy+sin(e.ang_offset)*e.orbit_radius
-    elseif e.chase then
-      local a=atan2(p.x-e.x,p.y-e.y)
-      e.vx=lerp_to(e.vx,cos(a)*e.speed,e.chase_turn,.02)
-      e.vy=lerp_to(e.vy,sin(a)*e.speed,e.chase_turn,.02)
-      e.x+=e.vx
-      e.y+=e.vy
-    elseif e.target_x or e.target_y then
-      if e.move_ease=="lerp" then
-        if e.target_x then e.x+=(e.target_x-e.x)*e.move_lerp end
-        if e.target_y then e.y+=(e.target_y-e.y)*e.move_lerp end
+    local d=e.age-e.move_delay
+    if d>0 and (d-1)%(e.stop_every+e.stop_for)<e.stop_every then
+      e.mt+=1
+      if e.orbit then
+        e.ang_offset+=e.orbit_spin
+        e.orbit_radius+=e.orbit_grow
+        e.x=e.orbit_cx+cos(e.ang_offset)*e.orbit_radius
+        e.y=e.orbit_cy+sin(e.ang_offset)*e.orbit_radius
+      elseif e.chase then
+        local a=atan2(p.x-e.x,p.y-e.y)
+        e.vx=lerp_to(e.vx,cos(a)*e.speed,e.chase_turn,.02)
+        e.vy=lerp_to(e.vy,sin(a)*e.speed,e.chase_turn,.02)
+        e.x+=e.vx
+        e.y+=e.vy
+      elseif e.target_x or e.target_y then
+        if e.move_ease=="lerp" then
+          if e.target_x then e.x+=(e.target_x-e.x)*e.move_lerp end
+          if e.target_y then e.y+=(e.target_y-e.y)*e.move_lerp end
+        else
+          local et=_ease(e.mt/(e.frames-e.move_delay),e.move_ease)
+          if e.target_x then e.x=e.origin_x+(e.target_x-e.origin_x)*et end
+          if e.target_y then e.y=e.origin_y+(e.target_y-e.origin_y)*et end
+        end
       else
-        local t=min(1,(e.age-e.move_delay)/(e.frames-e.move_delay))
-        local et=_ease(t,e.move_ease)
-        if e.target_x then e.x=e.origin_x+(e.target_x-e.origin_x)*et end
-        if e.target_y then e.y=e.origin_y+(e.target_y-e.origin_y)*et end
+        if e.pull then
+          local a=atan2(cx-e.x,cy-e.y)
+          e.vx+=cos(a)*e.pull
+          e.vy+=sin(a)*e.pull
+        end
+        e.x+=e.vx
+        e.y+=e.vy
       end
-    else
-      if e.pull then
-        local a=atan2(cx-e.x,cy-e.y)
-        e.vx+=cos(a)*e.pull
-        e.vy+=sin(a)*e.pull
-      end
-      e.x+=e.vx
-      e.y+=e.vy
-    end
 
-    if e.wave then
-      local o=sin(e.age*e.wave_freq)*e.wave_amp
-      e[e.wave_axis]+=o-(e.wave_last_off or 0)
-      e.wave_last_off=o
+      if e.wave then
+        local o=sin(e.mt*e.wave_freq)*e.wave_amp
+        e[e.wave_axis]+=o-(e.wave_last_off or 0)
+        e.wave_last_off=o
+      end
     end
 
     if e.wrap then
@@ -170,6 +172,7 @@ function spawn(etype,x,y,params)
     y=mid(6,p.y+p.h/2+rnd(r*2)-r,121)
   end
 
+  -- orbit: x,y = CENTRO. El enemigo (y su aviso) nace ya sobre la orbita, sin salto
   if params.orbit then
     local a,r=params.ang_offset or rnd(),params.orbit_radius or 20
     params.ang_offset,params.orbit_radius,params.orbit_cx,params.orbit_cy=a,r,params.orbit_cx or x,params.orbit_cy or y
@@ -212,7 +215,7 @@ function spawn(etype,x,y,params)
   return _create_enemy(etype,x,y,params)
 end
 
-local DEFAULTS=_kv_parts(split("chase=false;wrap=false;bounce=false;wave=false;flicker=false;burst=false;is_warning=false;orbit=false;move_delay=0;grow_delay=0;move_lerp=.1;speed=1.6;chase_turn=.06;grow_px=.5;grow_lerp=.1;wave_amp=10;wave_freq=.05;wave_axis=y;frames=30;hold_frames=0;len=80;ang=0;spin=0;orbit_spin=.01;orbit_grow=0;vx=0;vy=0;bounce_speed_mult=1;bounce_size_mult=1",";"))
+local DEFAULTS=_kv_parts(split("chase=false;wrap=false;bounce=false;wave=false;flicker=false;burst=false;is_warning=false;orbit=false;move_delay=0;grow_delay=0;move_lerp=.1;speed=1.6;chase_turn=.06;grow_px=.5;grow_lerp=.1;wave_amp=10;wave_freq=.05;wave_axis=y;frames=30;hold_frames=0;len=80;ang=0;spin=0;orbit_spin=.01;orbit_grow=0;vx=0;vy=0;bounce_speed_mult=1;bounce_size_mult=1;stop_every=1;stop_for=0;mt=0",";"))
 
 function _create_enemy(t,x,y,s)
   local s0=s.size or (t==E_BULLET and 1 or 2)
