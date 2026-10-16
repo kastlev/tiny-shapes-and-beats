@@ -2,6 +2,8 @@
 -- by Frank C.
 
 function _init()
+	cartdata("frankc_tbas")
+	flash_disabled=dget(0)==1
 	frame = 0
 	start_fadein(25)
 
@@ -50,6 +52,7 @@ end
 function flash_menuitem()
   menuitem(3, flash_disabled and "flashes: off" or "flashes: on", function()
     flash_disabled = not flash_disabled
+    dset(0, flash_disabled and 1 or 0)
     flash_menuitem()
     return true
   end)
