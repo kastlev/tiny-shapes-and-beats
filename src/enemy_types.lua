@@ -27,28 +27,26 @@ function _spw_pos(pt,i,n,c)
 end
 
 function spw_loop(cfg)
-  local n,coros=cfg.n or 6,{}
+  local n,coros,keep,skip=cfg.n or 6,{},cfg.pos_keep or 1,cfg.pos_skip or 0
   for i=1,n do
-    local x,y=_spw_pos(cfg.pattern,i,n,cfg)
-    local s=_merge({},cfg)
-    if cfg.pattern=="circle" then s.ang_offset=(i-1)/n end
-    if cfg.explode then
-      local a,v=(cfg.ang or 0)+(i-1)/n,cfg.speed or 1.5
-      s.vx,s.vy=cos(a)*v,sin(a)*v
-    end
-    for k,v in pairs(cfg) do
-      if sub(k,1,8)=="stagger_" then
-        local f=sub(k,9)
-        s[f]=(cfg[f] or 0)+v*(i-1)
+    if (i-1)%(keep+skip)<keep then
+      local x,y=_spw_pos(cfg.pattern,i,n,cfg)
+      local s=_merge({},cfg)
+      if cfg.pattern=="circle" then s.ang_offset=(i-1)/n end
+      for k,v in pairs(cfg) do
+        if sub(k,1,8)=="stagger_" then
+          local f=sub(k,9)
+          s[f]=(cfg[f] or 0)+v*(i-1)
+        end
+      end
+      if cfg.parallel then
+        s.spawn_delay=(cfg.stagger or 0)*(i-1)
+        add(coros,meanwhile(function() spawn(cfg.type,x,y,s) end))
+      else
+        spawn(cfg.type,x,y,s)
       end
     end
-    if cfg.parallel then
-      s.spawn_delay=(cfg.stagger or 0)*(i-1)
-      add(coros,meanwhile(function() spawn(cfg.type,x,y,s) end))
-    else
-      spawn(cfg.type,x,y,s)
-      wait_frames(cfg.spawn_interval or 15)
-    end
+    if not cfg.parallel then wait_frames(cfg.spawn_interval or 15) end
   end
   for co in all(coros) do wait_until_pattern_finished(co) end
 end

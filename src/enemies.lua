@@ -86,6 +86,11 @@ function update_enemies()
         if e.target_y then e.y=e.origin_y+(e.target_y-e.origin_y)*et end
       end
     else
+      if e.pull then
+        local a=atan2(cx-e.x,cy-e.y)
+        e.vx+=cos(a)*e.pull
+        e.vy+=sin(a)*e.pull
+      end
       e.x+=e.vx
       e.y+=e.vy
     end
@@ -165,7 +170,6 @@ function spawn(etype,x,y,params)
     y=mid(6,p.y+p.h/2+rnd(r*2)-r,121)
   end
 
-  -- orbit: x,y = CENTRO. El enemigo (y su aviso) nace ya sobre la orbita, sin salto
   if params.orbit then
     local a,r=params.ang_offset or rnd(),params.orbit_radius or 20
     params.ang_offset,params.orbit_radius,params.orbit_cx,params.orbit_cy=a,r,params.orbit_cx or x,params.orbit_cy or y
