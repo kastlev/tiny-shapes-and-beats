@@ -1,27 +1,10 @@
-# Tiny Shapes & Beat - PICO-8
+<p>
+  <img src="assets/readme/header-tiny.png" alt="Tiny Beats &amp; Shapes" width="100%">
+</p>
+<p>
+  <img src="assets/readme/tiny_beats_and_shapes_1.gif" alt="Tiny Beats &amp; Shapes gameplay" width="100%">
+</p>
 
-A small PICO-8 demake inspired by Just Shapes & Beats.
+A fan-made demake of **Just Shapes & Beats** by **Berzerk Studio**, made to learn PICO-8. This is a non-commercial project.
 
-Recreated core mechanics:
-- Top-down movement
-- Dash mechanic
-- Invulnerability frames
-- Enemy attack patterns
-- Warning indicators
-- Projectile bursts
-- Scripted level patterns
-
-## Built with
-
-- PICO-8
-- Lua
-
-## Run
-
-Open the `.p8` file with PICO-8.
-
-## Credits
-
-Inspired by Just Shapes & Beats by Berzerk Studio.
-
-This is a fan-made non-commercial demake created for learning purposes.
+The [MIT license](LICENCE) applies only to the original code written for this project. The original game's music, artwork and trademarks belong to their respective owners.
