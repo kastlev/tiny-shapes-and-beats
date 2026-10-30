@@ -1,8 +1,8 @@
 <p>
-  <img src="assets/readme/header-tiny.png" alt="Tiny Beats &amp; Shapes" width="100%">
+  <img src="assets/readme/header-tiny.png" alt="Tiny Beats &amp; Shapes" width="100%" style="image-rendering: pixelated;">
 </p>
-<p>
-  <img src="assets/readme/tiny_beats_and_shapes_1.gif" alt="Tiny Beats &amp; Shapes gameplay" width="100%">
+<p align="center">
+  <img src="assets/readme/tiny_beats_and_shapes_1.gif" alt="Tiny Beats &amp; Shapes gameplay" width="384">
 </p>
 
 A fan-made demake of **Just Shapes & Beats** by **Berzerk Studio**, made to learn PICO-8. This is a non-commercial project.
