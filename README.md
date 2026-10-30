@@ -1,8 +1,8 @@
-<p>
-  <img src="assets/readme/header-tiny.png" alt="Tiny Beats &amp; Shapes" width="100%" style="image-rendering: pixelated;">
+<p align="center">
+  <img src="assets/readme/header-tiny.png" alt="Tiny Beats &amp; Shapes"  style="image-rendering: pixelated;">
 </p>
 <p align="center">
-  <img src="assets/readme/tiny_beats_and_shapes_1.gif" alt="Tiny Beats &amp; Shapes gameplay" width="384">
+  <img src="assets/readme/tiny_beats_and_shapes_1.gif" alt="Tiny Beats &amp; Shapes gameplay" width="584">
 </p>
 
 <p align="center">
